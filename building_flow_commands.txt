@@ -130,7 +130,7 @@ do
 
 done
 -------------------- 网络不好或者不用国内镜像的话 自动重连脚本 结束 --------------------
-# 但有repo/sync错误发生，脚本无效，必须手动解决错误
+# 但有些网络错误发生，脚本无效，必须手动解决错误
 chmod a+x ReSync.sh
 
 
@@ -890,6 +890,9 @@ make sure to run ./get-prebuilts from /vendor/cm first.. that will solve the ter
 
 
 
+
+
+
 kernel 的源码已经加进去了，但上面还是用了boot.img来编译，需要配置些make参数，以后有时间再弄
 
 TODO:
@@ -899,6 +902,77 @@ build/core/tasks/kernel.mk:92: * Kernel source found, but no configuration was d
 build/core/tasks/kernel.mk:93: * Please add the TARGET_KERNEL_CONFIG variable to your   *
 build/core/tasks/kernel.mk:94: * BoardConfig.mk file                                    *
 build/core/tasks/kernel.mk:95: **********************************************************
+
+
+
+
+
+1. 打开下面 device & kernel, 并去到cm-13分支：
+https://github.com/CyanogenMod/android_device_xiaomi_cancro
+https://github.com/CyanogenMod/android_kernel_xiaomi_cancro
+
+2. 参考一下 device 的 cm-13.0 的 BoardConfig.mk ：
+https://github.com/CyanogenMod/android_device_xiaomi_cancro/blob/cm-13.0/BoardConfig.mk
+
+确实有 kernel 相关的配置 ：
+TARGET_KERNEL_SOURCE               := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH                 := arm
+TARGET_KERNEL_CONFIG               := cyanogen_cancro_defconfig
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-linux-androideabi-
+
+
+3. 然后去 kernel 路径 找 cyanogen_cancro_defconfig， 确认是存在的
+https://github.com/CyanogenMod/android_kernel_xiaomi_cancro/blob/cm-13.0/arch/arm/configs/cyanogen_cancro_defconfig
+
+为什么是去这个路径找的，因为wiki说的 (还好有人dump CyanogenMode的wiki)
+_______________________________________________________________________________________
+Referece https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
+Changing the kernel configuration
+
+The kernel configuration file used during the build process is referenced in TARGET_KERNEL_CONFIG variable in device/vendor-name/device-name/BoardConfig.mk. It generally points to kernel/vendor-name/kernel-name/arch/arm/configs/cyanogenmod_device-name_deconfig. 
+_______________________________________________________________________________________
+
+
+4. 但 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/tree/cancro-kk-oss/arch/arm/configs 下的所有，是没有 cyanogen_cancro_defconfig 的
+这就愁了，该写哪个呢？
+参考了一下 http://tieba.baidu.com/p/3927996934 ， 说用 cancro_user_defconfig
+恩，再参考一下 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/wiki/How-To-Use#build 官方Wiki， 确实是用 cancro_user_defconfig
+
+
+OK， 那么
+
+vim device/xiaomi/cancro/BoardConfig.mk
+在第 Line 48 行插入（48gg）:
+TARGET_KERNEL_SOURCE               := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH                 := arm
+TARGET_KERNEL_CONFIG               := cancro_user_defconfig
+
+退出 vim 后
+
+source build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+上面提示 TARGET_KERNEL_CONFIG 的消失了，但，有错误发生：
+——————————————————————————————————————————————————————————————
+target thumb C: recovery <= bootable/recovery/nandroid_md5.c
+target thumb C: recovery <= bootable/recovery/reboot.c
+drivers/net/Kconfig:296: can't open file "drivers/net/wan/Kconfig"
+make[3]: *** [cancro_user_defconfig] Error 1
+make[2]: *** [cancro_user_defconfig] Error 2
+make[1]: *** [sub-make] Error 2
+make[1]: Leaving directory `/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/kernel/xiaomi/cancro'
+make: *** [/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/obj/KERNEL_OBJ/.config] Error 2
+make: *** Waiting for unfinished jobs....
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+——————————————————————————————————————————————————————————————
+
+
+
+
+
 
 
 
@@ -924,12 +998,16 @@ build/core/tasks/kernel.mk:95: *************************************************
 
 source build/envsetup.sh
 
-pushd device/xiaomi/cancro/
-./extract-files.sh
-popd
-
 pushd vendor/cm/
 ./get-prebuilts
+popd
+
+# cm-11.0的需要自己手动复制过来
+# 因 https://github.com/CyanogenMod/android_device_xiaomi_cancro 没有cm-11.0分支
+# 用 https://github.com/mi3-dev/android_device_xiaomi_cancro 的cm-11.0分支
+
+pushd device/xiaomi/cancro/
+./extract-files.sh
 popd
 
 breakfast cancro && brunch cancro
@@ -938,10 +1016,25 @@ breakfast cancro && brunch cancro
 
 
 
+1. Issue on xda:
+
+https://forum.xda-developers.com/showthread.php?t=2635000&page=9
 
 
 
+2. Github Repository, for legacy support:
+
+https://github.com/legaCyMod
+https://github.com/androidarmv6
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource
 
 
+
+3. Dumped Wiki - CyanogenMod
+
+format: https://undocumented.software/wiki_dump/{ACTION}.html
+
+https://undocumented.software/wiki_dump/Build_guide.html
+https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
 
 
