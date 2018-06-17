@@ -804,7 +804,13 @@ perl unpack-bootimg.pl boot.img
 mv boot.img-kernel kernel
 popd && cp ~/Download/kernel out/target/product/cancro/
 
+# Or try:
+# Step 4. Configuring the fallback to prebuilts In
+# https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
 
+vim device/xiaomi/cancro/BoardConfig.mk:
+TARGET_PREBUILT_KERNEL := device/xiaomi/cancro/kernel
+cp ~/Download/kernel device/xiaomi/cancro/
 
 
 
@@ -971,9 +977,43 @@ Note: Recompile with -Xlint:unchecked for details.
 
 
 
+# 1 下载 https://github.com/CyanogenMod/android_kernel_xiaomi_cancro/tree/cm-12.1
+# 解压后，然后用diff软件(如DiffMerge)对比一下这两个文件：
+android_kernel_xiaomi_cancro-cm-12.1/arch/arm/configs/cancro_user_defconfig
+android_kernel_xiaomi_cancro-cm-12.1/arch/arm/configs/cyanogen_cancro_defconfig
+
+--- 差异不大：
+CONFIG_LOCALVERSION="-xiaomi" -> CONFIG_LOCALVERSION="-cyanogenmod"
+
+--- 而后 cyanogen_cancro_defconfig 新增:
+CONFIG_IOSCHED_BFQ=y
+CONFIG_CGROUP_BFQIO=y
+# CONFIG_DEFAULT_BFQ is not set
+
+# CONFIG_MSM_CPU_VOLTAGE_CONTROL is not set
+CONFIG_FORCE_FAST_CHARGE=y
+
+--- 就这点变化
 
 
+# 2 下载 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/tree/cancro-kk-oss
+# 解压后，跟上面CyanogenMode的上面两个文件作一下对比：
+Xiaomi_Kernel_OpenSource-cancro-kk-oss/arch/arm/configs/cancro_user_defconfig
 
+--- 其实差异也不算太大
+
+
+# 在 Google 搜索了一遍， 没发现有什么价值的信息
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource/issues/23
+https://forum.xda-developers.com/chef-central/android/guide-android-rom-development-t2814763/page315
+
+
+# 估计得用 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/branches/cancro-kk-oss 单独编译出 boot.img, 然后刷到 CyanogenOS 上去
+# 因为 CyanogenMod 不做兼容，不能一起编。以后再试吧，补点 Linux Kernel 的知识先。
+
+
+# 参考 1 mi3-dev/android_kernel_xiaomi_msm8x74pro & http://en.miui.com/thread-84332-1-1.html
+# 参考 2 https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
 
 
 
