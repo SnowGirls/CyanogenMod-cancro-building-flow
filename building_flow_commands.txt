@@ -2,7 +2,7 @@ Ubuntu 16.04 LTS
 
 sudo passwd  # 新安装的系统请设置一下 root 的密码
 
-sudo apt --fix-broken install
+sudo apt-get --fix-broken install
 
 sudo apt-get install -y vim git subversion curl wget
 
@@ -29,7 +29,7 @@ vim ~/.bash_aliases
 
 ------------------ 插入以下内容 ------------------
 
-# 2018-06-08 JDK
+# JDK
 JAVA_HOME=/usr/local/java/jdk1.7.0_80
 JRE_HOME=$JAVA_HOME/jre
 JAVA_BIN=$JAVA_HOME/bin
@@ -38,12 +38,12 @@ export JAVA_HOME JRE_HOME PATH CLASSPATH
 PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 
 
-# 2018-06-08 AOSP
+# AOSP
 PATH=$PATH:$HOME/Workspaces/bin
 export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
 
 
-# 2018-06-08 Android SDK
+# Android SDK
 ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
 PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/tools
@@ -70,8 +70,8 @@ adb --help
 sudo apt-get install -y lib32z1c
 sudo apt-get install -y lib32stdc++6
 
-# adb In Ubuntu 14.04 LTS ：
-sudo apt install lib32z1 lib32ncurses5 lib32bz2-1.0 lib32stdc++6
+# adb In Ubuntu 14.04 LTS & Ubuntu 12.04 LTS ：
+sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 lib32stdc++6 -y
 
 
 
