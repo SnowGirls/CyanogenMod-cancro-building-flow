@@ -45,8 +45,10 @@ export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
 
 # Android SDK
 ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
+ANDROID_NDK=$HOME/Workspaces/AndroidSDK/android-ndk-r16-beta1
 PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/tools
+PATH=$PATH:$ANDROID_NDK
 
 
 ------------------ 保存退出vim ------------------
@@ -55,7 +57,7 @@ source ~/.bash_aliases && java -version
 
 
 
-## 3. 配置Android SDK
+## 3. 配置Android SDK & NDK
 # 下载好SDK Tools & platform-tools 解压，并把 platform-tools 放到SDK目录下
 mkdir -p ~/Workspaces/AndroidSDK/
 sudo mv ~/Downloads/android-sdk_r24.4.1-linux.tar ~/Workspaces/AndroidSDK/
@@ -64,6 +66,10 @@ cd ~/Workspaces/AndroidSDK/
 tar zxvf android-sdk_r24.4.1-linux.tar
 unzip platform-tools_r22-linux.zip
 mv platform-tools/ android-sdk-linux/
+
+sudo mv ~/Downloads/android-ndk-r16-beta1-linux-x86_64.zip ~/Workspaces/AndroidSDK/
+unzip android-ndk-r16-beta1-linux-x86_64.zip
+
 
 # adb In Ubuntu 18.04 LTS ：
 adb --help
