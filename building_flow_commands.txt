@@ -1061,6 +1061,32 @@ https://forum.xda-developers.com/chef-central/android/guide-android-rom-developm
 
 ----------------------------------------- OK , 最后总结 -----------------------------------------
 
+
+1. Issue on xda:
+
+https://forum.xda-developers.com/showthread.php?t=2635000&page=9
+
+
+
+2. Github Repository, for legacy support:
+
+https://github.com/legaCyMod
+https://github.com/androidarmv6
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource
+
+
+
+3. Dumped Wiki - CyanogenMod
+
+format: https://undocumented.software/wiki_dump/{ACTION}.html
+
+https://undocumented.software/wiki_dump/Build_guide.html
+https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
+
+
+
+
+
 # 以后新的CyanogenMod AOSP:
 
 source build/envsetup.sh
@@ -1111,25 +1137,6 @@ breakfast cancro && brunch cancro
 
 
 
-1. Issue on xda:
 
-https://forum.xda-developers.com/showthread.php?t=2635000&page=9
-
-
-
-2. Github Repository, for legacy support:
-
-https://github.com/legaCyMod
-https://github.com/androidarmv6
-https://github.com/MiCode/Xiaomi_Kernel_OpenSource
-
-
-
-3. Dumped Wiki - CyanogenMod
-
-format: https://undocumented.software/wiki_dump/{ACTION}.html
-
-https://undocumented.software/wiki_dump/Build_guide.html
-https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
 
 
