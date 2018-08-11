@@ -241,8 +241,11 @@ def manufacturer_with_device(path, device):
     for file in os.listdir(path):
         dir_path = os.path.join(path, file)
         if os.path.isdir(dir_path):
-            if dir_path.find(device):
-                return os.path.basename(dir_path)
+
+            for x in os.listdir(dir_path):
+                if x.find(device) != -1:
+                    return os.path.basename(dir_path)
+                    
 
 if depsonly:
     repo_path = get_from_manifest(device)
