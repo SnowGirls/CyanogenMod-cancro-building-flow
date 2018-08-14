@@ -922,6 +922,14 @@ make sure to run ./get-prebuilts from /vendor/cm first.. that will solve the ter
 
 
 
+——————————————————————————————————————————————————————————————
+breakfast: command not found
+——————————————————————————————————————————————————————————————
+# 新开Terminal时, 低级错误, source build/envsetup.sh 一下就好了。
+
+
+
+
 
 
 
@@ -1137,8 +1145,16 @@ breakfast cancro && brunch cancro
 
 
 
+
+
 # 如果接下来要做修改源码，然后编译的话，开个分支好管理知道自己以后改了哪些
+# repo help start, repo help status, repo help diff
+
 repo start development --all
 
+repo status
 
+repo diff frameworks/base/
+
+repo status frameworks/base/
 
