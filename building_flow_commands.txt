@@ -1087,6 +1087,7 @@ https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
 
 
 
+
 # 以后新的CyanogenMod AOSP:
 
 source build/envsetup.sh
@@ -1136,7 +1137,8 @@ breakfast cancro && brunch cancro
 
 
 
-
+# 如果接下来要做修改源码，然后编译的话，开个分支好管理知道自己以后改了哪些
+repo start development --all
 
 
 
