@@ -374,11 +374,12 @@ fastboot reboot
 
 
 
-# 小米4 cm-13.0 刷时Baseband错误，基带问题
+# 小米4 cm-13.0 刷时Baseband upgrade错误，基带问题
 # http://www.miui.com/forum.php?mod=viewthread&tid=4265979
+# https://jrizzoli.github.io/dotfiles/
 curl -O https://github.com/jrizzoli/dotfiles/raw/master/cancro/cm13Upgrade.zip
 
-
+# 解压cm13Upgrade.zip, 然后运行flash_all.bat
 # 升级基带后，cm-13.0刷进去了，并且启动成功。进去后会看到Android 6.0
 
 
@@ -1096,7 +1097,7 @@ https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
 
 
 
-# 以后新的CyanogenMod AOSP:
+# 以后新的CyanogenMod AOSP (建议可以的话, 还是用继承于CyanogenMod的LineageOS):
 
 source build/envsetup.sh
 
@@ -1151,10 +1152,7 @@ breakfast cancro && brunch cancro
 # repo help start, repo help status, repo help diff
 
 repo start development --all
-
 repo status
-
 repo diff frameworks/base/
-
 repo status frameworks/base/
 
