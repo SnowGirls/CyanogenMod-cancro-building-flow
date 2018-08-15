@@ -1054,6 +1054,25 @@ https://forum.xda-developers.com/chef-central/android/guide-android-rom-developm
 
 
 
+别的分支的kernel, 有空了试试：
+-----------------------------------------
+对比
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource/compare/cancro-kk-oss...stempox:cancro-kk-oss
+也即 
+https://github.com/stempox/android_kernel_xiaomi_cancro/tree/cancro-kk-oss
+
+拿来试试可不可以 用kernel源码 来编译 cm-11
+
+另
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource/network/members
+以 ‘cancro’ 搜索，有许多 cancro 的 fork ，看看哪个适合的！！！
+
+参考下面几个试试
+https://source.android.com/setup/build/initializing
+https://blog.csdn.net/mxgg123/article/details/26269313
+https://blog.csdn.net/shulianghan/article/details/51592930
+https://blog.csdn.net/kevin_nazgul/article/details/53191993
+-----------------------------------------
 
 
 
@@ -1064,6 +1083,10 @@ https://forum.xda-developers.com/chef-central/android/guide-android-rom-developm
 
 
 
+
+----------------------------------------- 另外一些小问题 -----------------------------------------
+adb root && adb shell , su -> Permission Denied:
+Settings -> Developer options -> Root access, and change option to "Apps and ADB".
 
 
 
