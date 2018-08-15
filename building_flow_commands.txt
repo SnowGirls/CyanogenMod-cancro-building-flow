@@ -922,13 +922,24 @@ make sure to run ./get-prebuilts from /vendor/cm first.. that will solve the ter
 
 
 
-
+一些小问题：
+1.
 ——————————————————————————————————————————————————————————————
 breakfast: command not found
 ——————————————————————————————————————————————————————————————
 # 新开Terminal时, 低级错误, source build/envsetup.sh 一下就好了。
 
-
+2.
+——————————————————————————————————————————————————————————————
+$ adb devices
+List of devices attached
+51ada589        device
+emulator-5566   connecting
+——————————————————————————————————————————————————————————————
+# 多了个不知名的 emulator-5566， 而且是一直 connecting
+# 此时用 adb -d shell 来进入shell
+# https://stackoverflow.com/a/31819106
+# https://stackoverflow.com/a/38248504
 
 
 
