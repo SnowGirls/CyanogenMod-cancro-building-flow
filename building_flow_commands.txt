@@ -936,8 +936,10 @@ List of devices attached
 51ada589        device
 emulator-5566   connecting
 ——————————————————————————————————————————————————————————————
-# 多了个不知名的 emulator-5566， 而且是一直 connecting
-# 此时用 adb -d shell 来进入shell
+# 多了个不知名的 emulator-5566， 而且是一直 connecting。
+# 原因是自己的VMware网络NAT设置里开了个5567的端口转发，删掉即可。
+# 而WMware又因不正常关闭，导致不能上网(或虚拟机网络恢复默认设置、或重新点Ubuntu右上角的网络连接重连)。
+# 若不删掉转发配置，此时用 adb -d shell 来进入shell
 # https://stackoverflow.com/a/31819106
 # https://stackoverflow.com/a/38248504
 
