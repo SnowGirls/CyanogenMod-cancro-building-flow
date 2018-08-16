@@ -943,6 +943,20 @@ emulator-5566   connecting
 # https://stackoverflow.com/a/31819106
 # https://stackoverflow.com/a/38248504
 
+3.
+——————————————————————————————————————————————————————————————
+$ adb devices
+List of devices attached
+adb server version (31) doesn't match this client (40); killing...
+could not read ok from ADB Server
+* failed to start daemon
+error: cannot connect to daemon
+——————————————————————————————————————————————————————————————
+# 经验之谈
+# 如果发现有上面的错误，可以用下面的不同的adb命令，若有一个成功之后，便后面的adb命令都会成功．最后就可以adb shell了
+# adb kill-server && adb start-server
+# adb push / adb pull / adb shell ls / adb shell "echo > /dev/null" ...
+
 
 
 
@@ -1098,8 +1112,34 @@ https://blog.csdn.net/kevin_nazgul/article/details/53191993
 
 
 ----------------------------------------- 另外一些小问题 -----------------------------------------
+1.
 adb root && adb shell , su -> Permission Denied:
 Settings -> Developer options -> Root access, and change option to "Apps and ADB".
+
+
+
+2,单独编译时 framework时: (cd frameworks/base/ && mm)
+——————————————————————————————————————————————————————————————
+make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/system/framework/framework-res.apk', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/system/framework/framework.jar'.  Stop.
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
+——————————————————————————————————————————————————————————————
+# 参考：　https://bbs.csdn.net/topics/370150557
+
+croot
+mmm frameworks/base/core/res/
+mmm frameworks/base/
+
+有下面的Ｉnstall:结果出现，说明模块编译成功
+Install: .../out/target/product/generic/system/framework/framework.jar
+然后把编译出来的framework.jar替换掉 android设备的/system/framework下的对应文件就行，不需要完整编译．
+
+
+
+
+
+
+
+
 
 
 
