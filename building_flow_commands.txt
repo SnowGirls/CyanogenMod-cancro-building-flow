@@ -1133,7 +1133,9 @@ mmm frameworks/base/
 Install: .../out/target/product/generic/system/framework/framework.jar
 然后把编译出来的framework.jar替换掉 android设备的/system/framework下的对应文件就行，不需要完整编译．
 
-
+adb root
+adb shell mount -o remount,rw /system
+adb push ./framework.jar /system/framework/
 
 
 
