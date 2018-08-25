@@ -1214,7 +1214,7 @@ export ANDROID_CCACHE_SIZE="50G"
 prebuilts/misc/linux-x86/ccache/ccache -M 50G
 
 
-# 因为有 错误 TAG A，是因为'breakfast cancro'后, roomservice.py有bug, 并没有将 device/xiaomi/cancro/cm.dependencies 里的依赖完整的下载下来。
+# 因为有上面的 错误 TAG A，是因为'breakfast cancro'后, roomservice.py有bug, 并没有将 device/xiaomi/cancro/cm.dependencies 里的依赖完整的下载下来。
 # 所以，修复一下roomservice.py (此 Github的这Repo 有，直接覆盖即可)
 # 在breakfast前后，注意观察变化: less .repo/local_manifests/roomservice.xml
 
