@@ -1118,14 +1118,14 @@ Settings -> Developer options -> Root access, and change option to "Apps and ADB
 
 
 
-2,单独编译时 framework时: (cd frameworks/base/ && mm)
+2. 单独编译时 framework.jar时: (cd frameworks/base/ && mm)
 ——————————————————————————————————————————————————————————————
 make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/system/framework/framework-res.apk', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/system/framework/framework.jar'.  Stop.
 make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
 ——————————————————————————————————————————————————————————————
 # 参考：　https://bbs.csdn.net/topics/370150557
 
-croot
+croot  ## source build/envsetup.sh
 mmm frameworks/base/core/res/
 mmm frameworks/base/
 
@@ -1136,12 +1136,29 @@ Install: .../out/target/product/generic/system/framework/framework.jar
 adb root
 adb shell mount -o remount,rw /system
 adb push ./framework.jar /system/framework/
+adb push ./framework2.jar /system/framework/
+adb push ./ext.jar /system/framework/
 
 
 
 
+3. 单独编译 libandroid_runtime.so 时
+source build/envsetup.sh
+mmm frameworks/base/core/jni
+——————————————————————————————————————————————————————————————
+No private recovery resources for TARGET_DEVICE generic
+......
+make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/obj/SHARED_LIBRARIES/libEGL_intermediates/export_includes', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/obj/SHARED_LIBRARIES/libandroid_runtime_intermediates/import_includes'.  Stop.
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
+——————————————————————————————————————————————————————————————
+# 先
+breakfast cancro
+# 再
+mmm frameworks/base/core/jni
 
-
+# 因为 TARGET_DEVICE、PRODUCT_NAME 等编译变量没设置。参考：
+# https://blog.csdn.net/wh_19910525/article/details/7992570
+# https://blog.csdn.net/ly890700/article/details/54586527
 
 
 
