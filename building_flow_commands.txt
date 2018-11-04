@@ -7,10 +7,16 @@ sudo apt-get --fix-broken install
 sudo apt-get install -y vim git subversion curl wget
 
 
-## 1. 安装Google拼音输入法
-## 2. 安装Sougou拼音输入法
-## 3. 添加五笔输入法： Input Method Configuratioin里添加 Wubi
+## 0. System Settings -> Software & Updates -> Downlaod from 这里选择国内源，如aliyun。
+
+安装输入法(注意重启):
+sudo apt-get install fcitx-googlepinyin  fcitx-table-wubi -y
+## 1. 添加五笔输入法： Input Method Configuratioin里添加 Wubi
+## 2. 添加Google拼音输入法
+## 3. 安装Sougou拼音输入法
 ## 4. 安装Sublime Text 3, 并修复/修复Ubuntu下 Sublime Text 3 中文输入问题
+      git clone https://github.com/lyfeyaj/sublime-text-imfix.git && cd sublime-text-imfix && ./sublime-imfix
+
 ## 5. 安装Google Chrome浏览器
 
 
@@ -79,6 +85,9 @@ sudo apt-get install -y lib32stdc++6
 
 # adb In Ubuntu 14.04 LTS & Ubuntu 12.04 LTS ：
 sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 lib32stdc++6 -y
+# 若出现 lib32bz2-1.0 错误，则：
+sudo apt-get install lib32z1 lib32ncurses5 libbz2-1.0:i386 lib32stdc++6 -y
+
 
 
 
