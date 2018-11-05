@@ -8,12 +8,16 @@ sudo apt-get install -y vim git subversion curl wget
 
 
 ## 0. System Settings -> Software & Updates -> Downlaod from 这里选择国内源，如aliyun。
+sudo apt-get update
+
 
 安装输入法(注意重启):
 sudo apt-get install fcitx-googlepinyin  fcitx-table-wubi -y
 ## 1. 添加五笔输入法： Input Method Configuratioin里添加 Wubi
 ## 2. 添加Google拼音输入法
+
 ## 3. 安装Sougou拼音输入法
+
 ## 4. 安装Sublime Text 3, 并修复/修复Ubuntu下 Sublime Text 3 中文输入问题
       git clone https://github.com/lyfeyaj/sublime-text-imfix.git && cd sublime-text-imfix && ./sublime-imfix
 
@@ -92,19 +96,19 @@ sudo apt-get install lib32z1 lib32ncurses5 libbz2-1.0:i386 lib32stdc++6 -y
 
 
 ## 4. AOSP
-cd ~/Workspaces
 
-mkdir -p bin
-mkdir -p AOSP/CyanogenMod/android
-
-cd bin/
+mkdir -p ~/Workspaces/bin/
+cd ~/Workspaces/bin/
 curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
 chmod +x repo
 
+
+mkdir -p ~/Workspaces/AOSP/CyanogenMod/android/
 cd ~/Workspaces/AOSP/CyanogenMod/android/
 git config --global user.email "goodboy@example.com"
 git config --global user.name "Well Done"
 repo init -u https://github.com/CyanogenMod/android.git -b cm-13.0
+
 
 # 不会出现 gerrit.googlesource.com 连接错误，REPO_URL转到清华镜像源
 # 请参考 https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
