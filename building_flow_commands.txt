@@ -1169,6 +1169,7 @@ make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
 breakfast cancro
 # 再
 mmm frameworks/base/core/jni
+adb push out/target/product/cancro/system/lib/libandroid_runtime.so /system/lib/
 
 # 因为 TARGET_DEVICE、PRODUCT_NAME 等编译变量没设置。参考：
 # https://blog.csdn.net/wh_19910525/article/details/7992570
@@ -1176,7 +1177,9 @@ mmm frameworks/base/core/jni
 
 
 
+
 4. 单独编译 mmm system/vold/ 时
+# 同理，缺少Target
 source build/envsetup.sh
 breakfast cancro
 mmm system/vold/
