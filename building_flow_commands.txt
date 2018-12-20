@@ -1156,6 +1156,16 @@ adb push ./ext.jar /system/framework/
 
 
 
+## 如果先前 breakfast cancro,  那么直接拿中间文件来编译，于是出现：
+——————————————————————————————————————————————————————————————
+make: Nothing to be done for 'all_modules'.
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
+——————————————————————————————————————————————————————————————
+## 删除 \out\target\product\XXX\obj\JAVA_LIBRARIES 就好
+
+
+
+
 3. 单独编译 libandroid_runtime.so 时
 source build/envsetup.sh
 mmm frameworks/base/core/jni
