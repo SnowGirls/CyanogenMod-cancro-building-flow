@@ -825,11 +825,16 @@ acp: missing destination file
 make: *** [/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/kernel] Error 2
 make: *** Waiting for unfinished jobs....
 ——————————————————————————————————————————————————————————————
-pushd ~/Downloads/ && curl -O https://raw.githubusercontent.com/thornbirdblue/unpackbootimg/master/unpack-bootimg.pl 
+pushd ~/Downloads/
+curl -O https://raw.githubusercontent.com/thornbirdblue/unpackbootimg/master/unpack-bootimg.pl 
+
 # 再下载个cm-11.0的刷机包(去Lineage官网下载)，解压boot.img出来
+curl -O https://raw.githubusercontent.com/SnowGirls/CyanogenMod-cancro-building-flow/master/boot.img
+
 perl unpack-bootimg.pl boot.img
 mv boot.img-kernel kernel
 popd && cp ~/Download/kernel out/target/product/cancro/
+
 
 # Or try:
 # Step 4. Configuring the fallback to prebuilts In
