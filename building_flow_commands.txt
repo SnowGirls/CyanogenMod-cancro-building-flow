@@ -833,7 +833,7 @@ curl -O https://raw.githubusercontent.com/SnowGirls/CyanogenMod-cancro-building-
 
 perl unpack-bootimg.pl boot.img
 mv boot.img-kernel kernel
-popd && cp ~/Download/kernel out/target/product/cancro/
+popd && cp ~/Downloads/kernel out/target/product/cancro/
 
 
 # Or try:
