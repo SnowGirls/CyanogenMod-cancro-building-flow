@@ -1289,3 +1289,97 @@ repo status
 repo diff frameworks/base/
 repo status frameworks/base/
 
+
+
+
+
+
+
+
+
+----------------------------------------- cm-12.1 -----------------------------------------
+
+repo init -u git://github.com/CyanogenMod/android.git -b cm-12.1
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
+source build/envsetup.sh
+
+
+breakfast cancro
+
+
+
+----------------- 小插曲 1 ------------------------>>>
+# 又手戝 Ctrl-C 了一下, 导致
+
+# 1. Look into build/tools/roomservice.py, method 'add_to_manifest'.
+pushd .repo/local_manifests/
+
+cat roomservice.xml 
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <manifest>
+      <project name="CyanogenMod/android_device_xiaomi_cancro" path="device/xiaomi/cancro" remote="github" />
+      <project name="CyanogenMod/android_device_qcom_common" path="device/qcom/common" remote="github" />
+      <project name="CyanogenMod/android_kernel_xiaomi_cancro" path="kernel/xiaomi/cancro" remote="github" />
+    </manifest>
+
+vim roomservice.xml # Delete the contents
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <manifest>
+
+    </manifest>
+
+# 2. Then sync again
+
+breakfast cancro
+----------------- 小插曲 1 ------------------------<<<
+
+
+----------------- 小插曲 2 ------------------------>>>
+# build/core/product_config.mk:239: xxx "vendor/xiaomi/cancro/cancro-vendor.mk" does not exist.  Stop.
+
+pushd ~/Downloads/
+curl https://codeload.github.com/mi3-dev/proprietary_vendor_xiaomi/zip/lollipop -o lollipop.zip
+unzip lollipop.zip -d lollipop/
+popd
+
+mkdir -p vendor/xiaomi/cancro
+cp -r ~/Downloads/lollipop/proprietary_vendor_xiaomi-lollipop/cancro/* vendor/xiaomi/cancro/
+
+
+# 再 breakfast 一次，发现没错了
+breakfast cancro
+
+
+# 提示： 下面这些提取设备专有文件的步骤就不用做了，上面的步骤 download & cp -r 已经做了。
+pushd device/xiaomi/cancro/
+chmod a+x *.sh
+./extract-files.sh
+popd
+
+
+# You asked for an OpenJDK 7 build but your version is xxx
+# 用 apt-get 安装 OpenJDK 后，安装目录在/usr/lib/jvm/
+
+  export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+----------------- 小插曲 2 ------------------------<<<
+
+
+
+brunch cancro
+
+
+
