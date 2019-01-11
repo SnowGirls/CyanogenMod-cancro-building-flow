@@ -23,6 +23,8 @@ sudo apt-get install fcitx-googlepinyin  fcitx-table-wubi -y
 
 ## 5. 安装Google Chrome浏览器
 
+## 6. Firefox 安装 Decentraleyes 插件，加快打开 StackOverFlow 的速度
+
 
 注销重新登录一下
 
