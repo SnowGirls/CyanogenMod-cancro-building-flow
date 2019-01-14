@@ -9,6 +9,11 @@ repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-6.0.
 
 
 
+
+
+______________________________ Build HookZz ______________________________________
+
+
 ## 1. Check cmake version 
 cmake --version
 
@@ -55,3 +60,34 @@ cmake . \
 make -j4
 
 
+
+
+
+______________________________ Android Qualcomm Cancro Kernel Source ______________________________________
+
+make bootimage -j4
+build/core/main.mk:45: ********************************************************************************
+build/core/main.mk:46: *  You are using version 4.1 of make.
+build/core/main.mk:47: *  Android can only be built by versions 3.81 and 3.82.
+build/core/main.mk:48: *  see https://source.android.com/source/download.html
+build/core/main.mk:49: ********************************************************************************
+build/core/main.mk:50: *** stopping.  Stop
+
+
+
+mkdir -p ~/Workspaces/Softwares/
+pushd ~/Workspaces/Softwares/
+
+wget http://ftp.gnu.org/gnu/make/make-3.81.tar.gz
+
+tar xzvf make-3.81.tar.gz
+cd make-3.81/
+
+./configure
+make
+./make --version
+
+popd
+export PATH=~/Workspaces/Softwares/make-3.81:$PATH
+which make
+make --version
