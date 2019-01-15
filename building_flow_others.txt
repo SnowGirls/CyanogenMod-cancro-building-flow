@@ -1,0 +1,57 @@
+
+
+mkdir -p ~/Workspaces/AOSP/Google/android/
+cd ~/Workspaces/AOSP/Google/android/
+
+repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-6.0.1_r42
+
+
+
+
+
+## 1. Check cmake version 
+cmake --version
+
+## 2. Dwonload new version of cmake source from: https://github.com/Kitware/CMake/releases
+
+pushd ~/Workspaces/Softwares
+
+curl -L -O https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2.tar.gz
+
+# wget https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2.tar.gz
+# you will see 302 code and Location redirect, so we need the -L option)
+
+pushd cmake-3.13.2/
+
+tar -xzvf cmake-3.13.2.tar.gz
+./configure
+make
+
+which cmake
+export PATH=$HOME/Workspaces/Softwares/cmake-3.13.2/bin:$PATH
+which cmake
+
+cmake --version
+
+popd
+popd
+
+
+# HookZz
+
+pushd ~/Workspaces/Github/
+git clone https://github.com/jmpews/HookZz.git
+pushd HookZz/
+
+cmake . \
+-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DANDROID_ABI="armeabi-v7a" \
+-DANDROID_STL=c++_static \
+-DANDROID_NATIVE_API_LEVEL=android-14 \
+-DDEBUG=OFF \
+-DSHARED=ON
+
+make -j4
+
+

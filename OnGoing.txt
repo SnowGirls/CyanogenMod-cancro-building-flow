@@ -1,7 +1,0 @@
-
-
-mkdir -p ~/Workspaces/AOSP/Google/android/
-cd ~/Workspaces/AOSP/Google/android/
-
-repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-6.0.1_r42
-
