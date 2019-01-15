@@ -359,16 +359,16 @@ adb reboot bootloader
 # adb -> 进入 fastboot 模式
 
 # fastboot devices 提示 no permissions	fastboot
-# fastboot常规的一些参数跟adb一样，直接用，但因 fastboot no perssions，所以用 fastboot 需要这样用 sudo $(which fastboot)
+# fastboot常规的一些参数跟adb一样，直接用，但因 fastboot no permissions，所以用 fastboot 需要这样用 sudo $(which fastboot)
 
 sudo $(which fastboot) devices
 sudo $(which fastboot) reboot
-# fastboot -> 进入 adb 模式，即正常重启
+# 由 fastboot 模式 -> 进入 adb 模式，即正常重启
 
-# It's not safe and not good practice to just run everything with root permissions
+# But, it's not safe and not good practice to just run everything with root permissions
 # 参考 https://stackoverflow.com/a/28127944 &　https://askubuntu.com/a/733299
 
-fastboot -l devices
+sudo $(which fastboot) -l devices
 lsusb
 
 # 拿出 USB vendorID ，这里是 18d1 ， 注意替换自己的

@@ -65,6 +65,7 @@ make -j4
 
 ______________________________ Android Qualcomm Cancro Kernel Source ______________________________________
 
+1.
 make bootimage -j4
 build/core/main.mk:45: ********************************************************************************
 build/core/main.mk:46: *  You are using version 4.1 of make.
@@ -91,3 +92,55 @@ popd
 export PATH=~/Workspaces/Softwares/make-3.81:$PATH
 which make
 make --version
+
+
+
+2.
+make bootimage -j4
+Checking build tools versions...
+************************************************************
+You are attempting to build with the incorrect version
+of java.
+ 
+Your version is: java version "1.7.0_80".
+The correct version is: Java SE 1.6.
+ 
+Please follow the machine setup instructions at
+    https://source.android.com/source/download.html
+************************************************************
+
+# 在oracle官网下载 jdk-6:
+cd ~/Downloads/
+chmod a+x jdk-6u45-linux-x64.bin
+./jdk-6u45-linux-x64.bin
+sudo mv jdk1.6.0_45/ /usr/local/java/
+
+export JAVA_HOME=/usr/local/java/jdk1.6.0_45
+export JRE_HOME=$JAVA_HOME/jre
+export JAVA_BIN=$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
+export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+java -version
+
+
+
+3.
+/bin/bash: m4: command not found
+/bin/bash: flex: command not found
+sudo apt install -y m4 flex
+
+
+
+4.
+Can't use 'defined(@array)' (Maybe you should just omit the defined()?) at /home/ubuntu/Workspaces/AndroidKernel/Qualcomm_Android/kernel/kernel/timeconst.pl line 373.
+
+把 kernel/timeconst.pl 文件中 373行的：
+if (!defined(@val)) {
+改为if (!@val) {
+
+
+
+
+adb reboot bootloader
+fastboot flash boot out/target/product/msm8974/boot.img
+fastboot reboot
