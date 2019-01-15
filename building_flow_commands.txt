@@ -982,7 +982,17 @@ error: cannot connect to daemon
 
 
 
-kernel 的源码已经加进去了，但上面还是用了boot.img来编译，需要配置些make参数，以后有时间再弄
+
+
+
+
+
+
+
+
+
+
+kernel 的源码已经加进去了，但上面还是用了提取boot.img出来的kernel来编译，需要配置些make参数，以后有时间再弄
 
 TODO:
 
@@ -991,8 +1001,6 @@ build/core/tasks/kernel.mk:92: * Kernel source found, but no configuration was d
 build/core/tasks/kernel.mk:93: * Please add the TARGET_KERNEL_CONFIG variable to your   *
 build/core/tasks/kernel.mk:94: * BoardConfig.mk file                                    *
 build/core/tasks/kernel.mk:95: **********************************************************
-
-
 
 
 
@@ -1120,6 +1128,32 @@ https://blog.csdn.net/mxgg123/article/details/26269313
 https://blog.csdn.net/shulianghan/article/details/51592930
 https://blog.csdn.net/kevin_nazgul/article/details/53191993
 -----------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 按照 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/wiki/How-To-Use ，单独编译小米KK内核
+# 把整个 boot.img 刷到 cm-11系统去，开不机，logcat 报错
+# 把编译 出来的 kernel 放到 cm-11 去重新编 ROM, 能开机，但许多硬件设备不工作，如相机、WIFI、充电等
+
+# 后来按东哥所说的，cm-12.1 的内核 兼容 cm-11.0的内核，那么再尝试一遍:
+
+
+
+
+
+
 
 
 
