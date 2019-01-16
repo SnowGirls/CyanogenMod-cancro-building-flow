@@ -1,11 +1,12 @@
 #!/bin/bash
 
 backup_dir_path="${HOME}/Workspaces/Github/CM-11-Modified-Sources"
-# aosp_path="${HOME}/Workspaces/AOSP/CyanogenMod/android/"
-aosp_path="${HOME}/Downloads/Test"
+aosp_path="${HOME}/Workspaces/AOSP/CyanogenMod/android_cm-11.0/"
+# aosp_path="${HOME}/Downloads/Test"
 
 
 pushd $backup_dir_path
+
 restore_files=`find . -mindepth 2 -maxdepth 100 -type f | grep -v git`
 
 for file in $restore_files
@@ -23,5 +24,6 @@ do
 
 done
 
+popd
 
 echo "Done"
