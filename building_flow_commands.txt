@@ -1143,18 +1143,32 @@ https://blog.csdn.net/kevin_nazgul/article/details/53191993
 
 
 
-# 按照 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/wiki/How-To-Use ，单独编译小米KK内核
-# 把整个 boot.img 刷到 cm-11系统去，开不机，logcat 报错
-# 把编译 出来的 kernel 放到 cm-11 去重新编 ROM, 能开机，但许多硬件设备不工作，如相机、WIFI、充电等
+# 按照 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/wiki/How-To-Use ，单独编译小米KK内核:
+# a. 把整个 boot.img 刷到 cm-11系统去，开不机，logcat 报错
+# b. 把编译 出来的 kernel 放到 cm-11 去重新编 ROM, 能开机，但许多硬件设备不工作，如相机、WIFI、充电等
 
 # 后来按东哥所说的，cm-12.1 的内核 兼容 cm-11.0的内核，那么再尝试一遍:
 
+# 1. 在 /device/xiaomi/cancro/cm.dependencies 加上:
+,
+  {
+    "repository": "android_kernel_xiaomi_cancro",
+    "target_path": "kernel/xiaomi/cancro",
+    "branch": "cm-12.1"
+  }
+
+# 2. 在 /device/xiaomi/cancro/BoardConfig.mk 的 KERNEL 配置加上: 
+
+TARGET_KERNEL_SOURCE := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH := arm
+TARGET_KERNEL_CONFIG := cyanogen_cancro_defconfig
+
+# breakfast 一遍, 自动拉下 cm-12.1 的kernel， 用在cm-11.0上
+
+source build/envsetup.sh && breakfast cancro && brunch cancro
 
 
-
-
-
-
+# 最终得出的ROM是有问题的，但问题比小米KK内核的少，比如WIFI、充电正常，但相机还是不工作。
 
 
 
