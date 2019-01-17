@@ -53,6 +53,24 @@ pushd $aosp_path
 repo_status=`repo status | grep -B 1 " -"`
 popd
 
+# for line in $repo_status; do echo $line; done;
+
+# project
+# build/
+# branch
+# development
+# -m
+# tools/roomservice.py
+# --
+# project
+# frameworks/base/
+# branch
+# development
+# -m
+# api/current.txt
+# -m
+# core/java/android/app/ActivityThread.java
+# ...
 
 
 isNextLineProject=0
@@ -77,6 +95,16 @@ do
 		if [[ $isNextLineProject == 1 ]]; then
 			projectPath=$line
 			isNextLineProject=0
+
+			pushd $aosp_path
+			pushd $projectPath
+
+				patchName=${projectPath:0:-1}
+				patchName=${patchName/\//_}.patch
+				git diff > $backup_dir_path/$patchName
+
+			popd
+			popd
 
 		elif [[ $isNextLineSourceFile == 1  ]]; then
 			sourceFilePath=$line
