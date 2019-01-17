@@ -42,16 +42,17 @@
 #  -m	dalvik/src/main/java/dalvik/system/DexFile.java
 
 
+
 backup_dir_path="${HOME}/Workspaces/Github/CM-11-Modified-Sources"
 mkdir -p ${backup_dir_path}
-
 aosp_path="${HOME}/Workspaces/AOSP/CyanogenMod/android/"
+
+
 
 pushd $aosp_path
 repo_status=`repo status | grep -B 1 " -"`
 popd
 
-# repo_status=`cat test_repo.txt`
 
 
 isNextLineProject=0
@@ -98,3 +99,5 @@ do
 
 done
 
+
+echo "Done"
