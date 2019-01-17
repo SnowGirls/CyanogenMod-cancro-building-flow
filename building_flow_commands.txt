@@ -402,6 +402,24 @@ curl -O https://github.com/jrizzoli/dotfiles/raw/master/cancro/cm13Upgrade.zip
 
 
 
+_____________________________________________________________
+
+http://www.miui.com/thread-5548571-1-1.html
+https://tieba.baidu.com/p/4461331644?red_tag=3303868346
+
+CM-13 卡在了 设置向导 过不去，进不了桌面的问题：
+fastboot.exe boot recovery.img
+进入rec后挂载system分区，然后 高级选项->文件管理器->system/priv-app/CyanogenSetupWizard 删除即可
+
+_____________________________________________________________
+
+
+
+
+
+
+
+
 
 
 ---------------------------------------- cm-11.0 ----------------------------------------
