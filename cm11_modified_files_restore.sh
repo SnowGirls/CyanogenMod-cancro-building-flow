@@ -11,12 +11,13 @@ restore_files=`find . -mindepth 2 -maxdepth 100 -type f | grep -v git`
 
 for file in $restore_files
 do
+	echo -e "\n"
 	echo $file
 	directory_path=`dirname $file`
 
 	destination_path=$aosp_path/$directory_path
 
-	# mkdir -p $destination_path
+	# mkdir -p $destination_path	## Do not create directory now, we do not use legend now ...
 
 	cp $file $destination_path
 
