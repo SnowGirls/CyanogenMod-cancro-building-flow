@@ -45,7 +45,7 @@
 
 backup_dir_path="${HOME}/Workspaces/Github/CM-11-Modified-Sources"
 mkdir -p ${backup_dir_path}
-aosp_path="${HOME}/Workspaces/AOSP/CyanogenMod/android/"
+aosp_path="${HOME}/Workspaces/AOSP/CyanogenMod/android_cm-11.0/"
 
 
 
