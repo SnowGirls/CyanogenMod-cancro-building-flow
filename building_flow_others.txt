@@ -144,3 +144,25 @@ if (!defined(@val)) {
 adb reboot bootloader
 fastboot flash boot out/target/product/msm8974/boot.img
 fastboot reboot
+
+
+
+
+
+
+
+----------------------------------------- cm-14.1 -----------------------------------------
+
+cd ~/Workspaces/AOSP/CyanogenMod/
+
+mkdir android_cm-14.1 && cd android_cm-14.1/
+
+repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
