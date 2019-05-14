@@ -248,6 +248,46 @@ JAVA_HOME=/usr/local/java/jdk1.8.0_172
 source ~/.bash_aliases
 
 
+
 编译:
 
 brunch cancro
+
+
+
+
+3.
+--------------------------------- 
+[ 54% 18881/34643] Download: /home/ubuntu/Workspaces/AOSP/Cyanogen...t/common/obj/APPS/Gello_intermediates/org.cyanogenmod.gello-40.apk
+FAILED: /bin/bash -c "(mvn -q org.apache.maven.plugins:maven-dependency-plugin:2.10:get 				   org.apache.maven.plugins:maven-dependency-plugin:2.10:copy 		-DremoteRepositories=central::::https://maven.cyanogenmod.org/artifactory/gello_prebuilds 		-Dartifact=org.cyanogenmod:gello:40:apk 		-Dmdep.prependGroupId=true 		-Dmdep.overWriteSnapshots=true 		-Dmdep.overWriteReleases=true 		-Dtransitive=false 		-DoutputDirectory=/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1/out/target/common/obj/APPS/Gello_intermediates/ )"
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact org.cyanogenmod:gello:apk:40 from/to central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds): Connect to maven.cyanogenmod.org:443 [maven.cyanogenmod.org/216.168.38.166] failed: Connection timed out (Connection timed out)
+[ERROR] org.cyanogenmod:gello:apk:40
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR] central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR] central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds, releases=true, snapshots=true)
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ 54% 18881/34643] target thumb C++: libv8 <= external/v8/src/crankshaft/hydrogen.cc
+ninja: build stopped: subcommand failed.
+build/core/ninja.mk:151: recipe for target 'ninja_wrapper' failed
+make: *** [ninja_wrapper] Error 1
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1'
+
+#### make failed to build some targets (41:45 (mm:ss)) ####
+--------------------------------- 
+
+mv vendor/cm/gello/Android.mk vendor/cm/gello/Android.mk.bak
+curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk -o vendor/cm/gello/Android.mk 
+
+
+
+继续编译:
+
+brunch cancro
+
