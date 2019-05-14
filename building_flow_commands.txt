@@ -191,7 +191,7 @@ cd android/
 sudo add-apt-repository ppa:openjdk-r/ppa
 sudo apt-get update
 
-sudo apt-get install -y zip bison build-essential gnupg flex gperf libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop maven openjdk-7-jdk pngcrush schedtool squashfs-tools xsltproc  zlib1g-dev g++-multilib gcc-multilib lib32ncurses5-dev lib32readline6-dev lib32z1-dev
+sudo apt-get install -y zip curl bison build-essential gnupg flex gperf libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop maven openjdk-7-jdk pngcrush schedtool squashfs-tools xsltproc  zlib1g-dev g++-multilib gcc-multilib lib32ncurses5-dev lib32readline6-dev lib32z1-dev
 
 
 Ubuntu 14.04:
@@ -209,7 +209,7 @@ breakfast cancro
 # cancro 是小米4的代号
 # breakfast 这个命令会自动同步依赖(根据手机不同)，可以看 less .repo/local_manifests/roomservice.xml ，有那些依赖
 
-# 这里出现了个状况：中途下载依赖慢，网络错误 或者 手贱Ctrl+C了一下，导致以后触发这命令都出'找不到文件'的错误
+# 这里出现了个状况：中途下载依赖慢，网络错误 或者 手贱 Ctrl+C 了一下，导致以后触发这命令都出'找不到文件'的错误
 # grep -rn 'XXX' * 来看源码吧。最后定位到roomservice.py，看看，恩，用 repo sync --force-sync device/qcom/common 命令解决
 repo sync --force-sync device/qcom/common
 repo sync --force-sync kernel/xiaomi/cancro
@@ -1388,7 +1388,7 @@ breakfast cancro
 
 
 ----------------- 小插曲 1 ------------------------>>>
-# 又手戝 Ctrl-C 了一下, 导致
+# 又手戝 Ctrl-C 了一下, 导致以后出现'找不到文件'的错误
 
 # 1. Look into build/tools/roomservice.py, method 'add_to_manifest'.
 pushd .repo/local_manifests/

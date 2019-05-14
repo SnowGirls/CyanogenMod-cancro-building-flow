@@ -153,9 +153,20 @@ fastboot reboot
 
 ----------------------------------------- cm-14.1 -----------------------------------------
 
+Difference from cm-13.0, use openjdk-8 instead:
+
+sudo apt-get install git-core gnupg flex bison gperf libsdl1.2-dev libesd0-dev libwxgtk3.0-dev squashfs-tools build-essential zip curl libncurses5-dev zlib1g-dev openjdk-8-jre openjdk-8-jdk pngcrush schedtool libxml2 libxml2-utils xsltproc lzop libc6-dev schedtool g++-multilib lib32z1-dev lib32ncurses5-dev gcc-multilib maven liblz4-tool tmux screen w3m ncftp 
+
+
+# 因为已经装有 jdk7 和 jdk8，我就不装 openjdk7 和 openjdk8 了，下面换变量PATH来切换版本
+
+
 cd ~/Workspaces/AOSP/CyanogenMod/
 
-mkdir android_cm-14.1 && cd android_cm-14.1/
+mkdir android_cm-14.1
+cd android_cm-14.1/
+
+
 
 repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1
 
@@ -166,3 +177,77 @@ vim .repo/manifest.xml
 // ----- vim content end -----
 
 repo sync
+
+
+
+source build/envsetup.sh 		# 初始化环境变量
+
+breakfast Cancro				# 等待下载完成
+
+
+
+1.
+--------------------------------- 
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/qcom/binaries/msm8974/graphics/graphics-vendor.mk" does not exist.  Stop.
+
+** Don't have a product spec for: 'cm_cancro'
+** Do you have the right repo manifest?
+---------------------------------
+
+# 而发现在 .repo/local_manifests/roomservice.xml 确实有定义 device/qcom/common, 确没有 vendor/qcom/binaries
+# 根据 https://forum.xda-developers.com/oneplus-3/how-to/guide-complete-guide-building-t3477198/page7, 在 roomservice.xml 添加
+<project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+
+# 下载文件夹 https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/tree/cm-14.1/msm8974
+# 不想整个git clone，就用 http://kinolien.github.io/gitzip/ 吧，svn checkout 不了。
+
+mkdir -p vendor/qcom/binaries/msm8974/
+# 然后把下载内容复制过去
+# 另 roomservice.py 已经被移到 vendor/cm/build/tools/ 下面
+
+
+2.
+--------------------------------- 
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/xiaomi/cancro/cancro-vendor.mk" does not exist.  Stop.
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/xiaomi/cancro/cancro-vendor.mk" does not exist.  Stop.
+
+** Don't have a product spec for: 'cm_cancro'
+** Do you have the right repo manifest?
+---------------------------------
+
+pushd ~/Downloads
+svn checkout https://github.com/TheMuppets/proprietary_vendor_xiaomi/branches/cm-14.1/cancro/ ./proprietary_cancro_cm-14.1
+popd
+
+mkdir -p vendor/xiaomi/cancro
+cp -r ~/Downloads/proprietary_cancro_cm-14.1/* vendor/xiaomi/cancro/
+
+
+
+继续:
+
+breakfast Cancro
+
+
+切换一下 java 版本:
+
+which java 
+PATH=/usr/local/java/jdk1.8.0_172/bin:$PATH
+java -version
+
+
+改 .bash_alias 吧，改 $PATH 会不认：
+
+vim ~/.bash_aliases
+
+// ----- vim content begin -----
+# JAVA_HOME=/usr/local/java/jdk1.7.0_80
+JAVA_HOME=/usr/local/java/jdk1.8.0_172
+// ----- vim content end -----
+
+source ~/.bash_aliases
+
+
+编译:
+
+brunch cancro
