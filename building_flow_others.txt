@@ -291,3 +291,41 @@ curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/g
 
 brunch cancro
 
+
+
+4.
+--------------------------------- 
+ninja: build stopped: subcommand failed.
+build/core/ninja.mk:151: recipe for target 'ninja_wrapper' failed
+make: *** [ninja_wrapper] Error 1
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1
+---------------------------------
+
+make update-api
+
+export LC_ALL=C
+
+prebuilts/sdk/tools/jack-admin stop-server
+prebuilts/sdk/tools/jack-admin start-server
+
+还有这个错误因为源码出错了，所以请仔细检查代码!
+
+
+
+
+刷机：
+
+https://eu.dl.twrp.me/cancro/
+
+adb reboot bootloader
+fastboot devices
+
+fastboot flash recovery [image_name.img]
+fastboot boot [image_name.img]
+
+推荐用TWRP3.1.0来刷cm-14.1, 因为其它版本会出现以下错误:
+
+3.2.3.0  TWRP : recv error on uevent
+3.0.2.0  TWRP : unknown command [log]
+
+
