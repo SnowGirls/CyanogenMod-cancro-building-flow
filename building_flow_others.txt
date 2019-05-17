@@ -1,5 +1,8 @@
 
 
+
+______________________________ Build Google Android Source ______________________________________
+
 mkdir -p ~/Workspaces/AOSP/Google/android/
 cd ~/Workspaces/AOSP/Google/android/
 
@@ -328,4 +331,45 @@ fastboot boot [image_name.img]
 3.2.3.0  TWRP : recv error on uevent
 3.0.2.0  TWRP : unknown command [log]
 
+
+
+
+
+
+
+
+
+______________________________ View and Debug AOSP Using Android Studio ______________________________________
+
+
+
+source build/envsetup.sh && make idegen && development/tools/idegen/idegen.sh
+
+
+vim ~/.AndroidStudio3.2/config/studio64.vmoptions
+
+-Xms1g
+-Xmx4g
+
+
+File - open - android.ipr
+
+打开 Project Structure Settings -> Modules -> Dependencies 把底下的 <Module source> 移到最上面，优先跳转到它的API
+
+
+
+Scanning file to index ... or Indexing ... or Update index ... issue:
+
+# 选择好 Project SDK!!!!!!!! Project Structure Settings -> Project -> Project SDK
+
+# https://stackoverflow.com/a/30927850
+sudo vim /etc/sysctl.conf
+
+# Increase the limit for Android Studio
+fs.inotify.max_user_watches = 500000
+
+# https://stackoverflow.com/a/37627121
+cd android-studio/bin/
+cp idea.properties idea.properties.defaul
+vim idea.properties
 
