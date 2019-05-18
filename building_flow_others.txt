@@ -66,7 +66,7 @@ make -j4
 
 
 
-______________________________ Android Qualcomm Cancro Kernel Source ______________________________________
+______________________________ Android Qualcomm cancro Kernel Source ______________________________________
 
 1.
 make bootimage -j4
@@ -185,7 +185,7 @@ repo sync
 
 source build/envsetup.sh 		# 初始化环境变量
 
-breakfast Cancro				# 等待下载完成
+breakfast cancro				# 等待下载完成
 
 
 
@@ -229,7 +229,7 @@ cp -r ~/Downloads/proprietary_cancro_cm-14.1/* vendor/xiaomi/cancro/
 
 继续:
 
-breakfast Cancro
+breakfast cancro
 
 
 切换一下 java 版本:
@@ -326,7 +326,7 @@ fastboot devices
 fastboot flash recovery [image_name.img]
 fastboot boot [image_name.img]
 
-推荐用TWRP3.1.0来刷cm-14.1, 因为其它版本会出现以下错误:
+推荐用 TWRP 3.1.0 来刷cm-14.1, 因为其它版本会出现以下错误:
 
 3.2.3.0  TWRP : recv error on uevent
 3.0.2.0  TWRP : unknown command [log]
