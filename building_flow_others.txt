@@ -364,12 +364,11 @@ Scanning file to index ... or Indexing ... or Update index ... issue:
 
 # https://stackoverflow.com/a/30927850
 sudo vim /etc/sysctl.conf
-
 # Increase the limit for Android Studio
 fs.inotify.max_user_watches = 500000
 
 # https://stackoverflow.com/a/37627121
-cd android-studio/bin/
+cd [~/Workspaces/Softwares/]android-studio/bin/
 cp idea.properties idea.properties.defaul
 vim idea.properties
 
