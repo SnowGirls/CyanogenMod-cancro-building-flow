@@ -47,12 +47,12 @@ JAVA_HOME=/usr/local/java/jdk1.7.0_80
 JRE_HOME=$JAVA_HOME/jre
 JAVA_BIN=$JAVA_HOME/bin
 CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
-export JAVA_HOME JRE_HOME PATH CLASSPATH
+export JAVA_HOME JRE_HOME JAVA_BIN CLASSPATH
 PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 
 
 # AOSP
-PATH=$PATH:$HOME/Workspaces/bin
+PATH=$HOME/Workspaces/bin:$PATH
 export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
 
 

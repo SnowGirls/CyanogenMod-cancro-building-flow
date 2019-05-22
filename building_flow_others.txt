@@ -185,7 +185,7 @@ repo sync
 
 source build/envsetup.sh 		# 初始化环境变量
 
-breakfast cancro				# 等待下载完成
+breakfast cancro				# 等待下载依赖完成
 
 
 
@@ -371,4 +371,85 @@ fs.inotify.max_user_watches = 500000
 cd [~/Workspaces/Softwares/]android-studio/bin/
 cp idea.properties idea.properties.defaul
 vim idea.properties
+
+
+
+
+
+
+----------------------------------------- MoKee -----------------------------------------
+
+
+repo init -u https://github.com/MoKee/android.git -b mko-mr1
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
+. build/envsetup.sh
+
+
+lunch cancro
+
+
+
+--------------------
+build/core/product_config.mk:238: *** Can not locate config makefile for product "cancro".  Stop.
+build/core/product_config.mk:238: *** Can not locate config makefile for product "cancro".  Stop.
+
+** Don't have a product spec for: 'cancro'
+** Do you have the right repo manifest?
+--------------------
+# 先不管, 用 brunch cancro 来编译，可以不管这个错误
+ 
+brunch cancro
+
+
+--------------------
+You are attempting to build with an unsupported JDK.
+
+Only an OpenJDK based JDK is supported.
+
+The required version is: 1.8.x
+--------------------
+# 换成open-jdk
+# https://jdk.java.net/java-se-ri/8
+
+curl -O https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_linux-x64_bin.tar.gz
+curl -O https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz
+
+sudo mv openjdk-9.0.4_linux-x64_bin.tar.gz /usr/local/java/
+sudo mv openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz /usr/local/java/
+
+pushd /usr/local/java/
+
+sudo tar zxvf ./openjdk-9.0.4_linux-x64_bin.tar.gz
+sudo tar zxvf ./openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz
+
+sudo mv jdk-9.0.4 openjdk-9.0.4
+sudo mv java-se-8u40-ri openjdk-1.8.0_40
+
+
+------------ vim ~/.bash_aliases ------------
+
+# JAVA_HOME=/usr/local/java/jdk1.7.0_80
+# JAVA_HOME=/usr/local/java/jdk1.8.0_172
+# JAVA_HOME=/usr/local/java/openjdk-9.0.4
+JAVA_HOME=/usr/local/java/openjdk-1.8.0_40
+
+------------ vim ~/.bash_aliases ------------
+
+source ~/.bash_aliases
+java -version
+
+
+# Recovery 用 TWRP 3.2.3 版本
+# 去魔趣论坛 下载 addonsu-xxx.zip 包，进入 recovery 刷入此包。重启后进入开发者模式，就可以选择 应用与ADB 都ROOT了。  
 
