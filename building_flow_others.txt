@@ -167,7 +167,7 @@ sudo apt-get install git-core gnupg flex bison gperf libsdl1.2-dev libesd0-dev l
 cd ~/Workspaces/AOSP/CyanogenMod/
 
 mkdir android_cm-14.1
-cd android_cm-14.1/
+cd android_cm-14.1/device/xiaomi/cancro/BoardConfig.mk
 
 
 
@@ -290,7 +290,7 @@ curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/g
 
 
 
-继续编译:
+继续编译:device/xiaomi/cancro/BoardConfig.mk
 
 brunch cancro
 
@@ -316,7 +316,7 @@ prebuilts/sdk/tools/jack-admin start-server
 
 
 
-刷机：
+1. 刷机：
 
 https://eu.dl.twrp.me/cancro/
 
@@ -334,6 +334,16 @@ fastboot boot [image_name.img]
 
 
 
+2. 关掉 selinux 的正确做法:
+
+device/xiaomi/cancro/BoardConfig.mk : 在 BOARD_KERNEL_CMDLINE 追加 androidboot.selinux=permissive (注意前面空格)
+
+# Kernel
+BOARD_KERNEL_CMDLINE               := console=none vmalloc=340M androidboot.hardware=qcom msm_rtb.filter=0x3b7 ehci-hcd.park=3 androidboot.bootdevice=msm_sdcc.1 androidboot.selinux=permissive
+
+
+
+
 
 
 
@@ -342,6 +352,7 @@ fastboot boot [image_name.img]
 ______________________________ View and Debug AOSP Using Android Studio ______________________________________
 
 
+1. Debug Java
 
 source build/envsetup.sh && make idegen && development/tools/idegen/idegen.sh
 
@@ -371,6 +382,39 @@ fs.inotify.max_user_watches = 500000
 cd [~/Workspaces/Softwares/]android-studio/bin/
 cp idea.properties idea.properties.defaul
 vim idea.properties
+
+
+
+
+2. Debug C++
+
+lldb-server 端:
+adb push /home/ubuntu/Android/Sdk/lldb/3.1/android/armeabi/lldb-server /data/local/tmp/
+cancro:/ # adb shell
+cancro:/ # whoami
+cancro:/ # su
+cancro:/ # cd /data/local/tmp
+cancro:/ # chmod 777 ./lldb-server
+cancro:/ # ./lldb-server platform --server --listen unix-abstract:///data/local/tmp/debug.sock
+
+lldb 端:
+sudo apt install lldb 
+(lldb) platform select remote-android
+(lldb) platform connect unix-abstract-connect:///data/local/tmp/debug.sock
+(lldb) process attach -p 1439
+(lldb) c
+(lldb) br s -n Java_java_io_UnixFileSystem_createFileExclusively0
+(lldb) br list
+
+(lldb) source info
+(lldb) add-dsym '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1/out/target/product/cancro/symbols/system/lib/libopenjdk.so'
+(lldb) br list
+(lldb) source info 
+(lldb) settings set target.source-map /proc/self/cwd/ /home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1/
+(lldb) source info
+(lldb) n
+
+
 
 
 
