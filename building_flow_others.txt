@@ -386,7 +386,9 @@ vim idea.properties
 
 
 
-2. Debug C++
+2. LLDB Debug C++
+
+# https://zhuanlan.zhihu.com/p/24867284
 
 lldb-server 端:
 adb push /home/ubuntu/Android/Sdk/lldb/3.1/android/armeabi/lldb-server /data/local/tmp/
