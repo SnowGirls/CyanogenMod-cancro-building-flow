@@ -335,6 +335,7 @@ fastboot boot [image_name.img]
 
 
 2. 关掉 selinux 的正确做法:
+# 启示来源: http://www.miui.com/thread-9137678-1-1.html
 
 device/xiaomi/cancro/BoardConfig.mk : 在 BOARD_KERNEL_CMDLINE 追加 androidboot.selinux=permissive (注意前面空格)
 
@@ -344,6 +345,7 @@ BOARD_KERNEL_CMDLINE               := console=none vmalloc=340M androidboot.hard
 
 
 
+3. 记得一定要 清掉 Davilk Cache 目录， 要不会以为 system_server 一直访问不了/sdcard。其实关掉了 selinux 后是能访问的了，只是 dalvik cache 在搞鬼。
 
 
 
