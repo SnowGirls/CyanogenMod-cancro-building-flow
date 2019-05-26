@@ -1,5 +1,13 @@
 
 
+______________________________ 下载开发软件  ______________________________________
+
+# 1. Android Studio: android-studio-ide-181.5056338-linux.zip
+# 2. Visual Studio Code: code_1.34.0-1557957934_amd64.deb
+
+
+
+
 
 ______________________________ Build Google Android Source ______________________________________
 
@@ -51,18 +59,33 @@ pushd ~/Workspaces/Github/
 git clone https://github.com/jmpews/HookZz.git
 pushd HookZz/
 
+# 检查有没有配置了 ANDROID_NDK 变量, 没有的话下载或者指向 ANDROID_SDK/ndk-bundle/ 
+
+
+# 1. 编译出: shared library libhookzz.so
 cmake . \
 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
 -DCMAKE_BUILD_TYPE=Release \
 -DANDROID_ABI="armeabi-v7a" \
 -DANDROID_STL=c++_static \
--DANDROID_NATIVE_API_LEVEL=android-14 \
+-DANDROID_NATIVE_API_LEVEL=android-23 \
 -DDEBUG=OFF \
 -DSHARED=ON
 
 make -j4
 
 
+# 2. 编译出: static library libhookzz.a
+cmake . \
+-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DANDROID_ABI="armeabi-v7a" \
+-DANDROID_STL=c++_static \
+-DANDROID_NATIVE_API_LEVEL=android-23 \
+-DSHARED=OFF \
+-DHOOKZZ_DEBUG=OFF
+
+make -j4
 
 
 
