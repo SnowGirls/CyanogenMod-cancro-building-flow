@@ -89,6 +89,12 @@ make -j4
 
 
 
+# 切换编译别的架构时，清掉缓存: rm -rf CMakeFiles/ 及其它目录下的 CMakeFiles/ 目录; 如果还有错,新开terminal重新编。
+
+# 编译进libandroid_runtime.so时，需要把.cc文件后缀改为.cpp, .S文件后缀改为.s
+
+
+
 ______________________________ Android Qualcomm cancro Kernel Source ______________________________________
 
 1.
