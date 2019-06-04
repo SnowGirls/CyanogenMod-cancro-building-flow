@@ -88,10 +88,34 @@ cmake . \
 make -j4
 
 
+# 2. 编译 arm64 的:
+cmake . \
+-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DANDROID_ABI="arm64-v8a" \
+-DANDROID_STL=c++_static \
+-DANDROID_NATIVE_API_LEVEL=android-23 \
+-DDEBUG=OFF \
+-DSHARED=ON
 
-# 切换编译别的架构时，清掉缓存: rm -rf CMakeFiles/ 及其它目录下的 CMakeFiles/ 目录; 如果还有错,新开terminal重新编。
+make -j4 -n
 
-# 编译进libandroid_runtime.so时，需要把.cc文件后缀改为.cpp, .S文件后缀改为.s
+
+
+
+# 切换编译别的架构时，有错，都是因为缓存问题的，清掉一些缓存: 
+find ./ -name CMakeFiles | xargs rm -rf
+find ./ -name Makefile | xargs rm 
+find ./ -name *.a | xargs rm
+# 如果还有错,新开terminal重新编。还是有错的话，重新clone到别的目录去, 分别make:
+git clone https://github.com/jmpews/HookZz.git HookZz-arm/
+git clone https://github.com/jmpews/HookZz.git HookZz-arm64/
+
+# 根据Readme.md的make时输出，看看对应架构的编了哪些文凭，分别写进Android.mk/Android.bp去。编译进libandroid_runtime.so时，需要把.cc文件后缀改为.cpp
+# 写Android.mk/Android.bp时，可以找一个有编译汇编的模版来对照着定，比如 frameworks/rs/cpu_ref/Android.bp(.mk)
+# 也可指定多个后缀 LOCAL_CPP_EXTENSION := .cc .cpp .cxx
+
+# mmm showcommands mmm frameworks/base/core/jni
 
 
 
