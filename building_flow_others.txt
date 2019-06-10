@@ -45,6 +45,8 @@ make
 
 which cmake
 export PATH=$HOME/Workspaces/Softwares/cmake-3.13.2/bin:$PATH
+# export PATH=$HOME/Workspaces/Softwares/cmake-3.13.4/bin:$PATH
+# export PATH=$HOME/Workspaces/Github/CMake/bin:$PATH
 which cmake
 
 cmake --version
