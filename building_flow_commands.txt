@@ -819,6 +819,16 @@ lib/libqdutils.so
 
 
 
+——————————————————————————————————————————————————————————————
+collect2: error: ld terminated with signal 7 [Bus error], core dumped
+build/core/shared_library.mk:81: recipe for target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-11.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libwebviewchromium_intermediates/LINKED/libwebviewchromium.so' failed
+make: *** [/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-11.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libwebviewchromium_intermediates/LINKED/libwebviewchromium.so] Error 1
+make: *** Waiting for unfinished jobs....
+——————————————————————————————————————————————————————————————
+# 网上的资料（无论是国内的还是国外的）都说是要为 ubuntu 加 swap，都是扯蛋的。其实就是 make clean 一下，重新编译就完事了！
+
+
+
 
 
 错误 TAG A:
