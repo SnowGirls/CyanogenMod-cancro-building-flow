@@ -480,7 +480,7 @@ sudo apt install lldb
 
 
 
------------------------------------------ MoKee -----------------------------------------
+----------------------------------------- MoKee mko-mr1 -----------------------------------------
 
 
 repo init -u https://github.com/MoKee/android.git -b mko-mr1
@@ -556,3 +556,64 @@ java -version
 # Recovery 用 TWRP 3.2.3 版本
 # 去魔趣论坛 下载 addonsu-xxx.zip 包，进入 recovery 刷入此包。重启后进入开发者模式，就可以选择 应用与ADB 都ROOT了。  
 
+
+
+
+
+
+
+
+
+----------------------------------------- MoKee mkp -----------------------------------------
+repo init -u https://github.com/MoKee/android.git -b mkp
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+(注意: 先lunch再brunch,单独lunch和brunch都会出现错误)
+
+
+## 刷机：
+fastboot devices
+fastboot flash recovery recovery3.2.3.img
+fastboot boot recovery3.2.3.img
+## 如果出现这个错误： FAILED (remote: 'dtb not found'), 升级一下基带！ (cm13BaseBandUpgrade.zip or search cm13Upgrade.zip)
+
+## 给应用有su权限: (Download addonsu zip from: https://download.mokeedev.com/extension.html#addonsu)
+adb push addonsu-installer-MK90.0-arm-signed.zip  /sdcard/
+adb reboot bootloader
+fastboot flash recovery twrp-3.3.0-0-cancro.img
+fastboot boot twrp-3.3.0-0-cancro.img
+## 然后点击 INSTALL 这个 zip (addonsu-installer-MK90.0-arm-signed.zip ) 就行了。重开机，去开发者选项Root授权那里就可看到有‘应用与ADB’选项了。
+
+
+
+
+
+
+----------------------------------------- LineageOS -----------------------------------------
+
+mkdir LineageOS && cd LineageOS/
+
+mkdir lineage-15.0 && cd lineage-15.0/
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
