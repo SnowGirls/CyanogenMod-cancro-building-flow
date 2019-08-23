@@ -614,6 +614,11 @@ Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 把最
 Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 又或者把所有jar都选择，然后点-号全删掉
 
 
+// Android Studio 提示 Inotify Watches Limit！ // 参考: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
+sudo vim /etc/sysctl.d/idea.conf
+sudo sysctl -p --system
+
+
 // https://www.2cto.com/kf/201710/692109.html
 // https://wiki.lineageos.org/import-android-studio-howto.html
 // https://shuhaowu.com/blog/setting_up_intellij_with_aosp_development.html
