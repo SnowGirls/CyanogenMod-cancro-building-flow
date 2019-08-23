@@ -562,6 +562,66 @@ java -version
 
 
 
+----------------------------------------- Android Studio 配置浏览 MoKee mko-mr1 的源码  -----------------------------------------
+
+
+# 1. 在上面成功编译过一次之后
+
+
+# 2. 生成 idengen.jar 后执行 idegen.sh 来生成 android.ipr、android.iml 
+
+source build/envsetup.sh
+breakfast cancro
+mmm development/tools/idegen/				# 为了得到这个 out/host/linux-x86/framework/idegen.jar 这个 jar
+sudo env "PATH=$PATH" development/tools/idegen/idegen.sh
+# sudo development/tools/idegen/idegen.sh 	# 这 sh 其实就是执行上一步生成的 idengen.jar (这命令会出现下面的错误)
+
+
+# 出现错误: Exception in thread "main" java.lang.UnsupportedClassVersionError: Main : Unsupported major.minor version 52.0
+
+# 修改脚本在 development/tools/idegen/idegen.sh 加入 java -version 命令，发现执行 idegen.sh 的jvm版本与我们外部命令 java -version 是不一致的:
+java version "1.7.0_95"
+OpenJDK Runtime Environment (IcedTea 2.6.4) (7u95-2.6.4-3)
+OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)
+Exception in thread "main" java.lang.UnsupportedClassVersionError: Main : Unsupported major.minor version 52.0
+
+# 而我们编译的是用:
+java -version
+openjdk version "1.8.0_40"
+OpenJDK Runtime Environment (build 1.8.0_40-b25)
+OpenJDK 64-Bit Server VM (build 25.40-b25, mixed mode)
+
+# 去掉 sudo, 只用 development/tools/idegen/idegen.sh 版本一致了，但全出现很多 Permission denied, 访问不了 /sys/kernel/debug 这个目录 
+# 所以，正确的应该用:
+
+sudo env "PATH=$PATH" development/tools/idegen/idegen.sh
+
+
+# 3. Android Studio -> File -> Open -> 选择刚刚生成的android.ipr就好了
+
+Android Studio -> Help -> Edit Custom VM Options:
+-Xms1024m
+-Xmx4096m
+
+
+Android Studio -> Help -> Edit Custom Properties:
+idea.max.intellisense.filesize=5000
+
+
+Android Studio -> File -> Project Structure -> Project -> Select one SDK 
+
+Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 把最底下的 <Module source> 移到最前，那么就会优先跳到源码上，而不是反编前面jar的类
+Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 又或者把所有jar都选择，然后点-号全删掉
+
+
+// https://www.2cto.com/kf/201710/692109.html
+// https://wiki.lineageos.org/import-android-studio-howto.html
+// https://shuhaowu.com/blog/setting_up_intellij_with_aosp_development.html
+
+
+
+
+
 
 
 ----------------------------------------- MoKee mkp -----------------------------------------
@@ -606,9 +666,29 @@ fastboot boot twrp-3.3.0-0-cancro.img
 
 mkdir LineageOS && cd LineageOS/
 
+
+------------------------> lineage-15.0 <------------------------
+
+
 mkdir lineage-15.0 && cd lineage-15.0/
 
 repo init -u git://github.com/LineageOS/android.git -b lineage-15.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
+
+
+
+------------------------> cm-12.0 <------------------------
+
+mkdir cm-12.0 && cd cm-12.0
+
+repo init -u git://github.com/LineageOS/android.git -b cm-12.0
 
 vim .repo/manifest.xml
 // ----- vim content begin -----
