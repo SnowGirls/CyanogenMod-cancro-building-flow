@@ -702,3 +702,126 @@ vim .repo/manifest.xml
 // ----- vim content end -----
 
 repo sync
+
+
+
+
+
+----------------------------------------- OnePlusOSS -----------------------------------------
+
+cd Disk && mkdir -p Workspaces/AOSP/OnePlusOSS/
+
+------------------------> lineage-15.0 <------------------------
+
+
+mkdir oneplus3_6.0.1 && cd oneplus3_6.0.1/
+
+repo init -u git://github.com/OnePlusOSS/android.git -b oneplus3/6.0.1
+
+repo sync
+
+
+# connect to device and make sure adb is connected & unauthorized.
+
+pushd .repo/manifests && ./pull_library.sh && popd
+
+# 因为没有 root 权限，有些文件 pull 不下来
+# pull_library.sh -> pull_library_without_root.sh: 把所有 adb pull 改成 cp, 并在之前加上 mkdir -p $(dirname ${[Below_File_Name]})
+# adb push pull_library_without_root.sh /sdcard/
+# adb shell &&  cd /sdcard/ && sh pull_library_without_root.sh
+# adb pull /sdcard/vendor ~/Downloads/
+
+# 但还是不全:
+https://github.com/mkey-mi/android_vendor_oneplus_oneplus3
+# 下载完后改名作 oneplus 文件夹名, merge 进 vendor/oneplus/ 中去
+# 因为放错位置，导致了错误: No rule to make target out/target/common/obj/JAVA_LIBRARIES/tcmiface_intermediates/classes.jar
+
+
+# then copy the .repo/manifests/vendor to project root directory, cause root directory also has vendor/ folder, but copy to will auto merge.
+
+. build/envsetup.sh
+
+
+# Download https://download.java.net/openjdk/jdk7u75/ri/openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz
+
+sudo mv openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz /usr/local/java/
+pushd /usr/local/java/
+sudo mkdir openjdk-7u75-ri
+sudo tar zxvf ./openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz -C ./openjdk-7u75-ri/
+
+# 改一下名字
+pushd openjdk-7u75-ri/ && sudo mv java-se-7u75-ri openjdk-7u75 && sudo mv openjdk-7u75 ../ && popd && sudo rm -rf openjdk-7u75-ri
+
+popd
+
+------------ vim ~/.bash_aliases ------------
+...
+JAVA_HOME=/usr/local/java/openjdk-7u75
+------------ vim ~/.bash_aliases ------------
+
+source ~/.bash_aliases && echo $JAVA_HOME && java -version
+
+lunch  # 而后选择 25
+
+make -j4
+
+# 已经是 openjdk 1.7.0_75, 但还是不行:
+Your version is: openjdk version "1.7.0_75" OpenJDK Runtime Environment (build 1.7.0_75-b13) OpenJDK 64-Bit Server VM (build 24.75-b04, mixed mode).
+The required version is: "1.7.x"
+
+# 不是 openjdk 问题:
+把 oneplus3_6.0.1/build/core/main.mk 里的 line 156: ^java -> ^openjdk
+java_version := $(shell echo '$(java_version_str)' | grep '^java .*[ "]1\.7[\. "$$]')
+改成
+java_version := $(shell echo '$(java_version_str)' | grep '^openjdk .*[ "]1\.7[\. "$$]')
+
+
+
+----------------------------------------- Error -----------------------------------------
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+build/core/host_shared_library_internal.mk:51: recipe for target 'out/host/linux-x86/obj/lib/libart.so' failed
+make: *** [out/host/linux-x86/obj/lib/libart.so] Error 1
+make: *** Waiting for unfinished jobs....
+----------------------------------------- Error -----------------------------------------
+
+// https://stackoverflow.com/questions/36048358/building-android-from-sources-unsupported-reloc-43
+// https://blog.csdn.net/fuchaosz/article/details/51487585
+// https://forum.xda-developers.com/chef-central/android/guide-how-to-setup-ubuntu-16-04-lts-t3363669/page2
+
+# 差不多都是 art/build/Android.common_build.mk： ifneq ($(WITHOUT_HOST_CLANG),true) -> 改成 ifeq ($(WITHOUT_HOST_CLANG),false)
+
+stat prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld
+stat prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld
+
+mv prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld_bak
+cp /usr/bin/ld.gold prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld
+
+mv prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld_bak
+cp /usr/bin/ld.gold prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld
+
+# x86_64-linux-glibc2.15-4.8 这个目录下面 ld 才是主要的解决这个错误的。
+
+
+
+cd out/target/product/msm8996/
+adb reboot bootloader
+fastboot flash boot boot.img
+fastboot flash system system.img
+fastboot flash userdata userdata.img
+
+
+## 编译 OTA 包
+make otapackage -j8
+
+## 编译 Release 包
+make dist -j8
+
+## 生成了 Dist: out/dist/msm8996-ota-eng.ubuntu.zip
+
+# 去 TWRP 下载 Recovery 
+https://dl.twrp.me/oneplus3/
+adb reboot bootloader
+fastboot flash 
+fastboot flash recovery twrp-3.3.1-0-oneplus3.img
+fastboot boot twrp-3.3.1-0-oneplus3.img
+
