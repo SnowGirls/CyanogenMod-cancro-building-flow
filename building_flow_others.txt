@@ -811,14 +811,21 @@ fastboot flash userdata userdata.img
 
 
 ## 编译 OTA 包
+
 make otapackage -j8
 
+
 ## 编译 Release 包
+
 make dist -j8
+
+// make dist_files -j8
 
 ## 生成了 Dist: out/dist/msm8996-ota-eng.ubuntu.zip
 
+
 # 去 TWRP 下载 Recovery 
+
 https://dl.twrp.me/oneplus3/
 adb reboot bootloader
 fastboot flash 
