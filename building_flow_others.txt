@@ -711,7 +711,8 @@ repo sync
 
 cd Disk && mkdir -p Workspaces/AOSP/OnePlusOSS/
 
-------------------------> lineage-15.0 <------------------------
+
+------------------------> oneplus3_6.0.1 (垃圾系统来的，滑动点单击了) <------------------------
 
 
 mkdir oneplus3_6.0.1 && cd oneplus3_6.0.1/
@@ -827,7 +828,129 @@ make dist -j8
 
 https://dl.twrp.me/oneplus3/
 adb reboot bootloader
-fastboot flash 
 fastboot flash recovery twrp-3.3.1-0-oneplus3.img
 fastboot boot twrp-3.3.1-0-oneplus3.img
+
+
+
+
+----------------------------------------- cm-13.0 For oneplus3 -----------------------------------------
+
+source build/envsetup.sh
+
+
+breakfast oneplus3
+
+
+// 解决从github上拉取代码慢的问题: https://blog.csdn.net/yyou33459/article/details/84947819
+// 编辑hosts后，刷新DNS： https://askubuntu.com/a/414842
+// sudo /etc/init.d/dns-clean restart &&　sudo /etc/init.d/networking force-reload
+// 感觉确实有点效果
+
+
+# 中途下载有错, vim .repo/local_manifests/roomservice.xml 删掉下载/检出出错的:
+
+  <project name="CyanogenMod/android_device_oppo_common" path="device/oppo/common" remote="github" />
+  <project name="CyanogenMod/android_kernel_oneplus_msm8996" path="kernel/oneplus/msm8996" remote="github" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_frameworks" path="vendor/nxp-nfc/opensource/frameworks" remote="github" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_libnfc-nci" path="vendor/nxp-nfc/opensource/libnfc-nci" remote="github" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_Nfc" path="vendor/nxp-nfc/opensource/Nfc" remote="github" />
+
+# 然后再 breakfast oneplus3 一遍，让它重新下载
+
+
+#　 ！！！！！　实在下载太慢了　！！！！！
+#  把　https://github.com/CyanogenMod/android_kernel_oneplus_msm8996　fork 到码云上，然后再从码云上拉下来
+#  git clone --no-checkout [url_from_gitee.com]
+#   
+#  git remote -v
+#  改一下 .git/config 使其与　.repo/projects/kernel/oneplus/msm8996.git/config 及　.repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git　大致一致
+#  git fetch github 一下，然后移到 AOSP 源码去
+#  
+#  mv .repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git .repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git__
+#  mv ~/Downloads/android_kernel_oneplus_msm8996/.git .repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git
+#  
+#  然后再  breakfast oneplus3
+
+
+adb root
+pushd device/oneplus/oneplus3/
+./extract-files.sh
+popd
+
+
+# 同样的把 https://github.com/siankatabg/proprietary_vendor_oneplus3 弄到码云去，再下载zip，别clone了太大了，然后解压
+# 然后先把 vendor/oneplus/oneplus3 的 proprietary 复制Merge到刚刚下载解压文件去，然后再复制下载的 Merge 回 vendor/oneplus/oneplus3/下的 proprietary
+# 这样确保有的文件不变，没有的就复制过来了
+
+
+-----------------------------------------
+# 错误: make: *** No rule to make target 'vendor/oneplus/oneplus3/proprietary/framework/org.ifaa.android.manager.jar'
+# 这个 org.ifaa.android.manager.jar 错误其实在 extract-files.sh 那里也出现没adb pull到。
+# 氫OS 与 氧OS 都没有这个jar。2017年前是Android 6的。https://www.oneplusbbs.com/thread-3229065-1.html & http://pan.baidu.com/s/1eSutrz0 : hw5p
+# 下载个别人的Rom cm-13 for Sultan-oneplus3, 刷机后发现就有这个jar:
+// https://androidfilehost.com/?w=files&flid=98717&sort_by=date&sort_dir=DESC
+-----------------------------------------
+
+
+-----------------------------------------
+make: *** No rule to make target 'vendor/oneplus/oneplus3/proprietary/priv-app/xtra_t_app/xtra_t_app.apk', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-13.0/out/target/product/oneplus3/obj/APPS/xtra_t_app_intermediates/package.apk'.  Stop.
+make: *** Waiting for unfinished jobs....
+-----------------------------------------
+# 几种解决方法, 
+# 一、删掉 vendor/oneplus/oneplus3/Android.mk 和 vendor/oneplus/oneplus3/oneplus3-vendor.mk 里面关于引用 xtra_t_app 的编译内容
+# 二、下载 https://github.com/TheMuppets/proprietary_vendor_oneplus/tree/cm-13.0/oneplus3 proprietary 并用上它的 Android.mk & oneplus3-vendor.mk
+# 三、单独下载 https://github.com/TheMuppets/proprietary_vendor_oneplus/blob/cm-13.0/oneplus3/proprietary/priv-app/xtra_t_app/xtra_t_app.apk 放到对应目录
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/cm-13.0/oneplus3/ ./TheMuppest_cm-13.0_oneplus3/
+# 如果中途停了，进到子目录去 svn checkout [url_to_dir] 来下载子目录，用 svn update [file_or_sudir] 来下载单个文件/子目录, 利用svn ls配合写个python脚本来下载
+// svn ls https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/cm-13.0/oneplus3/
+// https://stackoverflow.com/questions/122107/checkout-one-file-from-subversion
+// https://stackoverflow.com/questions/3196083/download-single-file
+
+brunch oneplus3
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- cm-13.0 For oneplus3 -----------------------------------------
+
+source build/envsetup.sh
+
+
+breakfast oneplus3
+
+adb root
+pushd device/oneplus/oneplus3/
+./extract-files.sh
+popd
+
+brunch oneplus3
+
+
+// https://forum.xda-developers.com/oneplus-3/how-to/guide-complete-guide-building-t3477198/page7
+# 如果不想从设备上 extract-files.sh, 毕竟老是有些 adb: error: remote object 'xxx' does not exist, 可以 roomservice.xml 加上:
+<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="cm-14.0" />
+# 然后再 repo sync 一遍
+
+-----------------------------------------
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/oneplus/oneplus3/cm.mk]]: "vendor/qcom/binaries/msm8996/graphics/graphics-vendor.mk" does not exist.  Stop.
+Device oneplus3 not found. Attempting to retrieve device repository from CyanogenMod Github (http://github.com/CyanogenMod).
+...
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/oneplus/oneplus3/cm.mk]]: "vendor/qcom/binaries/msm8996/graphics/graphics-vendor.mk" does not exist.  Stop.
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/oneplus/oneplus3/cm.mk]]: "vendor/qcom/binaries/msm8996/graphics/graphics-vendor.mk" does not exist.  Stop.
+-----------------------------------------
+// https://github.com/TheMuppets/proprietary_vendor_qcom_binaries
+# vim .repo/local_manifests/roomservice.xml:
+------ vim begin ------
+<project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+------ vim end ------
+# 编辑完 roomservice.xml 后，需要重新 sync 一次: repo sync --force-sync -j8
+
 
