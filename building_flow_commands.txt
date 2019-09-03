@@ -72,6 +72,8 @@ PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/tools
 PATH=$PATH:$ANDROID_NDK
 
+# export USE_CCACHE=1
+# ccache -M 100G
 
 ------------------ 保存退出vim ------------------
 

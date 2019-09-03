@@ -711,6 +711,22 @@ repo sync -j8
 
 breakfast oneplus3
 
+// https://wiki.lineageos.org/devices/oneplus3/build
+// 把 ./extract-files.sh 改为
+vim .repo/local_manifests/roomservice.xml
+----- vim -----
+<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" />
+----- vim -----
+repo sync --force-sync
+
+
+brunch oneplus3
+
+
+
+# 先刷底包，再刷Rom
+https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
+https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable5.0.8_Firmware_Modem_OnePlus3.zip
 
 
 
@@ -729,6 +745,14 @@ vim .repo/manifest.xml
 // ----- vim content end -----
 
 repo sync
+
+
+
+
+
+
+
+
 
 
 
@@ -861,6 +885,7 @@ fastboot boot twrp-3.3.1-0-oneplus3.img
 
 
 
+
 ----------------------------------------- cm-13.0 For oneplus3 -----------------------------------------
 
 source build/envsetup.sh
@@ -875,7 +900,9 @@ breakfast oneplus3
 // 感觉确实有点效果
 
 
-# 中途下载有错, vim .repo/local_manifests/roomservice.xml 删掉下载/检出出错的:
+# 中途下载有错/或想换branch "stable/cm-13.0-ZNH5Y" , vim .repo/local_manifests/roomservice.xml 删掉下载/检出出错的:
+  <project name="CyanogenMod/android_device_oneplus_oneplus3" path="device/oneplus/oneplus3" remote="github" revision="stable/cm-13.0-ZNH5Y" />
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="stable/cm-13.0-ZNH5Y" />
 
   <project name="CyanogenMod/android_device_oppo_common" path="device/oppo/common" remote="github" />
   <project name="CyanogenMod/android_kernel_oneplus_msm8996" path="kernel/oneplus/msm8996" remote="github" />
@@ -883,7 +910,8 @@ breakfast oneplus3
   <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_libnfc-nci" path="vendor/nxp-nfc/opensource/libnfc-nci" remote="github" />
   <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_Nfc" path="vendor/nxp-nfc/opensource/Nfc" remote="github" />
 
-# 然后再 breakfast oneplus3 一遍，让它重新下载
+
+# 然后再 breakfast oneplus3 && repo sync --force-sync 一遍，让它重新下载
 
 
 #　 ！！！！！　实在下载太慢了　！！！！！
@@ -900,15 +928,27 @@ breakfast oneplus3
 #  然后再  breakfast oneplus3
 
 
+
+------------------ ------------------ 
+###### 如果不采用上面的 repo sync 来下载 proprietary_vendor_oneplus 
 adb root
 pushd device/oneplus/oneplus3/
 ./extract-files.sh
 popd
 
+(extract-files.sh 会有好多没 pull 下来的，采用下面两种方法)
 
+1. 
+svn ls https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/stable/cm-13.0-ZNH5Y/oneplus3
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/stable/cm-13.0-ZNH5Y/oneplus3 ./cm-13.0-ZNH5Y_oneplus3/
+cp ./cm-13.0-ZNH5Y_oneplus3/* [path_to_aosp]/vendor/oneplus/oneplus3/
+
+
+2.
 # 同样的把 https://github.com/siankatabg/proprietary_vendor_oneplus3 弄到码云去，再下载zip，别clone了太大了，然后解压
 # 然后先把 vendor/oneplus/oneplus3 的 proprietary 复制Merge到刚刚下载解压文件去，然后再复制下载的 Merge 回 vendor/oneplus/oneplus3/下的 proprietary
 # 这样确保有的文件不变，没有的就复制过来了
+------------------ ------------------ 
 
 
 -----------------------------------------
@@ -951,6 +991,8 @@ brunch oneplus3
 # 讨论1： https://www.oneplusbbs.com/thread-2972013-1.html
 # 讨论2： https://www.oneplusbbs.com/thread-2977319-1.html
 # 讨论3： https://www.oneplusbbs.com/thread-3000963-1.html
+
+
 
 
 
@@ -1086,7 +1128,7 @@ build/core/product_config.mk:238: *** Can not locate config makefile for product
 ** Don't have a product spec for: 'oneplus3'
 ** Do you have the right repo manifest?
 ----------------------------------------- 错误 -----------------------------------------
-## lunch oneplus3 会出上面的错后，用 brunch cancro
+## lunch oneplus3 会出上面的错后，用 brunch oneplus3
 
-brunch cancro  
+brunch oneplus3  
 
