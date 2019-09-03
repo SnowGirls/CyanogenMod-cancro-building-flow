@@ -728,6 +728,9 @@ brunch oneplus3
 https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
 https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable5.0.8_Firmware_Modem_OnePlus3.zip
 
+# 完全root, 把zip包push到sdcard上，进入Recovery Installn刷入。重启后，可以adb root 和 开发者选项->root->应用与ADB
+https://download.lineageos.org/extras
+https://iso.mirrors.ustc.edu.cn/lineageos/su/20190709/addonsu-15.1-arm64-signed.zip
 
 
 
@@ -889,6 +892,16 @@ fastboot boot twrp-3.3.1-0-oneplus3.img
 ----------------------------------------- cm-13.0 For oneplus3 -----------------------------------------
 
 source build/envsetup.sh
+
+
+
+#########################################################################
+#
+# 直接使用 sultanxda 的，放在 .repo/local_manifest 下， 把 sultanxda/ 改为 kerneltoast/
+# https://github.com/kerneltoast/android/blob/master/oneplus3/cm-13.0-stable/local_manifest.xml
+# 直接 repo sync --force-sync -f -j8, 完事之后直接 breakfast oneplus3 && brunch oneplus3 , 然后刷底包，然后刷机
+#
+#########################################################################
 
 
 breakfast oneplus3
