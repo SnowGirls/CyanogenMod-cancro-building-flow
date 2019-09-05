@@ -673,6 +673,26 @@ fastboot boot twrp-3.3.0-0-cancro.img
 mkdir LineageOS && cd LineageOS/
 
 
+------------------------> lineage-16.0 <------------------------
+
+
+mkdir lineage-16.0 && cd lineage-16.0/
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-16.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
+
+
+
+
+
+
 
 ------------------------> lineage-15.0 <------------------------
 
@@ -735,6 +755,93 @@ https://iso.mirrors.ustc.edu.cn/lineageos/su/20190709/addonsu-15.1-arm64-signed.
 
 
 
+
+make
+make all
+
+
+# 单独编译
+hmm
+make clean-framework
+mmm frameworks/base/:framework
+[100% 2/2] Install: xxx/out/target/product/oneplus3/system/framework/framework.jar
+
+# 编译(system/framework/)所有，包括 .art, .oat, .vdex 
+make update-api
+pushd frameworks/base/ && mma && popd
+mmma frameworks/base/
+
+
+# 单独编译 libandroid_runtime.so
+make clean-libandroid_runtime
+mmm frameworks/base/core/jni/
+
+
+
+
+----------------------------------------- Error -----------------------------------------
+javadoc: error - In doclet class com.google.doclava.Doclava,  method start has thrown an exception java.lang.reflect.InvocationTargetException
+com.sun.tools.javac.code.Symbol$CompletionFailure: class file for com.android.okhttp.ConnectionPool not found
+1 error
+----------------------------------------- Error -----------------------------------------
+因为里面sh执行导致PATH不一样JAVA版本不一样。为系统下载openjdk8, 并且用上这个openjdk8，参考:
+// https://forum.xda-developers.com/oneplus-3/how-to/guide-complete-guide-building-t3477198/post70646310#post70646310
+
+sudo add-apt-repository ppa:openjdk-r/ppa
+sudo apt-get update
+sudo apt-get install openjdk-7-jdk
+sudo apt-get install openjdk-8-jdk
+sudo update-alternatives --config java
+
+ls -al /usr/lib/jvm/
+
+vim ~/.bash_aliases
+JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+
+
+
+----------------------------------------- Error -----------------------------------------
+.....
+/bin/bash -c "(build/core/tasks/check_boot_jars/check_boot_jars.py build/core/tasks/check_boot_jars/package_whitelist.txt  lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/core-oj_intermediates/classes.jar
+.....
+Error: lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/telephony-ext_intermediates/classes.jar contains class file org/codeaurora/internal/IDepersoResCallback.class, which is not in the whitelist
+----------------------------------------- Error -----------------------------------------
+
+----------------------------------------- Error -----------------------------------------
+.....
+build/core/tasks/check_boot_jars/check_boot_jars.py build/core/tasks/check_boot_jars/package_whitelist.txt
+.....
+Error: /home/ubuntu/Disk/Workspaces/AOSP/LineageOS/lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/org.ifaa.android.manager_intermediates/classes.jar contains class file org/ifaa/android/manager/IFAAManagerFactory$1.class, which is not in the whitelist
+----------------------------------------- Error -----------------------------------------
+
+# 往 build/make/core/tasks/check_boot_jars/package_whitelist.txt 追加:
+org\.codeaurora\.internal
+org\.ifaa\.android\.manager
+# 但后面也有，干脆改 check_boot_jars.py 不让它检查算了: 
+build/core/tasks/boot_jars_package_check.mk : ifneq ($(SKIP_BOOT_JARS_CHECK),true) -> ifneq ($(SKIP_BOOT_JARS_CHECK),)
+
+
+
+
+
+boot.img: make bootimage
+system.img: make snod （snod: System NO Dependent）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ------------------------> cm-12.0 <------------------------
 
 mkdir cm-12.0 && cd cm-12.0
@@ -748,6 +855,10 @@ vim .repo/manifest.xml
 // ----- vim content end -----
 
 repo sync
+
+
+
+
 
 
 
@@ -942,7 +1053,7 @@ breakfast oneplus3
 
 
 
------------------- ------------------ 
+------------------------------------ 
 ###### 如果不采用上面的 repo sync 来下载 proprietary_vendor_oneplus 
 adb root
 pushd device/oneplus/oneplus3/
@@ -961,7 +1072,13 @@ cp ./cm-13.0-ZNH5Y_oneplus3/* [path_to_aosp]/vendor/oneplus/oneplus3/
 # 同样的把 https://github.com/siankatabg/proprietary_vendor_oneplus3 弄到码云去，再下载zip，别clone了太大了，然后解压
 # 然后先把 vendor/oneplus/oneplus3 的 proprietary 复制Merge到刚刚下载解压文件去，然后再复制下载的 Merge 回 vendor/oneplus/oneplus3/下的 proprietary
 # 这样确保有的文件不变，没有的就复制过来了
------------------- ------------------ 
+------------------------------------ 
+
+
+
+
+
+
 
 
 -----------------------------------------

@@ -46,7 +46,11 @@ vim ~/.bash_aliases
 ------------------ 插入以下内容 ------------------
 
 # JDK
+
+# JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+# JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 # JAVA_HOME=/usr/local/java/jdk1.7.0_80
+# JAVA_HOME=/usr/local/java/openjdk-7u75
 # JAVA_HOME=/usr/local/java/jdk1.8.0_172
 # JAVA_HOME=/usr/local/java/openjdk-9.0.4
 JAVA_HOME=/usr/local/java/openjdk-1.8.0_40
@@ -63,17 +67,19 @@ export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
 
 
 # Android SDK
-ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
-ANDROID_NDK=$HOME/Workspaces/AndroidSDK/android-ndk-r16-beta1
+# ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
+# ANDROID_NDK=$HOME/Workspaces/AndroidSDK/android-ndk-r16-beta1
 # If already install AndroidStudio
-# ANDROID_SDK=$HOME/Android/Sdk/
-# ANDROID_NDK=$HOME/Android/Sdk/ndk-bundle
+ANDROID_SDK=$HOME/Android/Sdk/
+ANDROID_NDK=$HOME/Android/Sdk/ndk-bundle
+PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/tools
 PATH=$PATH:$ANDROID_NDK
 
-# export USE_CCACHE=1
-# ccache -M 100G
+# Enable ccache and default in ~/.ccache/
+export USE_CCACHE=1
+ccache -M 100G
 
 ------------------ 保存退出vim ------------------
 
