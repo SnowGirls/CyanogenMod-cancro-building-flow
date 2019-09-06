@@ -1002,6 +1002,23 @@ fastboot boot twrp-3.3.1-0-oneplus3.img
 
 ----------------------------------------- cm-13.0 For oneplus3 -----------------------------------------
 
+
+cd ~/Workspaces/AOSP/CyanogenMod && mkdir android_cm-13.0-ZNH5Y/ && cd android_cm-13.0-ZNH5Y/
+
+
+repo init -u git://github.com/CyanogenMod/android.git -b stable/cm-13.0-ZNH5Y
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
 source build/envsetup.sh
 
 

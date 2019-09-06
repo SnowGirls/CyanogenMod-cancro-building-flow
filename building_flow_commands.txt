@@ -78,8 +78,8 @@ PATH=$PATH:$ANDROID_SDK/tools
 PATH=$PATH:$ANDROID_NDK
 
 # Enable ccache and default in ~/.ccache/
-export USE_CCACHE=1
-ccache -M 100G
+# export USE_CCACHE=1
+# ccache -M 100G
 
 ------------------ 保存退出vim ------------------
 

@@ -1,0 +1,93 @@
+
+## openjdk
+
+sudo apt-get update
+sudo apt-get install openjdk-8-jdk
+java -version
+
+
+
+
+## android sdk
+
+cd Downloads
+wget https://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
+
+tar zxvf android-sdk_r24.4.1-linux.tgz
+mkdir -p ~/Workspaces/AndroidSDK/
+mv android-sdk-linux/ ~/Workspaces/AndroidSDK/
+cd ~/Workspaces/AndroidSDK/android-sdk-linux/
+
+./tools/android list sdk --all						# 查看下载列表
+./tools/android update sdk -u --all --filter 1,2,3	# 下载最新(Tools, Platform-tools, Build-tools) Android SDK Tools, Android SDK Platform-tools, Android SDK Build-tools
+./tools/android update sdk -u --all --filter 51		# 下载一个特定版本的SDK
+
+
+
+## repo
+
+mkdir -p ~/Workspaces/bin/
+cd ~/Workspaces/bin/
+curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
+chmod +x repo
+
+
+
+
+## ccache 
+
+apt install ccache
+
+
+
+## git
+
+apt install git
+
+
+
+
+
+vim ~/.bash_aliases 
+
+------------------ 插入以下内容 ------------------
+
+# JDK
+
+# JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+
+JRE_HOME=$JAVA_HOME/jre
+JAVA_BIN=$JAVA_HOME/bin
+CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME JAVA_BIN CLASSPATH
+PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+
+
+# AOSP
+PATH=$HOME/Workspaces/bin:$PATH
+export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
+
+
+# Android SDK
+ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
+ANDROID_NDK=$HOME/Workspaces/AndroidSDK/android-ndk-r16-beta1
+# If already install AndroidStudio
+# ANDROID_SDK=$HOME/Android/Sdk/
+# ANDROID_NDK=$HOME/Android/Sdk/ndk-bundle
+
+PATH=$PATH:$ANDROID_SDK/platform-tools
+PATH=$PATH:$ANDROID_SDK/platform-tools
+PATH=$PATH:$ANDROID_SDK/tools
+PATH=$PATH:$ANDROID_NDK
+
+# Enable ccache and default in ~/.ccache/
+# export USE_CCACHE=1
+# ccache -M 100G
+
+------------------ 保存退出vim ------------------
+
+
+source ~/.bash_aliases 
+
+
