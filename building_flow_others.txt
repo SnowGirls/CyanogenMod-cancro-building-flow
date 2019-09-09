@@ -1027,7 +1027,7 @@ source build/envsetup.sh
 #
 # 直接使用 sultanxda 的，放在 .repo/local_manifest 下， 把 sultanxda/ 改为 kerneltoast/
 # https://github.com/kerneltoast/android/blob/master/oneplus3/cm-13.0-stable/local_manifest.xml
-# 直接 repo sync --force-sync -f -j8, 完事之后直接 breakfast oneplus3 && brunch oneplus3 , 然后刷底包，然后刷机
+# 直接 repo sync --force-sync -f -j8, 完事之后直接 brunch oneplus3 , 然后刷底包，然后刷机
 #
 #########################################################################
 
@@ -1094,17 +1094,26 @@ cp ./cm-13.0-ZNH5Y_oneplus3/* [path_to_aosp]/vendor/oneplus/oneplus3/
 
 
 
+-----------------------------------------
+make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y/out/target/common/obj/JAVA_LIBRARIES/sap-api-java-static_intermediates/classes.jack', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y/out/target/common/obj/APPS/Bluetooth_intermediates/with-local/classes.dex'.  Stop.
+make: *** Waiting for unfinished jobs....
+Import includes file: /home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y/out/target/product/oneplus3/obj_arm/STATIC_LIBRARIES/libcutils_intermediates/import_includes
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y'
+-----------------------------------------
+device/oneplus/oneplus3/BoardConfig.mk:
+BOARD_HAVE_BLUETOOTH_QCOM := false -> BOARD_HAVE_BLUETOOTH_QCOM := false
 
 
 
 
 -----------------------------------------
 # 错误: make: *** No rule to make target 'vendor/oneplus/oneplus3/proprietary/framework/org.ifaa.android.manager.jar'
+-----------------------------------------
 # 这个 org.ifaa.android.manager.jar 错误其实在 extract-files.sh 那里也出现没adb pull到。
 # 氫OS 与 氧OS 都没有这个jar。2017年前是Android 6的。https://www.oneplusbbs.com/thread-3229065-1.html & http://pan.baidu.com/s/1eSutrz0 : hw5p
 # 下载个别人的Rom cm-13 for Sultan-oneplus3, 刷机后发现就有这个jar:
 // https://androidfilehost.com/?w=files&flid=98717&sort_by=date&sort_dir=DESC
------------------------------------------
+
 
 
 -----------------------------------------
@@ -1129,8 +1138,8 @@ brunch oneplus3
 
 # 刷 CM 前先刷底包
 // https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/    	(一加三的!!!!)
-// http://www.oneplusbbs.com/thread-594213-1-1.html 	(注意这是一加一的)
 // https://ciux.org/oneplus3-base-firmware.html
+// http://www.oneplusbbs.com/thread-594213-1-1.html 	(注意这是一加一的)
 // http://www.oneplusbbs.com/thread-2964248-1-2.html
 // https://forum.xda-developers.com/showpost.php?p=76943628&postcount=8
 # 所一加论坛说的： 刷了氧3.2.6底包再去刷CM14，才能正常。CM13的话，看第一条链接刷个底包看看。
