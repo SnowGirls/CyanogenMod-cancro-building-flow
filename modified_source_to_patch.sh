@@ -34,15 +34,30 @@ echo $repo_status
 for line in $repo_status
 do
 
-	echo "Handling projcet ${line}"
-	pushd $line
+	## create the .patch file using git diff
+	sub_dir=$line
+	echo "Handling projcet ${sub_dir}"
+	pushd $sub_dir
 
-	name=${line//\//_}	# / -> _
+	name=${sub_dir//\//_}	# / -> _
 	name=${name%*_}		# delete last _
 
 	echo $name	
 
 	git diff > $pwd_dir/$aosp_name/$name.patch
+
+	## copy the modified files
+	mkdir -p $pwd_dir/$aosp_name/sources
+	modified_files=`git status | grep modified | awk '{print $2}'`
+	for file in $modified_files
+	do
+		file_name=${file//\//_}
+		file_name=${file_name%*_}
+		file_name=${name}_${file_name}
+		echo $file_name
+
+		cp $file $pwd_dir/$aosp_name/sources/${file_name}
+	done
 
 	popd
 
