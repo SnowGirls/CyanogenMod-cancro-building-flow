@@ -31,8 +31,7 @@ mkdir -p $patch_dir
 
 
 pushd $aosp_dir
-# repo_status=`repo status | grep project | awk '{print $2}'`
-repo_status=`cat ~/Desktop/repo_status.txt`
+repo_status=`repo status | grep project | awk '{print $2}'`
 echo $repo_status
 
 

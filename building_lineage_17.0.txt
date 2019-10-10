@@ -16,3 +16,18 @@ vim .repo/manifest.xml
 
 repo sync --force-sync
 
+
+---------------------- 专有文件 ----------------------
+// https://wiki.lineageos.org/devices/oneplus3/build
+// 把 ./extract-files.sh 的步骤用以下操作代替
+mkdir .repo/local_manifests
+vim .repo/local_manifests/roomservice.xml
+----- vim -----
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" />
+</manifest>
+----- vim -----
+repo sync --force-sync
+---------------------- 专有文件 ----------------------
+

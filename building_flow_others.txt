@@ -732,7 +732,7 @@ repo sync -j8
 breakfast oneplus3
 
 // https://wiki.lineageos.org/devices/oneplus3/build
-// 把 ./extract-files.sh 改为
+// 把 ./extract-files.sh 的步骤用以下操作代替
 vim .repo/local_manifests/roomservice.xml
 ----- vim -----
 <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" />
