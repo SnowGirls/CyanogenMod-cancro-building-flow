@@ -19,11 +19,16 @@
 
 pwd_dir=`pwd`
 echo "pwd directory is ${pwd_dir}"
+parent_dir=`dirname $pwd_dir`
+echo "parent directory is ${parent_dir}"
 aosp_dir=$1
 echo "aosp directory is ${aosp_dir}"
 aosp_name=`basename $aosp_dir`
 aosp_name="${aosp_name}_git_diff"
-mkdir $aosp_name
+
+patch_dir=$parent_dir/CyanogenMod-cancro-modified-sources/$aosp_name
+mkdir -p $patch_dir
+
 
 pushd $aosp_dir
 # repo_status=`repo status | grep project | awk '{print $2}'`
@@ -44,10 +49,10 @@ do
 
 	echo $name	
 
-	git diff > $pwd_dir/$aosp_name/$name.patch
+	git diff > $patch_dir/$name.patch
 
 	## copy the modified files
-	mkdir -p $pwd_dir/$aosp_name/sources
+	mkdir -p $patch_dir/sources
 	modified_files=`git status | grep modified | awk '{print $2}'`
 	for file in $modified_files
 	do
@@ -56,7 +61,7 @@ do
 		file_name=${name}_${file_name}
 		echo $file_name
 
-		cp $file $pwd_dir/$aosp_name/sources/${file_name}
+		cp $file $patch_dir/sources/${file_name}
 	done
 
 	popd
