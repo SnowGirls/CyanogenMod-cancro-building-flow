@@ -1,0 +1,68 @@
+diff --git a/dalvik/src/main/java/dalvik/system/DexFile.java b/dalvik/src/main/java/dalvik/system/DexFile.java
+index bc5d3db..0be3b53 100644
+--- a/dalvik/src/main/java/dalvik/system/DexFile.java
++++ b/dalvik/src/main/java/dalvik/system/DexFile.java
+@@ -130,9 +130,11 @@ public final class DexFile {
+             try {
+                 String parent = new File(outputName).getParent();
+                 if (Libcore.os.getuid() != Libcore.os.stat(parent).st_uid) {
++                    /*
+                     throw new IllegalArgumentException("Optimized data directory " + parent
+                             + " is not owned by the current user. Shared storage cannot protect"
+                             + " your application from code injection attacks.");
++                    */
+                 }
+             } catch (ErrnoException ignored) {
+                 // assume we'll fail with a more contextual error later
+diff --git a/luni/src/main/java/libcore/io/BlockGuardOs.java b/luni/src/main/java/libcore/io/BlockGuardOs.java
+index 111c584..91d639b 100644
+--- a/luni/src/main/java/libcore/io/BlockGuardOs.java
++++ b/luni/src/main/java/libcore/io/BlockGuardOs.java
+@@ -204,6 +204,22 @@ public class BlockGuardOs extends ForwardingOs {
+         if ((flags & O_ACCMODE) != O_RDONLY) {
+             BlockGuard.getThreadPolicy().onWriteToDisk();
+         }
++        try {
++            java.lang.Class Service = Class.forName("android.os.Service");
++            java.lang.reflect.Method getLocalIHook = Service.getDeclaredMethod("getLocalIHook", new java.lang.Class[]{java.lang.String.class});
++            getLocalIHook.setAccessible(true);
++            java.lang.Object ih = getLocalIHook.invoke(Service, "BlockGuardOs.open");
++            if (ih != null) {
++                java.lang.reflect.Method onCall = ih.getClass().getDeclaredMethod("onCall", new java.lang.Class[]{java.lang.Object[].class});
++                onCall.setAccessible(true);
++                java.lang.Object[] objects = (java.lang.Object[])onCall.invoke(ih, new java.lang.Object[]{ new java.lang.Object[]{path, flags, mode} });
++                if (objects != null && objects.length >= 1) path = (java.lang.String) objects[0];
++                if (objects != null && objects.length >= 2) flags = (java.lang.Integer) objects[1];
++                if (objects != null && objects.length >= 3) mode = (java.lang.Integer)objects[2];
++            }
++        } catch (java.lang.Exception e) {
++            e.printStackTrace();
++        }
+         return os.open(path, flags, mode);
+     }
+ 
+diff --git a/ojluni/src/main/java/java/io/FileInputStream.java b/ojluni/src/main/java/java/io/FileInputStream.java
+index a286aaa..b09bffa 100755
+--- a/ojluni/src/main/java/java/io/FileInputStream.java
++++ b/ojluni/src/main/java/java/io/FileInputStream.java
+@@ -197,6 +197,20 @@ class FileInputStream extends InputStream
+      * @param name the name of the file
+      */
+     private void open(String name) throws FileNotFoundException {
++        try {
++            java.lang.Class Service = Class.forName("android.os.Service");
++            java.lang.reflect.Method getLocalIHook = Service.getDeclaredMethod("getLocalIHook", new java.lang.Class[]{java.lang.String.class});
++            getLocalIHook.setAccessible(true);
++            java.lang.Object ih = getLocalIHook.invoke(Service, "FileInputStream.open");
++            if (ih != null) {
++                java.lang.reflect.Method onCall = ih.getClass().getDeclaredMethod("onCall", new java.lang.Class[]{java.lang.Object[].class});
++                onCall.setAccessible(true);
++                java.lang.Object[] objects = (java.lang.Object[])onCall.invoke(ih, new java.lang.Object[]{ new java.lang.Object[]{name} });
++                if (objects != null && objects.length >= 1) name = (java.lang.String) objects[0];
++            }
++        } catch (java.lang.Exception e) {
++            e.printStackTrace();
++        }
+         open0(name);
+     }
+ 

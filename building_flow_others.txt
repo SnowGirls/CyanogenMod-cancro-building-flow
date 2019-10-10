@@ -686,7 +686,7 @@ vim .repo/manifest.xml
 +           fetch="https://aosp.tuna.tsinghua.edu.cn"
 // ----- vim content end -----
 
-repo sync
+repo sync --force-sync
 
 
 
@@ -993,6 +993,7 @@ make dist -j8
 
 https://dl.twrp.me/oneplus3/
 adb reboot bootloader
+fastboot oem unlock
 fastboot flash recovery twrp-3.3.1-0-oneplus3.img
 fastboot boot twrp-3.3.1-0-oneplus3.img
 

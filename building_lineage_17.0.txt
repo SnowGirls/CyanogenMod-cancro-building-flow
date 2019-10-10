@@ -1,0 +1,18 @@
+
+
+----------------------------------------- LineageOS 17.0 -----------------------------------------
+
+cd ~/Disk/Workspaces/AOSP/LineageOS
+
+mkdir lineage-17.0 && cd lineage-17.0
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync --force-sync
+

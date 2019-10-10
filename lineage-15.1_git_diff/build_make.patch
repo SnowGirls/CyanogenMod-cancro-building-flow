@@ -1,0 +1,13 @@
+diff --git a/core/tasks/boot_jars_package_check.mk b/core/tasks/boot_jars_package_check.mk
+index 188c267..b3f8cfc 100644
+--- a/core/tasks/boot_jars_package_check.mk
++++ b/core/tasks/boot_jars_package_check.mk
+@@ -16,7 +16,7 @@
+ # Rules to check if classes in the boot jars are from the whitelisted packages.
+ #
+ 
+-ifneq ($(SKIP_BOOT_JARS_CHECK),true)
++ifneq ($(SKIP_BOOT_JARS_CHECK),)
+ ifneq ($(TARGET_BUILD_PDK),true)
+ ifdef PRODUCT_BOOT_JARS
+ 
