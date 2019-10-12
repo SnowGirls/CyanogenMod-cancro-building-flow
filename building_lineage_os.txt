@@ -187,6 +187,11 @@ repo sync --force-sync
 
 breakfast oneplus3
 
+brunch oneplus3
+
+## 最终一次性编译成功!!!
+
+
 
 
 
