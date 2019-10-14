@@ -1,7 +1,9 @@
 #!/bin/bash
 
 ########
-# Usage: ./modified_source_to_patch.sh ~/Disk/Workspaces/AOSP/LineageOS/lineage-15.1
+# Usage: 
+# ./modified_source_to_patch.sh ~/Disk/Workspaces/AOSP/LineageOS/lineage-15.1
+# ./modified_source_to_patch.sh ~/Disk/Workspaces/AOSP/LineageOS/lineage-16.0
 ########
 
 # repo status | grep project 

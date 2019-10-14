@@ -67,6 +67,39 @@ https://download.lineageos.org/extras
 https://iso.mirrors.ustc.edu.cn/lineageos/su/20190709/addonsu-15.1-arm64-signed.zip
 
 
+————————————————————————————————— 一加3刷机步骤 —————————————————————————————————
+A.进入Recovery正确步骤:
+
+进入原生系统　-> 点击６次版本号 -> 打开开发者模式 -> 开发者选项　-> 勾上　OEM解锁　及　允许ADB调试　-> 等待驱动安装完毕
+-> 进入　bootloader: adb reboot bootloader
+-> sh fastboot_oem_unlock.sh (fastboot oem unlock)
+-> 按音量键选择YES，按开机键来确定　解锁bootloader -> 按音量键进入Options menu -> 选择　fastboot, 按开机键来确定进入 bootloader
+-> sh fastboot_flash_rec.sh (fastboot flash recovery twrp-3.3.1-0-oneplus3.img && fastboot boot twrp-3.3.1-0-oneplus3.img)
+-> 自动重启进入TWRP Recovery -> 此时自动进入的有mount错误，手动进入一遍Recovery, 点击Reboot-Recovery -> 
+-> 按音量键进入Options menu -> Recovery, 按开机键来确定进入 Recovery
+
+B.在Recovery刷机步骤:
+
+1. 
+Wipe -> Format Data -> yes
+
+2. 
+sh adb_push_in_rec.sh 
+(adb push Stable9.0.3_Firmware_Modem_OnePlus3.zip /sdcard/ && adb push addonsu-16.0-arm64-signed.zip /sdcard/ && adb push lineage-16.0-20191012-UNOFFICIAL-oneplus3.zip /sdcard/)
+
+3.
+Install -> StableXXX.zip (先刷底包)
+Install -> lineageXXX.zip (再刷Rom包)
+Install -> addonsuXXX.zip (最后刷SU包)
+
+4. 
+刷完后　-> Wipe Cache/Dalvik -> Reboot System (Do Not Install TWRP APP)
+————————————————————————————————— 一加3刷机步骤 —————————————————————————————————
+
+
+
+
+
 
 
 
@@ -152,6 +185,9 @@ system.img: make snod （snod: System NO Dependent）
 
 
 
+
+
+
 ----------------------------------------- LineageOS 16.0 -----------------------------------------
 
 
@@ -191,8 +227,19 @@ brunch oneplus3
 
 ## 最终一次性编译成功!!!
 
+## 修改源码后: make update-api
 
+## 1. 底包
+一加3: https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus3.zip
+一加3T: https://f.celsoazevedo.com/file/cfiles/oneplus3t-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus_3T.zip
+## 2. addonsu
+https://download.lineageos.org/extras
+https://mirrorbits.lineageos.org/su/20190709/addonsu-16.0-arm64-signed.zip
+## 3. recovery image
+https://twrp.me/oneplus/oneplusthree.html
+https://dl.twrp.me/oneplus3/twrp-3.3.1-0-oneplus3.img.html
 
+# 刷TWRP后自动重启进入TWRP Recovery有Mount问题，手动重启再进入一遍: 先刷底包 -> 再刷Rom包 -> 最后刷SU包
 
 
 
