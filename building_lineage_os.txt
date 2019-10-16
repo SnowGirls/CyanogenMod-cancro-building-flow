@@ -230,6 +230,7 @@ brunch oneplus3
 ## 修改源码后: make update-api
 
 ## 1. 底包
+https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
 一加3: https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus3.zip
 一加3T: https://f.celsoazevedo.com/file/cfiles/oneplus3t-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus_3T.zip
 ## 2. addonsu
@@ -274,9 +275,15 @@ vim .repo/local_manifests/roomservice.xml
 ----- vim -----
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" />
+	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-17.0" />
 </manifest>
 ----- vim -----
 repo sync --force-sync
 ---------------------- 专有文件 ----------------------
+
+
+. build/envsetup.sh
+
+
+breakfast oneplus3
 
