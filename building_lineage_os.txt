@@ -248,6 +248,27 @@ https://dl.twrp.me/oneplus3/twrp-3.3.1-0-oneplus3.img.html
 
 
 
+## Android Studio To View Sources
+
+source build/envsetup.sh && breakfast oneplus3 && make idegen && development/tools/idegen/idegen.sh
+
+
+--------------------------------------------------------------------------------------------------
+## 执行命令出现错误: development/tools/idegen/idegen.sh 
+find: ‘out/target/product/oneplus3/obj/PACKAGING/target_files_intermediates/lineage_oneplus3-target_files-eng.ubuntu/RECOVERY/RAMDISK/d’: Permission denied
+find: ‘out/target/product/oneplus3/obj/PACKAGING/target_files_intermediates/lineage_oneplus3-target_files-eng.ubuntu/BOOT/RAMDISK/d’: Permission denied
+find: ‘out/target/product/oneplus3/root/d’: Permission denied
+find: ‘out/target/product/oneplus3/recovery/root/d’: Permission denied
+Read excludes: 43ms
+Traversed tree: 148649ms
+
+## 发现这几个路径是软链，都指向　/sys/kernel/debug
+## 进入　su 后，发现　chmod a+r -R /sys/kernel/debug　还是不能完全解决, 可能要给到w权限, 于是不管它了, 毕竟修改到系统级的东西．
+--------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 ----------------------------------------- LineageOS 17.0 -----------------------------------------
