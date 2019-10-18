@@ -415,6 +415,7 @@ source build/envsetup.sh && make idegen && development/tools/idegen/idegen.sh
 
 
 vim ~/.AndroidStudio3.2/config/studio64.vmoptions
+vim ~/.AndroidStudio[version_number]/config/studio64.vmoptions
 
 -Xms1g
 -Xmx4g
@@ -437,7 +438,7 @@ fs.inotify.max_user_watches = 500000
 
 # https://stackoverflow.com/a/37627121
 cd [~/Workspaces/Softwares/]android-studio/bin/
-cp idea.properties idea.properties.defaul
+cp idea.properties idea.properties.defaulf
 vim idea.properties
 
 

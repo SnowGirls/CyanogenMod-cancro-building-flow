@@ -180,6 +180,15 @@ system.img: make snod （snod: System NO Dependent）
 
 
 
+## Android Studio To View Sources
+
+source build/envsetup.sh && breakfast oneplus3 && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+
+
+
 
 
 
@@ -263,7 +272,7 @@ Read excludes: 43ms
 Traversed tree: 148649ms
 
 ## 发现这几个路径是软链，都指向　/sys/kernel/debug
-## 进入　su 后，发现　chmod a+r -R /sys/kernel/debug　还是不能完全解决, 可能要给到w权限, 于是不管它了, 毕竟修改到系统级的东西．
+## 进入　su 后，发现　chmod a+r -R /sys/kernel/debug　还是不能完全解决, 可能要给到x/w权限, 于是不管它了, 毕竟修改到系统级的东西．
 --------------------------------------------------------------------------------------------------
 
 
