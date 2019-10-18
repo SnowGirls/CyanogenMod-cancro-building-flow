@@ -186,7 +186,7 @@ source build/envsetup.sh && breakfast oneplus3 && make idegen && development/too
 
 Android Studio -> File -> Open -> android.ipr
 
-
+## 不設置 Project SDK 了，會導致 indexing 很久並且佔據大量內存．或者把　android.ipr　内容的　project-jdk-name="" project-jdk-type=""　设置为空．
 
 
 
