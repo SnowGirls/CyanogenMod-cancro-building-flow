@@ -617,6 +617,9 @@ Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 又或
 
 // Android Studio 提示 Inotify Watches Limit！ // 参考: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
 sudo vim /etc/sysctl.d/idea.conf
+--------- contents ---------
+fs.inotify.max_user_watches = 524288
+--------- contents ---------
 sudo sysctl -p --system
 
 
