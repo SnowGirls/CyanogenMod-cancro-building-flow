@@ -2,6 +2,9 @@
 
 ----------------------------------------- LineageOS -----------------------------------------
 
+
+
+
 mkdir LineageOS && cd LineageOS/
 
 
@@ -221,7 +224,7 @@ vim .repo/local_manifests/roomservice.xml
 ----- vim -----
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" />
+	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-16.0" />
 </manifest>
 ----- vim -----
 repo sync --force-sync
@@ -276,6 +279,13 @@ Traversed tree: 148649ms
 --------------------------------------------------------------------------------------------------
 
 
+
+--------------------------------------------------------------------------------------------------
+## ERROR: Users are strongly recommended to migrate to the new APIs.
+
+## 原因是 Ubuntu 18.04 一些环境及开发包没装好: 
+sudo apt install -y gnupg flex bison gperf build-essential zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc ccache
+--------------------------------------------------------------------------------------------------
 
 
 
