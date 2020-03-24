@@ -290,6 +290,34 @@ sudo apt install -y gnupg flex bison gperf build-essential zlib1g-dev gcc-multil
 
 
 
+##### 编译 libandroid_runtime.so #####
+
+mmm frameworks/base/core/jni/
+
+# 新机制不允许 系统 lib 被 普通 APP 加载:
+# https://www.jianshu.com/p/4be3d1dafbec
+# https://jackwish.net/2017/namespace-based-dynamic-linking-chn.html
+
+# 需要把 libandroid_runtime.so 如 liblog.so、libc.so、libm.so 一样加入白名单中 /system/etc/public.libraries.txt
+mount -o remount,rw /system
+echo "libandroid_runtime.so\n" >> /etc/public.libraries.txt
+reboot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ----------------------------------------- LineageOS 17.0 -----------------------------------------
 
