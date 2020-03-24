@@ -238,6 +238,7 @@ breakfast oneplus3
 brunch oneplus3
 
 ## 最终一次性编译成功!!!
+## 其实 JDK 版本也不用换, 已经在 prebuilts/jdk/jdk9/linux-x86 了
 
 ## 修改源码后: make update-api
 
