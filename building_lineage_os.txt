@@ -305,6 +305,12 @@ reboot
 
 
 
+##### 编译 framework #####
+
+mmm frameworks/base/:framework
+[100% 10/10] Install: ***/lineage-16.0/out/target/product/oneplus3/system/framework/arm64/boot.art
+#### build completed successfully (02:49 (mm:ss)) ####
+
 
 
 
