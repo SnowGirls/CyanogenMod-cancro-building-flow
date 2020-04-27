@@ -315,6 +315,19 @@ mmm frameworks/base/:framework
 
 
 
+##### /system/bin/service 命令 #####
+
+mmm showcommands frameworks/native/cmds/service
+
+
+
+mmm showcommands bionic/libc/
+mmm showcommands external/json-c/
+mmm showcommands frameworks/base/media/jni
+
+
+
+
 
 
 
