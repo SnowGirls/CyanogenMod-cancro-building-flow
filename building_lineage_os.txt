@@ -179,6 +179,9 @@ boot.img: make bootimage
 system.img: make snod （snod: System NO Dependent）
 
 
+adb reboot bootloader
+fastboot boot boot.img
+
 
 
 
@@ -320,12 +323,11 @@ mmm frameworks/base/:framework
 mmm showcommands frameworks/native/cmds/service
 
 
-
 mmm showcommands bionic/libc/
 mmm showcommands external/json-c/
 mmm showcommands frameworks/base/media/jni
 
-
+adb root && adb shell mount -o remount,rw /system
 
 
 
