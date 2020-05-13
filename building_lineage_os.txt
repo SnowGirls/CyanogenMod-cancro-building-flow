@@ -332,6 +332,12 @@ adb root && adb shell mount -o remount,rw /system
 
 
 
+##### 编译内核 boot.img #####
+. build/envsetup.sh && breakfast oneplus3
+make bootimage
+adb reboot bootloader
+fastboot boot ${OUT}/boot.img
+
 
 
 

@@ -1,0 +1,24 @@
+
+
+gcc --version
+g++ --version
+
+sudo apt-get install gcc-6
+sudo apt-get install g++-6
+
+sudo apt-get install gcc-5
+sudo apt-get install g++-5
+
+sudo apt-get install gcc-4.8
+sudo apt-get install g++-4.8
+
+ls -al /usr/bin/gcc*
+ls -al /usr/bin/g++*
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
+
+sudo update-alternatives --config gcc
+
