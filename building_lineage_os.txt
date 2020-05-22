@@ -336,7 +336,8 @@ adb root && adb shell mount -o remount,rw /system
 . build/envsetup.sh && breakfast oneplus3
 make bootimage
 adb reboot bootloader
-fastboot boot ${OUT}/boot.img
+fastboot boot ${OUT}/boot.img 			# 下次启动会恢复原来的 boot.img
+fastboot flash boot ${OUT}/boot.img  	# 永久替换了
 
 
 
