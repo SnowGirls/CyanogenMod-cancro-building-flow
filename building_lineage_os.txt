@@ -116,10 +116,34 @@ make clean-framework
 mmm frameworks/base/:framework
 [100% 2/2] Install: xxx/out/target/product/oneplus3/system/framework/framework.jar
 
+
+// Than push all modified/complied to device
+export OUT=__path_to_your_aosp_dir__/out/target/product/oneplus3
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/
+
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/
+
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+
+i.e.
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "May 29 06" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "May 29 06" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "May 29 06" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+
+
+adb shell sync
+adb shell sync system
+
+
+
 # 编译(system/framework/)所有，包括 .art, .oat, .vdex 
 make update-api
 pushd frameworks/base/ && mma && popd
 mmma frameworks/base/
+
+
+
 
 
 # 单独编译 libandroid_runtime.so
@@ -162,7 +186,7 @@ Error: lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/telephony-ext_intermedi
 .....
 build/core/tasks/check_boot_jars/check_boot_jars.py build/core/tasks/check_boot_jars/package_whitelist.txt
 .....
-Error: /home/ubuntu/Disk/Workspaces/AOSP/LineageOS/lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/org.ifaa.android.manager_intermediates/classes.jar contains class file org/ifaa/android/manager/IFAAManagerFactory$1.class, which is not in the whitelist
+Error: out/target/common/obj/JAVA_LIBRARIES/org.ifaa.android.manager_intermediates/classes.jar contains class file org/ifaa/android/manager/IFAAManagerFactory$1.class, which is not in the whitelist
 ----------------------------------------- Error -----------------------------------------
 
 # 往 build/make/core/tasks/check_boot_jars/package_whitelist.txt 追加:
@@ -194,6 +218,22 @@ Android Studio -> File -> Open -> android.ipr
 
 ## 不設置 Project SDK 了，會導致 indexing 很久並且佔據大量內存．或者把　android.ipr　内容的　project-jdk-name="" project-jdk-type=""　设置为空．
 
+
+
+
+
+
+_________________________________________________________________________
+
+模块 	make命令 	mmm命令
+init 	make init 	mmm system/core/init
+zygote 	make app_process 	mmm frameworks/base/cmds/app_process
+system_server 	make services 	mmm frameworks/base/services
+java framework 	make framework 	mmm frameworks/base
+framework资源 	make framework-res 	mmm frameworks/base/core/res
+jni framework 	make libandroid_runtime 	mmm frameworks/base/core/jni
+binder 	make libbinder 	mmm frameworks/native/libs/binder
+_________________________________________________________________________
 
 
 
@@ -293,6 +333,58 @@ sudo apt install -y gnupg flex bison gperf build-essential zlib1g-dev gcc-multil
 
 
 
+
+
+
+
+### 往 libc 里添加 export 函数的时候:
+
+## 1. 先往 bionic/libc/libc.map.txt 加入你的 [your_export_function_name]
+## 2. 然后 python bionic/libc/tools/genversion-scripts.py 会自动生成各 arch 的 map 文件
+
+
+mmm showcommands bionic/libc/
+--------------------------------------------------------------------------------------------------
+******************************************************
+error: VNDK library: libc's ABI has EXTENDING CHANGES Please check compatiblity report at : out/soong/.intermediates/bionic/libc/libc/android_arm64_armv8-a_kryo_core_shared/libc.so.abidiff
+******************************************************
+ ---- Please update abi references by running platform/development/vndk/tools/header-checker/utils/create_reference_dumps.py -l libc ----
+--------------------------------------------------------------------------------------------------
+
+
+development/vndk/tools/header-checker/utils/create_reference_dumps.py -l libc
+--------------------------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "development/vndk/tools/header-checker/utils/create_reference_dumps.py", line 224, in <module>
+    main()
+  File "development/vndk/tools/header-checker/utils/create_reference_dumps.py", line 210, in main
+    targets = [Target(True, product), Target(False, product)]
+  File "development/vndk/tools/header-checker/utils/create_reference_dumps.py", line 29, in __init__
+    self.arch = build_vars[1]
+IndexError: list index out of range
+--------------------------------------------------------------------------------------------------
+
+
+## 修改编译工具源码 development/vndk/tools/header-checker/utils/utils.py 的方法 get_build_vars_for_product, 注释掉拼接 lunch 的命令
+## 重新执行上面，成功后，重新编译 mmm showcommands bionic/libc/
+nm -D [path_to_libc.so] | grep [your_export_function_name]
+objdump -T [path_to_libc.so] | grep [your_export_function_name]
+
+## 参考: 
+// 1. https://blog.csdn.net/m0_37340681/article/details/98734047
+// 2. https://www.jianshu.com/p/ff31f3e693bb
+// 3. https://blog.csdn.net/u013082948/article/details/106060443
+
+
+
+
+
+
+
+
+
+
+
 ##### 编译 libandroid_runtime.so #####
 
 mmm frameworks/base/core/jni/
@@ -338,6 +430,29 @@ make bootimage
 adb reboot bootloader
 fastboot boot ${OUT}/boot.img 			# 下次启动会恢复原来的 boot.img
 fastboot flash boot ${OUT}/boot.img  	# 永久替换了
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
