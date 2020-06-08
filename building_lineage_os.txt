@@ -200,7 +200,7 @@ build/core/tasks/boot_jars_package_check.mk : ifneq ($(SKIP_BOOT_JARS_CHECK),tru
 
 
 boot.img: make bootimage
-system.img: make snod （snod: System NO Dependent）
+system.img: make snod (snod: System NO Dependent)
 
 
 adb reboot bootloader
