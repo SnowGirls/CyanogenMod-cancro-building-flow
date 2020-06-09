@@ -41,28 +41,39 @@ for line in $repo_status
 do
 
 	## create the .patch file using git diff
-	sub_dir=$line
-	echo "Handling projcet ${sub_dir}"
-	pushd $sub_dir
+	projcet_dir=$line
+	echo ""
+	echo ""
+	echo "************************** Handling projcet ${projcet_dir} **************************"
+	pushd $projcet_dir
 
-	name=${sub_dir//\//_}	# / -> _
-	name=${name%*_}		# delete last _
+	projcet_name=${projcet_dir//\//_}	# / -> _
+	projcet_name=${projcet_name%*_}		# delete last _
 
-	echo $name	
+	echo $projcet_name	
 
-	git diff > $patch_dir/$name.patch
+	git diff > ${patch_dir}/${projcet_name}.patch
+	git status -s > ${patch_dir}/${projcet_name}.status
 
 	## copy the modified files
 	mkdir -p $patch_dir/sources
-	modified_files=`git status | grep modified | awk '{print $2}'`
+	modified_files=`git status -s | awk '{print $2}'`
 	for file in $modified_files
 	do
-		file_name=${file//\//_}
-		file_name=${file_name%*_}
-		file_name=${name}_${file_name}
-		echo $file_name
+		file_name=${projcet_dir}${file}
+		# echo $file_name
 
-		cp $file $patch_dir/sources/${file_name}
+		if [ "${file_name##*.}" = "gz" ]; then
+			echo "omited file -> $file_name"
+			continue
+		fi
+
+		target_dir=`dirname $patch_dir/sources/${file_name}`
+		echo "mkdir -p ${target_dir}"
+		mkdir -p ${target_dir}
+
+		echo "cp -r $file ${target_dir}/"
+		cp -r $file ${target_dir}/
 	done
 
 	popd
