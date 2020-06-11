@@ -29,6 +29,7 @@ for dir in `ls ./`
 do
 	echo $dir
 	echo "cp -r ${patch_dir}/sources/${dir} ${aosp_dir}/"
+	## or using git apply __path_to_patch_file__ but need to reset first
 done
 
 echo -e "\n"
