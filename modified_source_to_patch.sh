@@ -23,13 +23,20 @@ pwd_dir=`pwd`
 echo "pwd directory is ${pwd_dir}"
 parent_dir=`dirname $pwd_dir`
 echo "parent directory is ${parent_dir}"
+
 aosp_dir=$1
 echo "aosp directory is ${aosp_dir}"
 aosp_name=`basename $aosp_dir`
-aosp_name="${aosp_name}_git_diff"
+aosp_diff_name="${aosp_name}_git_diff"
 
-patch_dir=$parent_dir/CyanogenMod-cancro-modified-sources/$aosp_name
-mkdir -p $patch_dir
+if [ "$2" = "" ]
+then
+  patch_dir=${parent_dir}/CyanogenMod-cancro-modified-sources/${aosp_diff_name}
+else  
+  patch_dir=$2/${aosp_diff_name}
+fi
+mkdir -p ${patch_dir}
+echo "patch directory is ${patch_dir}"
 
 
 pushd $aosp_dir
@@ -53,10 +60,13 @@ do
 	echo $projcet_name	
 
 	git diff > ${patch_dir}/${projcet_name}.patch
-	git status -s > ${patch_dir}/${projcet_name}.status
+
+	## save status to status dir
+	mkdir -p ${patch_dir}/status
+	git status -s > ${patch_dir}/status/${projcet_name}.status
 
 	## copy the modified files
-	mkdir -p $patch_dir/sources
+	mkdir -p ${patch_dir}/sources
 	modified_files=`git status -s | awk '{print $2}'`
 	for file in $modified_files
 	do
@@ -68,7 +78,7 @@ do
 			continue
 		fi
 
-		target_dir=`dirname $patch_dir/sources/${file_name}`
+		target_dir=`dirname ${patch_dir}/sources/${file_name}`
 		echo "mkdir -p ${target_dir}"
 		mkdir -p ${target_dir}
 
