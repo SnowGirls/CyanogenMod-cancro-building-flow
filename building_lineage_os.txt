@@ -278,7 +278,11 @@ repo sync --force-sync
 
 breakfast oneplus3
 
+## export WITH_SU=true 可选, 编译时带上 su 就不需要再刷 addonsu 了
+
 brunch oneplus3
+
+
 
 ## 最终一次性编译成功!!!
 ## 其实 JDK 版本也不用换, 已经在 prebuilts/jdk/jdk9/linux-x86 了
@@ -400,11 +404,22 @@ reboot
 
 
 
+
 ##### 编译 framework #####
 
 mmm frameworks/base/:framework
 [100% 10/10] Install: ***/lineage-16.0/out/target/product/oneplus3/system/framework/arm64/boot.art
 #### build completed successfully (02:49 (mm:ss)) ####
+
+adb root && adb remount 
+
+// Than push all modified/complied (jar,vdex,oat,art ...) to device as mentioned by 15.1 aboved
+
+export OUT=__path_to_your_aosp_dir__/out/target/product/oneplus3
+export __modify_time_string__="Jun 15 02"
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+
+adb shell sync && adb shell sync system
 
 
 
