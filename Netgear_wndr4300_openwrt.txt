@@ -7,6 +7,9 @@
 // http://www.5lazy.cn/post-146.html
 // http://www.5lazy.cn/post-144.html
 // https://pylist.com/t/1583242216
+// https://archive.openwrt.org/ && https://archive.openwrt.org/releases/19.07.2/targets/ar71xx/nand/
+
+
 
 apt install tftp
 
