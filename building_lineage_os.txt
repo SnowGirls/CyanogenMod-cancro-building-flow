@@ -278,7 +278,7 @@ repo sync --force-sync
 
 breakfast oneplus3
 
-## export WITH_SU=true 可选, 编译时带上 su 就不需要再刷 addonsu 了
+export WITH_SU=true 	## 可选, 编译时带上 su 就不需要再刷 addonsu 了
 
 brunch oneplus3
 
@@ -369,10 +369,17 @@ IndexError: list index out of range
 --------------------------------------------------------------------------------------------------
 
 
-## 修改编译工具源码 development/vndk/tools/header-checker/utils/utils.py 的方法 get_build_vars_for_product, 注释掉拼接 lunch 的命令
+## 修改编译工具源码 development/vndk/tools/header-checker/utils/utils.py 的方法 get_build_vars_for_product, 注释掉拼接 lunch 的命令:
+    # if product is not None:
+    #     cmd += 'source build/envsetup.sh>/dev/null && lunch>/dev/null ' + product + '&&'
+
 ## 重新执行上面，成功后，重新编译 mmm showcommands bionic/libc/
 nm -D [path_to_libc.so] | grep [your_export_function_name]
 objdump -T [path_to_libc.so] | grep [your_export_function_name]
+
+i.e. 
+nm -D out/target/product/oneplus3/system/lib64/libc.so | grep kt
+objdump -T out/target/product/oneplus3/system/lib64/libc.so | grep kt
 
 ## 参考: 
 // 1. https://blog.csdn.net/m0_37340681/article/details/98734047
