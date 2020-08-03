@@ -447,6 +447,7 @@ adb root && adb shell mount -o remount,rw /system
 
 
 ##### 编译 内核kernel boot.img #####
+
 . build/envsetup.sh && breakfast oneplus3
 make bootimage
 adb reboot bootloader
@@ -463,12 +464,23 @@ fastboot flash boot ${OUT}/boot.img  	# 永久替换了
 
 
 
+##### 编译 libart.so #####
 
+mmm art/
+--------------------------------------------------------------------------------------------------
+ninja: no work to do.
+[1/1] out/soong/.bootstrap/bi...g_build out/soong/build.ninja
+out/build-lineage_oneplus3-_art_Android.mk-cleanspec.ninja is missing, regenerating...
+out/build-lineage_oneplus3-_art_Android.mk.ninja is missing, regenerating...
+[ 75% 3/4] glob frameworks/base/core/java/**/*.java
+ninja: error: 'out/host/linux-x86/framework/apache-xml-hostdex.jar', needed by 'out/host/linux-x86/framework/x86_64/core.art', missing and no known rule to make it
+--------------------------------------------------------------------------------------------------
 
+# 原因是没有构建依赖: 
+# mmm 构建模块指定路径，不构建依赖
+# mmma 构建模块指定路径，并构建依赖
 
-
-
-
+mmma art/
 
 
 
