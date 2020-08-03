@@ -483,6 +483,7 @@ ninja: error: 'out/host/linux-x86/framework/apache-xml-hostdex.jar', needed by '
 mmma art/
 
 
+# 当构件过依赖后，以后若想再编译，则可以直接 mmm art/ 了
 
 
 
