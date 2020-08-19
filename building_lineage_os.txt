@@ -412,6 +412,7 @@ reboot
 
 
 
+
 ##### 编译 framework #####
 
 mmm frameworks/base/:framework
@@ -423,10 +424,22 @@ adb root && adb remount
 // Than push all modified/complied (jar,vdex,oat,art ...) to device as mentioned by 15.1 aboved
 
 export OUT=__path_to_your_aosp_dir__/out/target/product/oneplus3
+
 export __modify_time_string__="Jun 15 02"
+
 ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
 
 adb shell sync && adb shell sync system
+
+
+// Just print out
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' 
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' 
+
+i.e.
+mkdir -p system/framework/arm64/
+xargs -I{} cp {} system/framework/arm64/
 
 
 
