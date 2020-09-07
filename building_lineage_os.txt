@@ -498,9 +498,16 @@ mmma art/
 
 # 当构件过依赖后，以后若想再编译，则可以直接 mmm art/ 了
 
+# 又或者仅单独编译 libart.so，省些编译了其他so的时间:
+
+pushd ./art/runtime && mm -j8 && popd
 
 
 
+
+##### 编译 libc.so #####
+
+pushd bionic/libc && mm && popd
 
 
 
