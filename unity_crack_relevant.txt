@@ -1,0 +1,11 @@
+
+一、修改代码：
+1. 利用 dnSpy[https://github.com/0xd4d/dnSpy/releases] 来反编/修改/导出 CSharp 代码
+
+1.1 用dnSpy导出所有代码，在Sumblime Text里搜索到要改的点所在的类及方法
+1.2 在dnSpy里找到代码所在，右键 - 编辑方法 - 编译 - 保存模块/全部保存
+
+
+二、修改资源：
+1. 用 AssetStudio[https://github.com/Perfare/AssetStudio] 找到 Texture2D及PathID
+2. 然后用 Unity Assets Bundle Extractor 替换资源图片，最后压缩保存资源包，并替换原资源包

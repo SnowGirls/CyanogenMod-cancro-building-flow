@@ -280,6 +280,8 @@ breakfast oneplus3
 
 export WITH_SU=true 	## 可选, 编译时带上 su 就不需要再刷 addonsu 了
 
+## 一次性方便复制的: . build/envsetup.sh && breakfast oneplus3 && export WITH_SU=true
+
 brunch oneplus3
 
 
@@ -290,6 +292,10 @@ brunch oneplus3
 ## 修改源码后: make update-api
 
 ## 1. 底包
+https://www.celsoazevedo.com/files/android/
+https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
+https://www.celsoazevedo.com/files/android/oneplus3t-modem-firmware/
+
 https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
 一加3: https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus3.zip
 一加3T: https://f.celsoazevedo.com/file/cfiles/oneplus3t-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus_3T.zip
