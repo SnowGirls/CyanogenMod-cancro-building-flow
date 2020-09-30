@@ -63,12 +63,33 @@ c. <global-metadata> 文件是指 Apk 包里的 assets\bin\Data\Managed\Metadata
 查看: keytool -list -v -keystore ~/.android/debug.keystore	## 直接回车了，也可以输入 android 这默认密码
 生成: keytool -genkey -alias key0 -keypass 123456 -keyalg RSA -keysize 2048 -validity 36500 -keystore ./key0_123456.keystore -storepass 123456	## 最后确认 Y/yes
 
-签名APK: jarsigner -verbose -keystore ./key0_123456.keystore -signedjar [path_2_out_signed_apk] [path_2_in_apk] key0  ## 但用 jadx-gui 打开它认不出签名，还是用 java -jar
-验证APK: jarsigner -verify [path_2_signed_apk] -verbose 		## -certs
 
 
-java -jar 方式: 
+
+签名APK
+
+A 方式. 用 jarsigner ，但 jarsigner 太老了，只支持 v1 不建议使用了，验证时APK: jarsigner -verify [path_2_signed_apk] -verbose 		## -certs
+
+jarsigner -verbose -keystore ./key0_123456.keystore -signedjar [path_2_out_signed_apk] [path_2_in_apk] key0  
+
+
+
+B 方式. java -jar signapk.jar. 从 [https://github.com/appium-boneyard/sign] 下载 signapk.jar 
+
 java -jar 'path_2_signapk.jar' 'path_2_your_x509_pem' 'path_2_your_pk8' path_2_your_input.apk path_2_your_output_signed.apk
+
+
+
+C 方式. 推荐官方 apksigner。在 Android SDK 的 build-tools 目录下 [Sdk/build-tools/29.0.2/apksigner], 签名的包会被覆盖
+apksigner sign --ks-pass pass:123456 --ks release.jks app.apk
+apksigner verify --verbose --print-certs app.apk
+
+
+
+
+查看 APK 的签名:
+keytool -list -printcert -jarfile [path_2_your_signed_apk]
+apksigner verify --verbose --print-certs [path_2_your_signed_apk]
 
 
 
