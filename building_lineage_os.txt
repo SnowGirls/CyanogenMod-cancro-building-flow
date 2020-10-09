@@ -544,18 +544,52 @@ Device gemini not found. Attempting to retrieve device repository from LineageOS
 Failed to search GitHub
 
 # 打开 vendor/lineage/build/tools/roomservice.py 搜索 ‘Failed to search GitHub’ 发现是开了代理，请求不了GitHub。
-# 直接把浏览器打开 url 把那段json保存成文件，暂时让 roomservice.py 读取吧:
 
+# 1. 直接把浏览器打开 url 把那段json保存成文件，暂时让 roomservice.py 读取吧:
+
+``````
 with open("/home/ubuntu/Downloads/repositories.json") as f:
     content = f.read()
     # print(content)
     result = json.loads(content)
     # print(result)
+``````
 
-# 但发现 roomservice.py 下面还有一句 result = json.loads(urllib.request.urlopen(githubreq).read().decode()) ，看来还是得解决在 python 设置proxy请求问题
+# 2. 但发现 roomservice.py 下面还有一句 result = json.loads(urllib.request.urlopen(githubreq).read().decode()) ，看来还是得解决在 python 设置 socks5 proxy 请求问题
+# 参考:
+https://www.cnblogs.com/kainhuck/p/12421700.html
+https://blog.csdn.net/huangkangying/article/details/78858446
 
+``````
+def get_result_by_socks5(githubreq):
+    url = githubreq.get_full_url()
+    socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 1090)
+    socket.socket = socks.socksocket
+    r = requests.get(url)
+    result = r.content.decode('utf-8')
+    return result
+``````
 
+# 把 roomservice.py 的所有代码是
+json.loads(urllib.request.urlopen(githubreq).read().decode()) 
+# 换成
+json.loads(get_result_by_socks5(githubreq))
 
+# 把下面文件中包含 xiaomi 或 gemini 的行删掉:
+lineage-16.0/.repo/local_manifests/roomservice.xml
+lineage-16.0/.repo/project.list
+lineage-16.0/.repo/.repo_fetchtimes.json
+
+# 同时把对应的文件夹删掉:
+lineage-16.0/.repo/projects/device/xiaomi/
+lineage-16.0/.repo/projects/kernel/xiaomi/
+lineage-16.0/.repo/project-objects/LineageOS/android_device_xiaomi_gemini.git
+lineage-16.0/.repo/project-objects/LineageOS/android_device_xiaomi_msm8996-common.git
+lineage-16.0/.repo/project-objects/LineageOS/android_kernel_xiaomi_msm8996.git
+
+# 然后再次
+
+breakfast gemini
 
 
 
