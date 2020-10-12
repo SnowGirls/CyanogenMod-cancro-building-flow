@@ -530,6 +530,9 @@ pushd bionic/libc && mm && popd
 
 
 
+
+
+
 export WITH_SU=true 
 
 . build/envsetup.sh
@@ -560,7 +563,16 @@ with open("/home/ubuntu/Downloads/repositories.json") as f:
 https://www.cnblogs.com/kainhuck/p/12421700.html
 https://blog.csdn.net/huangkangying/article/details/78858446
 
+git config --global http.proxy 'socks5://127.0.0.1:1090'
+git config --global https.proxy 'socks5://127.0.0.1:1090'
+cat ~/.gitconfig
+
+
 ``````
+import socks
+import socket
+import requests
+
 def get_result_by_socks5(githubreq):
     url = githubreq.get_full_url()
     socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 1090)
@@ -590,6 +602,70 @@ lineage-16.0/.repo/project-objects/LineageOS/android_kernel_xiaomi_msm8996.git
 # 然后再次
 
 breakfast gemini
+
+
+
+
+
+Error:
+--------------------------------------------------------------------------------------------------
+build/target/product/product_launched_with_m.mk:2: error: _nic.PRODUCTS.[[device/xiaomi/gemini/lineage_gemini.mk]]: "vendor/xiaomi/msm8996-common/msm8996-common-vendor.mk" does not exist.
+23:22:25 dumpvars failed with: exit status 1
+--------------------------------------------------------------------------------------------------
+# 参考
+https://blog.csdn.net/yusakul/article/details/103270156
+https://blog.csdn.net/fftt516/article/details/78160488
+
+# 拉取 vendor 需要Mi5手机连 adb 并且 root，我们还是从 github 下载吧 [小米开源 https://github.com/MiCode]
+# 类似
+https://github.com/mi3-dev
+# 请去
+https://github.com/mi5-dev 
+# 把两个 vendor 库写进 lineage-16.0/.repo/local_manifests/roomservice.xml 去:
+
+``````
+  <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+``````
+
+# 然后
+
+repo sync --force-sync 
+
+
+
+# 如果需要提交你的修改才能 sync ，那么请切换个新分支来提交，sync 完毕后 rebase 一下最新的，别 merge ，方便管理。
+
+
+
+# 最后
+
+brunch gemini
+
+
+
+# 下载 Recovery 和 固件
+https://twrp.me/Devices/Xiaomi/
+https://xiaomifirmwareupdater.com/
+
+# 1. 出现 ERROR: This package requires firmware from MIUI 8.8.30 ...
+# 1.1 可以到 Rom zip 包的 META-INF/com/google/updater-script 文件，找到此处的 assert 所在行，然后删掉此行，保存回zip。
+# 1.2 又或者下载 [https://xiaomifirmwareupdater.com/archive/firmware/gemini/] fw_gemini_miui_MI5Global_8.8.30.zip 固件包，升级了此 firmware 先。
+
+# 2. 出现ERROR 7: TWRP 要用 twrp-3.2.1-0-gemini.img 这个 3.2.1 版本的。尝试了 3.4.0 的会出现 ERROR: 7 错误, mkdir /cache/xxx 的错误。
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
