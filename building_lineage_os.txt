@@ -539,12 +539,13 @@ export WITH_SU=true
 
 breakfast gemini
 
-
+----------------------------------------------------------------------------
 including vendor/lineage/vendorsetup.sh
 build/make/core/product_config.mk:234: error: Can not locate config makefile for product "lineage_gemini".
 18:52:34 dumpvars failed with: exit status 1
 Device gemini not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
 Failed to search GitHub
+----------------------------------------------------------------------------
 
 # 打开 vendor/lineage/build/tools/roomservice.py 搜索 ‘Failed to search GitHub’ 发现是开了代理，请求不了GitHub。
 
