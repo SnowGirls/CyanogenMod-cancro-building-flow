@@ -1,5 +1,15 @@
 
 
+###### 无需科学上网！访问所有 https://source.android.com 的链接请把 com 改成 google.cn 即: https://source.android.google.cn ######
+
+##### 谷歌源码镜像:
+https://source.codeaurora.org/
+##### 如 chromium/src 的 https://source.codeaurora.org/quic/lc/chromium/src/
+
+repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest 	# 是清华提供的镜像源
+repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest  		# 是中国科学技术大学的镜像源
+
+
 ______________________________ 下载开发软件  ______________________________________
 
 # 1. Android Studio: android-studio-ide-181.5056338-linux.zip

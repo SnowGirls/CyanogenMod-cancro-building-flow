@@ -474,6 +474,14 @@ fastboot boot ${OUT}/boot.img 			# 下次启动会恢复原来的 boot.img
 fastboot flash boot ${OUT}/boot.img  	# 永久替换了
 
 
+# 查看 kernel log:
+dmesg -w
+cat proc/kmsg
+# https://www.cnblogs.com/ZanyRain/p/10076645.html
+cat /proc/last_kmsg 
+cat /sys/fs/pstore/console-ramoops
+
+
 
 
 
@@ -629,6 +637,33 @@ https://github.com/mi5-dev
   <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
 ``````
 
+------------------------------------------------- 參考的roomservice.xml -------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-16.0" />
+  <project name="LineageOS/android_device_oneplus_oneplus3" path="device/oneplus/oneplus3" remote="github" />
+  <project name="LineageOS/android_device_oppo_common" path="device/oppo/common" remote="github" />
+  <project name="LineageOS/android_kernel_oneplus_msm8996" path="kernel/oneplus/msm8996" remote="github" />
+  <project name="LineageOS/android_packages_resources_devicesettings" path="packages/resources/devicesettings" remote="github" />
+   
+  <project name="LineageOS/android_device_xiaomi_gemini" path="device/xiaomi/gemini" remote="github" />
+  <project name="LineageOS/android_device_xiaomi_msm8996-common" path="device/xiaomi/msm8996-common" remote="github" />
+  <project name="LineageOS/android_kernel_xiaomi_msm8996" path="kernel/xiaomi/msm8996" remote="github" /> 
+
+<!--
+  <project name="mi5-dev/device_xiaomi_gemini" path="device/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/device_xiaomi_msm8996-common" path="device/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/kernel_xiaomi_msm8996" path="kernel/xiaomi/msm8996" remote="github" revision="lineage-16.0" />
+-->
+
+  <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+
+</manifest>
+------------------------------------------------- 參考的roomservice.xml -------------------------------------------------
+
+
 # 然后
 
 repo sync --force-sync 
@@ -679,6 +714,13 @@ https://xiaomifirmwareupdater.com/
 
 ----------------------------------------- LineageOS 17.0 -----------------------------------------
 
+
+
+## 为 repo 设置代理，把 repo 拖 sublime text 里看 repo 源码，发现可设置环境变量'http_proxy':export http_proxy="127.0.0.1:41091"
+
+
+
+
 cd ~/Disk/Workspaces/AOSP/LineageOS
 
 mkdir lineage-17.0 && cd lineage-17.0
@@ -694,7 +736,7 @@ vim .repo/manifest.xml
 repo sync --force-sync
 
 
----------------------- 专有文件 ----------------------
+---------------------- oneplus3 专有文件 ----------------------
 // https://wiki.lineageos.org/devices/oneplus3/build
 // 把 ./extract-files.sh 的步骤用以下操作代替
 mkdir .repo/local_manifests
@@ -706,13 +748,144 @@ vim .repo/local_manifests/roomservice.xml
 </manifest>
 ----- vim -----
 repo sync --force-sync
----------------------- 专有文件 ----------------------
+---------------------- oneplus3 专有文件 ----------------------
+
+
+
+---------------------- gemini 专有文件 ----------------------
+
+# 从这个网站 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi 可以找到所有小米的驱动相关: 
+
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.0/gemini 得 proprietary_vendor_xiaomi-lineage-17.0-gemini.zip
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.0/msm8996-common 得 proprietary_vendor_xiaomi-lineage-17.0-msm8996-common.zip
+
+mkdir -p ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.0/vendor/xiaomi/
+
+unzip proprietary_vendor_xiaomi-lineage-17.0-gemini.zip  && unzip proprietary_vendor_xiaomi-lineage-17.0-msm8996-common.zip
+mv proprietary_vendor_xiaomi-lineage-17.0-gemini/gemini ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.0/vendor/xiaomi/gemini
+mv proprietary_vendor_xiaomi-lineage-17.0-msm8996-common/msm8996-common ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.0/vendor/xiaomi/msm8996-common
+
+---------------------- gemini 专有文件 ----------------------
 
 
 . build/envsetup.sh
 
+export WITH_SU=true
 
-breakfast oneplus3
 
+
+# 把 vendor/lineage/build/tools/roomservice.py 里所有的 repo sync --force-sync 改成 repo sync --current-branch --force-sync 。从而只拉当前分支的代码，加快下载速度。
+
+breakfast oneplus3 / breakfast gemini
+
+
+
+brunch oneplus3 / brunch gemini
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 17.1 -----------------------------------------
+
+
+
+# python2 与 python3　的自由切换:
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 100
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
+sudo update-alternatives --list python
+sudo update-alternatives --config python
+
+
+
+cd ~/Disk/Workspaces/AOSP/LineageOS
+
+mkdir lineage-17.1 && cd lineage-17.1
+
+# 只要当前 branch，加快下载速度
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
+
+repo sync --force-sync --current-branch -j 4
+
+## repo sync -c -n -j 4 && repo sync -c -l -j 16 for faster syncing
+## https://superuser.com/q/603547
+
+
+# 用下面重试 sync 脚本来 sync 吧：
+------------------------- ReRepoSync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- ReRepoSync.sh -------------------------
+
+
+
+
+
+---------------------- 专有文件 ----------------------
+
+oneplus: 
+mkdir -p ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/
+
+# 用 svn 下载 https://github.com/TheMuppets/proprietary_vendor_oneplus/tree/lineage-17.1/oneplus3，因为只想拉我们需要的部分，多余的我们不要，要不会耗太长时间了
+cd ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/
+# 链接 https://github.com/TheMuppets/proprietary_vendor_oneplus/tree/lineage-17.1/oneplus3 中的 tree 改成 branches
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/oneplus3/ ./oneplus3
+
+# 若 svn 太慢了，或者 git 吧: git clone --single-branch -b lineage-17.1 https://github.com/TheMuppets/proprietary_vendor_oneplus.git，然后:
+mv proprietary_vendor_oneplus/oneplus3 ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/oneplus3
+
+# 若 svn 和 git 都太慢了，直接下载zip包吧:
+unzip proprietary_vendor_oneplus-lineage-17.1.zip
+mv proprietary_vendor_oneplus-lineage-17.1/oneplus3 ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/oneplus3
+
+
+
+gemini:
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.1/gemini 
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.1/msm8996-common 
+
+mkdir -p ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/xiaomi/
+
+unzip proprietary_vendor_xiaomi-lineage-17.1-gemini.zip  && unzip proprietary_vendor_xiaomi-lineage-17.1-msm8996-common.zip
+mv proprietary_vendor_xiaomi-lineage-17.1-gemini/gemini ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/xiaomi/gemini
+mv proprietary_vendor_xiaomi-lineage-17.1-msm8996-common/msm8996-common ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/xiaomi/msm8996-common
+
+---------------------- 专有文件 ----------------------
+
+
+
+. build/envsetup.sh && export WITH_SU=true
+
+
+# 把 vendor/lineage/build/tools/roomservice.py 里所有的 repo sync --force-sync 改成 repo sync --current-branch --force-sync 。从而只拉当前分支的代码，加快下载速度。
+
+
+breakfast oneplus3 && breakfast gemini
 
 
