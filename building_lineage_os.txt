@@ -886,6 +886,7 @@ mv proprietary_vendor_xiaomi-lineage-17.1-msm8996-common/msm8996-common ~/Disk/W
 # 把 vendor/lineage/build/tools/roomservice.py 里所有的 repo sync --force-sync 改成 repo sync --current-branch --force-sync 。从而只拉当前分支的代码，加快下载速度。
 
 
-breakfast oneplus3 && breakfast gemini
+breakfast oneplus3 / breakfast gemini
 
+brunch oneplus3
 
