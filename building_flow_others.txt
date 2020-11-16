@@ -442,9 +442,14 @@ Scanning file to index ... or Indexing ... or Update index ... issue:
 # 选择好 Project SDK!!!!!!!! Project Structure Settings -> Project -> Project SDK
 
 # https://stackoverflow.com/a/30927850
-sudo vim /etc/sysctl.conf
+# https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
+
+sudo vim /etc/sysctl.conf or cd /etc/sysctl.d/ && vim idea.conf
 # Increase the limit for Android Studio
-fs.inotify.max_user_watches = 500000
+fs.inotify.max_user_watches = 8388608
+
+sudo sysctl -p --system
+cat /proc/sys/fs/inotify/max_user_watches
 
 # https://stackoverflow.com/a/37627121
 cd [~/Workspaces/Softwares/]android-studio/bin/
