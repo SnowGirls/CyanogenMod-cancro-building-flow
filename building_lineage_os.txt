@@ -928,8 +928,8 @@ adb root && adb remount && adb push out/target/product/oneplus3/system/xbin/su /
 
 
 1.修改 system/core/libcutils/fs_config.cpp
-// 把 system/xbin/su 的 04750 改成 06755
-{ 06755, AID_ROOT,      AID_SHELL,     0, "system/xbin/su" },
+// 把 system/xbin/su 的 04750 改成 00755
+{ 00755, AID_ROOT,      AID_SHELL,     0, "system/xbin/su" },
 
 
 2.把 LineageOS 16.0 的 system/extras/su/ 全部复制过来
@@ -944,6 +944,6 @@ service su_daemon /system/xbin/su --daemon
     seclabel u:r:su:s0 	## 改成这样
 
 4.往 frameworks/native/libs/binder/include/binder/AppOpsManager.h 的 Line 112 加入:
-      OP_SU = 82,
+      OP_SU = 79,
 
 5.
