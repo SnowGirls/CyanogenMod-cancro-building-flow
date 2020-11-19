@@ -796,6 +796,10 @@ brunch oneplus3 / brunch gemini
 
 
 
+
+
+
+
 ----------------------------------------- LineageOS 17.1 -----------------------------------------
 
 
@@ -890,3 +894,56 @@ breakfast oneplus3 / breakfast gemini
 
 brunch oneplus3
 
+
+
+
+
+
+## Android Studio To View Sources
+
+source build/envsetup.sh && breakfast oneplus3 && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+
+
+
+
+
+## system 的 mount 由 /system 改为 /，可用命令 tune2fs -l /dev/block/by-name/system 查看!
+mount -o remount,rw /
+
+
+## Android 10 编译完全root版本 https://www.jianshu.com/p/b7b0361aca34
+
+## ----------------------------- 但发现不行 -----------------------------
+1.修改 system/extras/su/su.cpp
+// 注释掉第83-84行
+// uid_t current_uid = getuid();
+// if (current_uid != AID_ROOT && current_uid != AID_SHELL) error(1, 0, "not allowed");
+
+mmm system/extras/su/
+adb root && adb remount && adb push out/target/product/oneplus3/system/xbin/su /system/xbin/su 
+## ----------------------------- 但发现不行 -----------------------------
+
+
+1.修改 system/core/libcutils/fs_config.cpp
+// 把 system/xbin/su 的 04750 改成 06755
+{ 06755, AID_ROOT,      AID_SHELL,     0, "system/xbin/su" },
+
+
+2.把 LineageOS 16.0 的 system/extras/su/ 全部复制过来
+
+3.改一下 superuser.rc 的前8行:
+# su daemon
+service su_daemon /system/xbin/su --daemon
+	class main 			## 插入此行
+    user root
+    group root
+    disabled
+    seclabel u:r:su:s0 	## 改成这样
+
+4.往 frameworks/native/libs/binder/include/binder/AppOpsManager.h 的 Line 112 加入:
+      OP_SU = 82,
+
+5.
