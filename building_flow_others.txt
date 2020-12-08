@@ -1145,3 +1145,23 @@ build/core/product_config.mk:238: *** Can not locate config makefile for product
 
 brunch oneplus3  
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 打印指针: 
+  const uint8_t* const begin_ = dex_file.Begin();
+  LOG(ERROR) << "ClassLinker::DefineClass " << std::hex << /*static_cast<void*>(ptr)*/(void *)begin_ << " ,Size " << dex_file.Size() << " !";
+

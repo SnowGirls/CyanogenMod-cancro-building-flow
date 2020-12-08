@@ -3,6 +3,7 @@
 Reference: 
 https://www.52pojie.cn/thread-618515-1-1.html
 https://www.52pojie.cn/thread-978958-1-1.html
+https://github.com/imadr/Unity-game-hacking
 
 
 1. 如何识别u3d游戏？打开解压包，如果lib文件夹下有 libunity.so 就证明这是一个unity3d游戏。
@@ -50,7 +51,8 @@ https://www.52pojie.cn/thread-978958-1-1.html
 
 	命令: Il2CppDumper.exe <executable-file> <global-metadata> <output-directory>
 
-2. 打开 IDA 加载 libil2cpp.so，耐心等加载完毕，File -> Script file -> 选择 ida_with_struct.py -> 会提示依次选择 Json及头文件，耐心等待 IDA 分析完毕
+2. 打开 IDA 加载 libil2cpp.so，耐心等加载完毕，File -> Script file -> 选择 Il2CppDumper 解压安装目录下的 ida_with_struct.py 
+	-> 会提示依次选择<output-directory> 的 script.json 及其 il2cpp.h 头文件，耐心等待 IDA 分析完毕
 
 3. 最后用 dnSpy 导出所有 dump 出来的 dll 成 CSharp 代码用 Sublime Text 打开方便搜索
 
