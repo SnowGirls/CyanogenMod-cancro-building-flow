@@ -22,3 +22,38 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
 
 sudo update-alternatives --config gcc
 
+
+
+
+---------------------------------------------------
+https://www.bilibili.com/read/cv6547509
+https://www.jianshu.com/p/b6b30ed9f1b6
+
+https://github.com/HeQuanX/navicat-keygen-tools
+https://github.com/Lesmm/navicat15-premium-zips
+
+
+cd /usr/lib/x86_64-linux-gnu
+ls -al libstdc++*
+sudo rm libstdc++.so.6 && sudo ln -s '[path_to_your_download]/libstdc++.so.6.0.26' libstdc++.so.6
+sudo rm libstdc++.so.6 && sudo ln -s libstdc++.so.6.0.25 libstdc++.so.6
+
+
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+chmod a+x appimagetool-x86_64.AppImage
+appimagetool-x86_64.AppImage [mount后 cp -r 的文件夹]
+
+
+
+____________________________________________________
+
+
+把证书 adb push charles-ssl-proxying-certificate.cer 到手机上, 然后安装用户证书
+把安装好的用户证书从 /data/misc/user/0/cacerts-added/ 移动到 /system/etc/security/cacerts 下重启手机就OK了
+
+
+____________________________________________________
+
+
+
+
