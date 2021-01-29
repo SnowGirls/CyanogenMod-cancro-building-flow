@@ -601,7 +601,7 @@ lineage-16.0/.repo/local_manifests/roomservice.xml
 lineage-16.0/.repo/project.list
 lineage-16.0/.repo/.repo_fetchtimes.json
 
-# 同时把对应的文件夹删掉:
+# 同时把对应的文件夹删除掉:
 lineage-16.0/.repo/projects/device/xiaomi/
 lineage-16.0/.repo/projects/kernel/xiaomi/
 lineage-16.0/.repo/project-objects/LineageOS/android_device_xiaomi_gemini.git
