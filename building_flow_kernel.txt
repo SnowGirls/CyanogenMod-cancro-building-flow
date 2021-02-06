@@ -68,3 +68,25 @@ make clean 一下，并且不 make O=out 到 out 目录
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######
+
+https://forum.xda-developers.com/t/kernel-patch-usb-otg-host-mode-simultaneous-charging.3668119/
+
+https://github.com/sollapse/opo_dwc3_otg/blob/master/dwc3_otg.c
+
+
+
