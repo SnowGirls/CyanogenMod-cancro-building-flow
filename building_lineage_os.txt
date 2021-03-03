@@ -483,7 +483,24 @@ cat /sys/fs/pstore/console-ramoops
 
 
 
+. build/envsetup.sh && breakfast gemini && make bootimage
+adb reboot bootloader && fastboot flash boot ${OUT}/boot.img && fastboot boot ${OUT}/boot.img 
 
+
+
+
+# 查看 dwc3-msm.c 所有 dev_dbg 的输出
+# https://wiki.stmicroelectronics.cn/stm32mpu/wiki/How_to_use_the_kernel_dynamic_debug
+# https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/admin-guide/dynamic-debug-howto.rst?h=v5.5.3
+
+mount | grep debugfs
+echo "file dwc3-msm.c +p" > /sys/kernel/debug/dynamic_debug/control
+
+
+
+
+##### 常用的 kernel 命令
+insmod、lsmod、rmmod
 
 
 
