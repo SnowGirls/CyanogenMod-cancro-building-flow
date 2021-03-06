@@ -589,9 +589,24 @@ with open("/home/ubuntu/Downloads/repositories.json") as f:
 https://www.cnblogs.com/kainhuck/p/12421700.html
 https://blog.csdn.net/huangkangying/article/details/78858446
 
+## unset ALL_PROXY && unset all_proxy
+set | grep proxy
+set | grep PROXY
+
+# ALL_PROXY=socks://127.0.0.1:1090/
+# NO_PROXY=localhost,127.0.0.0/8,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,localhost
+# all_proxy=socks://127.0.0.1:1090/
+# no_proxy=localhost,127.0.0.0/8,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,localhost
+
+
 git config --global http.proxy 'socks5://127.0.0.1:1090'
 git config --global https.proxy 'socks5://127.0.0.1:1090'
 cat ~/.gitconfig
+
+
+export http_proxy=http://127.0.0.1:41091
+export https_proxy=https://127.0.0.1:41091
+
 
 
 ``````
@@ -631,6 +646,16 @@ breakfast gemini
 
 
 
+
+Error:
+--------------------------------------------------------------------------------------------------
+TypeError: a bytes-like object is required, not 'str'
+--------------------------------------------------------------------------------------------------
+python --version
+repo --version
+## 看看是不是相同大版本的 python 
+sudo update-alternatives --list python
+sudo update-alternatives --config python
 
 
 Error:

@@ -1,0 +1,10 @@
+
+代码对比工具命令: meld
+
+图像编辑工具命令: gimp
+
+
+Fix error of 'The following packages have unmet dependencies:'
+
+sudo apt-get install aptitude
+sudo aptitude install winehq-devel

@@ -232,7 +232,7 @@ sudo apt-get install git-core gnupg flex bison gperf libsdl1.2-dev libesd0-dev l
 cd ~/Workspaces/AOSP/CyanogenMod/
 
 mkdir android_cm-14.1
-cd android_cm-14.1/device/xiaomi/cancro/BoardConfig.mk
+cd android_cm-14.1/
 
 
 
@@ -247,6 +247,7 @@ vim .repo/manifest.xml
 repo sync
 
 
+ 
 
 source build/envsetup.sh 		# 初始化环境变量
 
@@ -324,6 +325,12 @@ brunch cancro
 
 
 
+
+
+
+
+
+
 3.
 --------------------------------- 
 [ 54% 18881/34643] Download: /home/ubuntu/Workspaces/AOSP/Cyanogen...t/common/obj/APPS/Gello_intermediates/org.cyanogenmod.gello-40.apk
@@ -355,7 +362,7 @@ curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/g
 
 
 
-继续编译:device/xiaomi/cancro/BoardConfig.mk
+继续编译:
 
 brunch cancro
 
@@ -375,6 +382,12 @@ export LC_ALL=C
 
 prebuilts/sdk/tools/jack-admin stop-server
 prebuilts/sdk/tools/jack-admin start-server
+
+## 若出现 Jack server installation not found, 则: 
+cd prebuilts/sdk/tools/ && ./jack-admin install-server jack-launcher.jar jack-server-4.8.ALPHA.jar && cd -
+prebuilts/sdk/tools/jack-admin start-server
+
+
 
 还有这个错误因为改源码出错了，所以请仔细检查代码!
 
@@ -411,6 +424,26 @@ BOARD_KERNEL_CMDLINE               := console=none vmalloc=340M androidboot.hard
 
 
 3. 记得一定要 清掉 Davilk Cache 目录， 要不会以为 system_server 一直访问不了/sdcard。其实关掉了 selinux 后是能访问的了，只是 dalvik cache 在搞鬼。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -650,15 +683,50 @@ sudo sysctl -p --system
 
 ----------------------------------------- MoKee mkp -----------------------------------------
 
-repo init -u https://github.com/MoKee/android.git -b mkp
 
-vim .repo/manifest.xml
+mkdir mkp && cd mkp
+
+# repo init -u https://github.com/MoKee/android.git -b mkp
+repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
+
+
+
+vim .repo/manifest.xml or vim .repo/manifests/default.xml
 // ----- vim content begin -----
 -           fetch="https://android.googlesource.com"
 +           fetch="https://aosp.tuna.tsinghua.edu.cn"
 // ----- vim content end -----
 
-repo sync
+
+
+vim ReRepoSync.sh
+------------------------- ReRepoSync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- ReRepoSync.sh -------------------------
+ chmod 777 ReRepoSync.sh
+
+
+
+## repo sync
+./ReRepoSync.sh
+
+
 
 . build/envsetup.sh
 
