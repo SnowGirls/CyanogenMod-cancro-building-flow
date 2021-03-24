@@ -67,6 +67,14 @@ fastboot boot recovery3.2.3.img
 
 
 
+fastboot flash recovery twrp-3.2.3-0-cancro.img
+fastboot boot twrp-3.2.3-0-cancro.img
+## 如果 boot 不了 twrp-3.2.3-0-cancro.img， 先在bootloader模式升级一下基带！ (cm13BaseBandUpgrade.zip)
+## 同样，如果用了低版本的 twrp 刷不了 ROM，先升级基带，再用高版本的 twrp-3.2.3-0-cancro.img 来刷 ROM
+
+
+
+
 ## 给应用有su权限: (Download addonsu zip from: https://download.mokeedev.com/extension.html#addonsu)
 adb push addonsu-installer-MK90.0-arm-signed.zip  /sdcard/
 adb reboot bootloader

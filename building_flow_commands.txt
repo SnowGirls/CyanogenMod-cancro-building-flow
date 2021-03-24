@@ -410,7 +410,6 @@ fastboot reboot
 
 # 小米4 cm-13.0 刷时Baseband upgrade错误，基带问题
 # http://www.miui.com/forum.php?mod=viewthread&tid=4265979
-# https://jrizzoli.github.io/dotfiles/
 
 # 解压cm13BaseBandUpgrade.zip, 然后运行flash_all.bat
 # 升级基带后，cm-13.0刷进去了，并且启动成功。进去后会看到Android 6.0
