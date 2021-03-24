@@ -1,0 +1,580 @@
+
+
+
+
+----------------------------------------- MoKee mkp -----------------------------------------
+
+
+mkdir mkp && cd mkp
+
+# repo init -u https://github.com/MoKee/android.git -b mkp
+repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
+
+
+
+vim .repo/manifest.xml or vim .repo/manifests/default.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+
+vim ReRepoSync.sh
+------------------------- ReRepoSync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- ReRepoSync.sh -------------------------
+ chmod 777 ReRepoSync.sh
+
+
+
+## repo sync
+./ReRepoSync.sh
+
+
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+(注意: 先lunch再brunch,单独lunch和brunch都会出现错误)
+
+
+
+## 刷机：
+fastboot devices
+fastboot flash recovery recovery3.2.3.img
+fastboot boot recovery3.2.3.img
+## 如果出现这个错误： FAILED (remote: 'dtb not found'), 升级一下基带！ (cm13BaseBandUpgrade.zip)
+
+
+
+## 给应用有su权限: (Download addonsu zip from: https://download.mokeedev.com/extension.html#addonsu)
+adb push addonsu-installer-MK90.0-arm-signed.zip  /sdcard/
+adb reboot bootloader
+fastboot flash recovery twrp-3.3.0-0-cancro.img
+fastboot boot twrp-3.3.0-0-cancro.img
+## 然后点击 INSTALL 这个 zip (addonsu-installer-MK90.0-arm-signed.zip ) 就行了
+## 重开机，去开发者选项Root授权那里就可看到有‘应用与ADB’选项了。
+
+
+
+
+
+
+
+
+
+
+
+----------------- 错误集合 -----------------
+
+
+
+## https://blog.csdn.net/xuangelouzhu/article/details/112566485
+----------------------------------------
+error: prebuilts/clang/host/darwin-x86/: platform/prebuilts/clang/host/darwin-x86 checkout 86b722f7355235c0c1521d4420791280f91f2b59 
+error: Cannot checkout platform/prebuilts/clang/host/darwin-x86
+Checking out projects:  95% (678/709) platform/tools/external/fat32liberror: The following untracked working tree files would be overwritten by checkout:
+	BUILD
+	MODULE_LICENSE_APACHE2
+	OWNERS
+	PREBUILT
+	gradle-2.10-all.zip
+Please move or remove them before you switch branches.
+Aborting
+error: tools/external/gradle/: platform/tools/external/gradle checkout 67bfb32dc68fac519a27e93bcedb32dc6c060475 
+error: Cannot checkout platform/tools/external/gradle
+----------------------------------------
+
+pushd prebuilts/clang/host/ && rm -rf darwin-x86/ && popd
+pushd tools/external/ && rm -rf gradle/ && popd
+
+pushd .repo/projects/prebuilts/clang/host && rm -rf darwin-x86.git && popd
+pushd .repo/projects/tools/external && rm -rf gradle.git && popd
+
+pushd .repo/project-objects/platform/prebuilts/clang/host/ && rm -rf darwin-x86.git && popd
+pushd .repo/project-objects/platform/tools/external/ && rm -rf gradle.git && popd
+
+
+
+
+
+----------------------------------------
+Checking out projects:  83% (591/709) platform/prebuilts/clang-toolsfatal: Unable to create '/home/ubuntu/Disk16.04/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock': File exists.
+----------------------------------------
+rm -rf '/home/ubuntu/Disk16.04/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock'
+pushd prebuilts/clang/host/darwin-x86/ && git status && popd
+## 一般这种情况都是 sync 不完整:
+
+pushd prebuilts/clang/host/ && rm -rf darwin-x86/ && popd
+pushd .repo/projects/prebuilts/clang/host && rm -rf darwin-x86.git/ && popd
+pushd .repo/project-objects/platform/prebuilts/clang/host/ && rm -rf darwin-x86.git && popd
+
+./ReRepoSync.sh
+
+
+
+
+----------------------------------------
+Aborting
+error: prebuilts/clang/host/darwin-x86/: platform/prebuilts/clang/host/darwin-x86 checkout 86b722f7355235c0c1521d4420791280f91f2b59 
+error: Cannot checkout platform/prebuilts/clang/host/darwin-x86
+Checking out projects:  99% (708/709), done.
+----------------------------------------
+pushd prebuilts/clang/host/darwin-x86/ && git status && popd
+## 同样情况都是 sync 不完整:
+
+pushd prebuilts/clang/host && rm -rf darwin-x86/ && popd
+pushd .repo/projects/prebuilts/clang/host/ && rm -rf darwin-x86.git/ && popd
+pushd .repo/project-objects/platform/prebuilts/clang/host/ && rm -rf darwin-x86.git && popd
+
+./ReRepoSync.sh
+
+
+
+
+----------------------------------------
+system/sepolicy/Android.mk:88: warning: Be careful when using the SELINUX_IGNORE_NEVERALLOWS flag. It does not work in user builds and using it will not stop you from failing CTS.
+[1025/1036] including vendor/mk-priv/prebuilt/mokee/app/Gallery2/Android.mk ...
+  End-of-central-directory signature not found.  Either this file is not
+  a zipfile, or it constitutes one disk of a multi-part archive.  In the
+  latter case the central directory and zipfile comment will be found on
+  the last disk(s) of this archive.
+unzip:  cannot find zipfile directory in one of vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk or
+        vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk.zip, and cannot find vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk.ZIP, period.
+----------------------------------------
+pushd vendor/mk-priv/
+git status
+## 发现有未 commit ???
+
+git checkout .
+
+## fatal: Unable to create 'vendor/mk-priv/.git/index.lock': File exists.
+## 发现 .git/index.lock 存在，checkout 不了，那么删除掉这个 .git/index.lock ，说明此 .git 是下载不完的,
+## ls -al vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk 发现 0 byte 果然如此
+## 删掉 working_tree/, .repo/projects/, .repo/project-objects 下对应的 git 目录
+
+pushd vendor/ && rm -rf mk-priv/ && popd
+pushd .repo/projects/vendor/ && rm -rf mk-priv.git/ && popd
+pushd .repo/project-objects/MoKee && rm -rf android_vendor_mk-priv.git && popd
+
+## 然后重新 sync 一次
+./ReRepoSync.sh
+
+
+## 成功同步后发现 ls -al vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk 的大小不会再是 0 byte了
+
+
+
+
+
+----------------------------------------
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: protocol error: bad pack header
+platform/prebuilts/clang/host/darwin-x86:
+remote: Counting objects: 4954, done        
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: protocol error: bad pack header
+
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: early EOF
+fatal: unpack-objects failed
+platform/tools/external/gradle:
+remote: Counting objects: 20, done        
+remote: Finding sources: 100% (20/20)           
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: early EOF
+fatal: unpack-objects failed
+----------------------------------------
+## sync 过程中出现 RPC failed; curl 56 GnuTLS recv error (-110)
+## 查看一下 git 的设置:
+git config --system --list
+git config --global --list
+git config --local --list
+
+git config --global http.postBuffer 524288000
+git config --global https.postBuffer 524288000
+
+## 发现还是不行，改了成清华源再试试:
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+
+
+----------------------------------------
+  File "libcore/annotations/generate_annotated_java_files.py", line 34
+    print '// Do not edit; generated using libcore/annotations/generate_annotated_java_files.py'
+                                                                                               ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('// Do not edit)?
+  File "build/make/tools/merge-event-log-tags.py", line 51
+    except getopt.GetoptError, err:
+                             ^
+SyntaxError: invalid syntax
+----------------------------------------
+python --version ## Python 3.6.9
+## 转回 python 2.7 看看
+sudo update-alternatives --config python
+
+
+
+
+
+解决每上面的一个问题后:
+
+brunch cancro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- MoKee mko-mr1 -----------------------------------------
+
+
+repo init -u https://github.com/MoKee/android.git -b mko-mr1
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
+. build/envsetup.sh
+
+
+lunch cancro
+
+
+
+--------------------
+build/core/product_config.mk:238: *** Can not locate config makefile for product "cancro".  Stop.
+build/core/product_config.mk:238: *** Can not locate config makefile for product "cancro".  Stop.
+
+** Don't have a product spec for: 'cancro'
+** Do you have the right repo manifest?
+--------------------
+# 先不管, 用 brunch cancro 来编译，可以不管这个错误
+ 
+brunch cancro
+
+
+--------------------
+You are attempting to build with an unsupported JDK.
+
+Only an OpenJDK based JDK is supported.
+
+The required version is: 1.8.x
+--------------------
+# 换成open-jdk
+# https://jdk.java.net/java-se-ri/8
+
+curl -O https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_linux-x64_bin.tar.gz
+curl -O https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz
+
+sudo mv openjdk-9.0.4_linux-x64_bin.tar.gz /usr/local/java/
+sudo mv openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz /usr/local/java/
+
+pushd /usr/local/java/
+
+sudo tar zxvf ./openjdk-9.0.4_linux-x64_bin.tar.gz
+sudo tar zxvf ./openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz
+
+sudo mv jdk-9.0.4 openjdk-9.0.4
+sudo mv java-se-8u40-ri openjdk-1.8.0_40
+
+
+------------ vim ~/.bash_aliases ------------
+
+# JAVA_HOME=/usr/local/java/jdk1.7.0_80
+# JAVA_HOME=/usr/local/java/jdk1.8.0_172
+# JAVA_HOME=/usr/local/java/openjdk-9.0.4
+JAVA_HOME=/usr/local/java/openjdk-1.8.0_40
+
+------------ vim ~/.bash_aliases ------------
+
+source ~/.bash_aliases
+java -version
+
+
+
+# Recovery 用 TWRP 3.2.3 版本
+# https://dl.twrp.me/cancro/
+fastboot flash recovery twrp-3.2.3-0-cancro.img && fastboot boot twrp-3.2.3-0-cancro.img
+
+
+# 去魔趣论坛 下载 addonsu-xxx.zip 包，进入 recovery 刷入此包。重启后进入开发者模式，就可以选择 应用与ADB 都ROOT了。  
+
+
+
+
+
+
+
+
+
+
+
+
+## 修改 libc 代码加入 jsonc，注意先编译出了 libjson.so & libjson.a 再修改 libc 源码来编译 libc。
+
+
+
+
+
+
+
+
+
+----------------------- gemini -----------------------
+
+. build/envsetup.sh && lunch gemini && brunch gemini
+
+
+
+
+
+
+
+
+
+
+
+----------------------- oneplus3 -----------------------
+
+. build/envsetup.sh
+
+breakfast oneplus3
+
+
+# 用 openjdk version "1.8.0_40"
+
+
+lunch oneplus3
+----------------------------------------- 错误 -----------------------------------------
+build/core/product_config.mk:238: *** Can not locate config makefile for product "oneplus3".  Stop.
+build/core/product_config.mk:238: *** Can not locate config makefile for product "oneplus3".  Stop.
+
+** Don't have a product spec for: 'oneplus3'
+** Do you have the right repo manifest?
+----------------------------------------- 错误 -----------------------------------------
+## lunch oneplus3 会出上面的错后，用 brunch oneplus3
+
+brunch oneplus3  
+
+
+
+
+# 打印指针: 
+  const uint8_t* const begin_ = dex_file.Begin();
+  LOG(ERROR) << "ClassLinker::DefineClass " << std::hex << /*static_cast<void*>(ptr)*/(void *)begin_ << " ,Size " << dex_file.Size() << " !";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------- Android Studio 配置浏览 MoKee mko-mr1 的源码  ----------------------------
+
+
+# 1. 在上面成功编译过一次之后
+
+
+# 2. 生成 idengen.jar 后执行 idegen.sh 来生成 android.ipr、android.iml 
+
+source build/envsetup.sh
+breakfast cancro
+mmm development/tools/idegen/				# 为了得到这个 out/host/linux-x86/framework/idegen.jar 这个 jar
+sudo env "PATH=$PATH" development/tools/idegen/idegen.sh
+# sudo development/tools/idegen/idegen.sh 	# 这 sh 其实就是执行上一步生成的 idengen.jar (这命令会出现下面的错误)
+
+
+Error:
+----------------------------------
+Couldn't find idegen.jar. Please run make first.
+----------------------------------
+# https://stackoverflow.com/questions/16582112/aosp-and-intellij-idea
+source build/envsetup.sh && cd development/tools/idegen && croot
+# then try again
+
+
+
+
+# 出现错误: Exception in thread "main" java.lang.UnsupportedClassVersionError: Main : Unsupported major.minor version 52.0
+
+# 修改脚本在 development/tools/idegen/idegen.sh 加入 java -version 命令，发现执行 idegen.sh 的jvm版本与我们外部命令 java -version 是不一致的:
+java version "1.7.0_95"
+OpenJDK Runtime Environment (IcedTea 2.6.4) (7u95-2.6.4-3)
+OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)
+Exception in thread "main" java.lang.UnsupportedClassVersionError: Main : Unsupported major.minor version 52.0
+
+# 而我们编译的是用:
+java -version
+openjdk version "1.8.0_40"
+OpenJDK Runtime Environment (build 1.8.0_40-b25)
+OpenJDK 64-Bit Server VM (build 25.40-b25, mixed mode)
+
+# 去掉 sudo, 只用 development/tools/idegen/idegen.sh 版本一致了，但全出现很多 Permission denied, 访问不了 /sys/kernel/debug 这个目录 
+# 所以，正确的应该用:
+
+sudo env "PATH=$PATH" development/tools/idegen/idegen.sh
+
+
+
+
+
+
+
+# 3. Android Studio -> File -> Open -> 选择刚刚生成的android.ipr就好了
+
+Android Studio -> Help -> Edit Custom VM Options:
+-Xms1024m
+-Xmx4096m
+
+
+Android Studio -> Help -> Edit Custom Properties:
+idea.max.intellisense.filesize=5000
+
+
+Android Studio -> File -> Project Structure -> Project -> Select one SDK 
+
+Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 把最底下的 <Module source> 移到最前，那么就会优先跳到源码上，而不是反编前面jar的类
+Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 又或者把所有jar都选择，然后点-号全删掉
+
+
+// Android Studio 提示 Inotify Watches Limit！ 
+// 参考: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
+sudo vim /etc/sysctl.d/idea.conf
+--------- contents ---------
+fs.inotify.max_user_watches = 8388608
+--------- contents ---------
+sudo sysctl -p --system
+
+
+// https://www.2cto.com/kf/201710/692109.html
+// https://wiki.lineageos.org/import-android-studio-howto.html
+// https://shuhaowu.com/blog/setting_up_intellij_with_aosp_development.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 换一个定制的repo吧: https://bbs.mokeedev.com/t/topic/21
+
+__________________________________ 重新 mko-mr1 __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mko-mr1 --depth=1
+
+repo sync 
+
+
+----------------------------
+Checking out:  9% (61/630) device/google/atverror: Cannot checkout LineageOS/android_external_okhttp: ManifestInvalidRevisionError: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
+Checking out: 25% (160/630) platform/external/liboggerror: in `sync --force-sync --current-branch -j 4`: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
+----------------------------
+## 它用了　LineageOS/android_external_okhttp　的git库，但人家没有 refs/heads/mko-mr1 分支，改一下
+.repo/manifests/default.xml
+## 搜索 LineageOS, 加上　revision="lineage-15.1" : 
+<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" />
+<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" revision="lineage-15.1" />
+## 重新 repo sync
+
+
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+__________________________________ 重新 mkp __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
+
+repo sync
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
