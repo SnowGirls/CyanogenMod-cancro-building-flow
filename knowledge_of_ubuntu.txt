@@ -1,10 +1,45 @@
 
+1.
+
 代码对比工具命令: meld
 
 图像编辑工具命令: gimp
 
 
+
+
+
+
+2.
+
 Fix error of 'The following packages have unmet dependencies:'
 
 sudo apt-get install aptitude
 sudo aptitude install winehq-devel
+
+
+
+
+
+
+
+
+3.
+
+GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+
+系统 git 用了 GnuTLS，重编一个 git 用 openssl 的
+
+重编 git :
+
+sudo apt-get install build-essential
+sudo apt-get install autoconf bison build-essential libssl-dev
+sudo apt-get install libz-dev
+sudo apt-get install gettext
+sudo apt-get install libcurl4-openssl-dev 
+
+
+git clone https://github.com/git/git.git -b v2.25.1 --single-branch --depth 1 git_v2.25.1 && cd git_v2.25.1/ && make configure && ./configure --prefix=/home/ubuntu/Disk6T/Workspaces/GitHub/git_v2.25.1/build && make all
+
+
+
