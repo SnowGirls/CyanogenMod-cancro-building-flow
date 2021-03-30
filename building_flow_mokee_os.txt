@@ -539,6 +539,11 @@ sudo sysctl -p --system
 
 ## 换一个定制的repo吧: https://bbs.mokeedev.com/t/topic/21
 
+export USE_CCACHE=1
+export CCACHE_SIZE=50G
+export WITH_SU=true
+
+
 
 __________________________________ 重新 mko __________________________________
 
@@ -683,7 +688,6 @@ FAILED: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Sn
 (touch /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp )"
 /bin/bash: line 1: 18598 Bus error               (core dumped) ( ASAN_OPTIONS=detect_leaks=0:detect_container_overflow=0 /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/host/linux-x86/bin/llvm-rs-cc -o /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/res/raw -p /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/src -d /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript -a /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp -MD -target-api 23 -Wall -Werror -I external/clang/lib/Headers -I frameworks/rs/script_api/include packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs )
 -----------------------------------------------------
-
 
 ulimit -c unlimited
 export LC_ALL=C
