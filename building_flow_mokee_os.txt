@@ -127,9 +127,9 @@ pushd .repo/project-objects/platform/tools/external/ && rm -rf gradle.git && pop
 
 
 ----------------------------------------
-Checking out projects:  83% (591/709) platform/prebuilts/clang-toolsfatal: Unable to create '/home/ubuntu/Disk16.04/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock': File exists.
+Checking out projects:  83% (591/709) platform/prebuilts/clang-toolsfatal: Unable to create '/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock': File exists.
 ----------------------------------------
-rm -rf '/home/ubuntu/Disk16.04/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock'
+rm -rf '/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock'
 pushd prebuilts/clang/host/darwin-x86/ && git status && popd
 ## 一般这种情况都是 sync 不完整:
 
@@ -539,6 +539,42 @@ sudo sysctl -p --system
 
 ## 换一个定制的repo吧: https://bbs.mokeedev.com/t/topic/21
 
+
+__________________________________ 重新 mko __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mko --depth=1
+
+
+------------------------- repo_sync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- repo_sync.sh -------------------------
+
+chmod 777 repo_sync.sh
+./repo_sync.sh
+
+
+
+
+
+
+
+
 __________________________________ 重新 mko-mr1 __________________________________
 
 repo init -u https://github.com/MoKee/android.git -b mko-mr1 --depth=1
@@ -570,6 +606,13 @@ brunch cancro
 以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
 
 
+
+
+
+
+
+
+
 __________________________________ 重新 mkp __________________________________
 
 repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
@@ -585,4 +628,93 @@ brunch cancro
 一次性成功
 
 以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+. build/envsetup.sh 
+lunch gemini
+brunch gemini
+
+-----------------------------------------------------
+e/ubuntu/Workspaces/AOSP/MoKee/mkp/out/target/common/obj/APPS/ConfigPanel_intermediates/src/R.stamp )"
+device/xiaomi/msm8996-common/configpanel/res/values/styles.xml:30: error: resource layout/preference_category_material_settings (aka org.mokee.settings.device:layout/preference_category_material_settings) not found.
+device/xiaomi/msm8996-common/configpanel/res/values/styles.xml:41: error: resource layout/preference_material_settings (aka org.mokee.settings.device:layout/preference_material_settings) not found.
+error: failed linking references
+-----------------------------------------------------
+# 发现是 MoKee/android_packages_resources_devicesettings 没 sync 成功
+# 删掉 .repo/projects/, .repo/project-objects/ 下对应的 .git 及 .repo/local_manifests/roomservice.xml 中的 itme.
+# 重新 breakfast gemini 拉一下，拉完后看看 packages/resources/devicesettings/ 存不存在 
+
+
+
+
+
+
+-----------------------------------------------------
+[  0% 178/20545] RenderScript: Snap <= packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs
+FAILED: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp 
+/bin/bash -c "(rm -rf /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript )
+...
+(touch /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp )"
+/bin/bash: line 1: 18598 Bus error               (core dumped) ( ASAN_OPTIONS=detect_leaks=0:detect_container_overflow=0 /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/host/linux-x86/bin/llvm-rs-cc -o /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/res/raw -p /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/src -d /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript -a /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp -MD -target-api 23 -Wall -Werror -I external/clang/lib/Headers -I frameworks/rs/script_api/include packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs )
+-----------------------------------------------------
+
+
+ulimit -c unlimited
+export LC_ALL=C
+echo $USE_CCACHE
+echo $CCACHE_DIR
+
+export CCACHE_SIZE=50G
+du -h -d 1 /home/ubuntu/.ccache/
+prebuilts/misc/linux-x86/ccache/ccache --help
+prebuilts/misc/linux-x86/ccache/ccache -s
+rm -rf /home/ubuntu/.ccache/*
+prebuilts/misc/linux-x86/ccache/ccache -M 50G
+prebuilts/misc/linux-x86/ccache/ccache -s
+
+
+
+
+
+
+-----------------------------------------------------
+[ 87% 81769/92955] //frameworks/rs:libRS header-abi-linker libRS.so.lsdump
+Couldn't find end of symbol
+[ 88% 82098/92955] //frameworks/compile/libbcc/bcinfo:libbcinfo header-abi-linker libbcinfo.so.lsdump
+FAILED: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump 
+prebuilts/build-tools/linux-x86/bin/header-abi-linker -o /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump -v frameworks/compile/libbcc/bcinfo/libbcinfo.map -arch arm64 -api current -Iframeworks/compile/libbcc/bcinfo/include @/home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump.rsp 
+[libprotobuf ERROR external/protobuf/src/google/protobuf/text_format.cc:274] Error parsing text-format abi_dump.TranslationUnit: 189563:327: Unexpected end of string.
+[libprotobuf ERROR external/protobuf/src/google/protobuf/text_format.cc:274] Error parsing text-format abi_dump.TranslationUnit: 189563:327: Expected identifier.
+Failed to link elements
+[ 88% 82106/92955] Docs droiddoc: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
+DroidDoc took 25 sec. to write docs to /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
+[ 88% 82107/92955] Docs droiddoc: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
+DroidDoc took 25 sec. to write docs to /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
+ninja: build stopped: subcommand failed.
+11:57:03 ninja failed with: exit status 1
+-----------------------------------------------------
 
