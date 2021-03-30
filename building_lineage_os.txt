@@ -606,6 +606,9 @@ set | grep PROXY
 git config --global http.proxy 'socks5://127.0.0.1:1090'
 git config --global https.proxy 'socks5://127.0.0.1:1090'
 cat ~/.gitconfig
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
 
 
 export http_proxy=http://127.0.0.1:41091

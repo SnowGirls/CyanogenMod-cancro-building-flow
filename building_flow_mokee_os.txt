@@ -544,12 +544,6 @@ export CCACHE_SIZE=50G
 export WITH_SU=true
 
 
-
-__________________________________ 重新 mko __________________________________
-
-repo init -u https://github.com/MoKee/android.git -b mko --depth=1
-
-
 ------------------------- repo_sync.sh -------------------------
 #!/bin/sh
 
@@ -569,22 +563,14 @@ do
 
 done
 ------------------------- repo_sync.sh -------------------------
-
 chmod 777 repo_sync.sh
 ./repo_sync.sh
 
 
-. build/envsetup.sh
 
-breakfast cancro 
+## mko 与 mkq 都有 mr1 版本发布，所又只编带 mr1 的，不带 mr1 的 mko 与 mkq 就不要编了，别人不维护，难搞，缺失些库。
 
-lunch cancro
 
-brunch cancro
-
-一次性成功
-
-以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
 
 
 
@@ -615,6 +601,8 @@ brunch cancro
 
 
 
+
+
 __________________________________ 重新 mkp __________________________________
 
 repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
@@ -630,6 +618,40 @@ brunch cancro
 一次性成功
 
 以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 mkq-mr1 __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mkq-mr1 --depth=1
+
+repo sync
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+
+
 
 
 
