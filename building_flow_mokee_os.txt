@@ -574,7 +574,17 @@ chmod 777 repo_sync.sh
 ./repo_sync.sh
 
 
+. build/envsetup.sh
 
+breakfast cancro 
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
 
 
 
