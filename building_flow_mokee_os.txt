@@ -582,19 +582,6 @@ repo init -u https://github.com/MoKee/android.git -b mko-mr1 --depth=1
 repo sync 
 
 
-----------------------------
-Checking out:  9% (61/630) device/google/atverror: Cannot checkout LineageOS/android_external_okhttp: ManifestInvalidRevisionError: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
-Checking out: 25% (160/630) platform/external/liboggerror: in `sync --force-sync --current-branch -j 4`: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
-----------------------------
-## 它用了　LineageOS/android_external_okhttp　的git库，但人家没有 refs/heads/mko-mr1 分支，改一下
-.repo/manifests/default.xml
-## 搜索 LineageOS, 加上　revision="lineage-15.1" : 
-<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" />
-<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" revision="lineage-15.1" />
-## 重新 repo sync
-
-
-
 . build/envsetup.sh
 
 lunch cancro
@@ -649,6 +636,21 @@ brunch cancro
 
 
 
+
+
+
+
+
+----------------------------
+Checking out:  9% (61/630) device/google/atverror: Cannot checkout LineageOS/android_external_okhttp: ManifestInvalidRevisionError: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
+Checking out: 25% (160/630) platform/external/liboggerror: in `sync --force-sync --current-branch -j 4`: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
+----------------------------
+## 它用了　LineageOS/android_external_okhttp　的git库，但人家没有 refs/heads/mko-mr1 分支，改一下
+.repo/manifests/default.xml
+## 搜索 LineageOS, 加上　revision="lineage-15.1" : 
+<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" />
+<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" revision="lineage-15.1" />
+## 重新 repo sync
 
 
 
@@ -717,4 +719,30 @@ DroidDoc took 25 sec. to write docs to /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr
 ninja: build stopped: subcommand failed.
 11:57:03 ninja failed with: exit status 1
 -----------------------------------------------------
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------
+The boot animation could not be generated as
+ImageMagick is not installed in your system.
+ 
+Please install ImageMagick from this website:
+https://imagemagick.org/script/binary-releases.php
+**********************************************
+./vendor/mk/bootanimation/Android.mk:49: error: stop.
+21:17:47 ckati failed with: exit status 1
+
+#### failed to build some targets (50 seconds) ####
+
+sudo apt-get install imagemagick
+-----------------------------------------------------
+
+
+
 
