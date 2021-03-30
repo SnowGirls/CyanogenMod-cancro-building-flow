@@ -739,10 +739,32 @@ https://imagemagick.org/script/binary-releases.php
 21:17:47 ckati failed with: exit status 1
 
 #### failed to build some targets (50 seconds) ####
-
-sudo apt-get install imagemagick
 -----------------------------------------------------
+sudo apt-get install imagemagick
 
+
+
+
+
+-----------------------------------------------------
+FAILED: /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/constants/src/gen/cpp/generate_constants.o 
+/bin/bash -c "PWD=/proc/self/cwd  prebuilts/clang/host/linux-x86/clang-4053586/bin/clang++  -I device/xiaomi/msm8996-common/include -I external/conscrypt -I /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates -I /AOSP/MoKee/mko-mr1/out/host/linux-x86/gen/EXECUTABLES/conscrypt_generate_constants_intermediates -I libnativehelper/include_deprecated \$(cat /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/import_includes)  -I system/core/include -I system/media/audio/include -I hardware/libhardware/include -I hardware/libhardware_legacy/include -I hardware/ril/include -I libnativehelper/include -I frameworks/native/include -I frameworks/native/opengl/include -I frameworks/av/include  -c  -fno-exceptions -Wno-multichar -Wa,--noexecstack -fPIC -no-canonical-prefixes -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -O2 -g -fno-strict-aliasing --gcc-toolchain=prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8 --sysroot prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/sysroot -fstack-protector-strong -m64 -DANDROID -fmessage-length=0 -W -Wall -Wno-unused -Winit-self -Wpointer-arith -DNDEBUG -UDEBUG -fdebug-prefix-map=/proc/self/cwd= -D__compiler_offsetof=__builtin_offsetof -Werror=int-conversion -Wno-reserved-id-macro -Wno-format-pedantic -Wno-unused-command-line-argument -fcolor-diagnostics -Wno-expansion-to-defined -fdebug-prefix-map=\$PWD/=   -target x86_64-linux-gnu -Bprebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin  -Wsign-promo -Wno-inconsistent-missing-override -Wno-null-dereference -D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS -Wno-thread-safety-negative -isystem prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/include/c++/4.8 -isystem prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/include/c++/4.8/backward -isystem prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/include/c++/4.8/x86_64-linux -std=gnu++14  -fPIE -D_USING_LIBCXX -nostdinc++  -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast -Werror=address-of-temporary -Werror=return-type   -MD -MF /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/constants/src/gen/cpp/generate_constants.d -o /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/constants/src/gen/cpp/generate_constants.o external/conscrypt/constants/src/gen/cpp/generate_constants.cpp"
+prebuilts/clang/host/linux-x86/clang-4053586/bin/clang++.real: error while loading shared libraries: libncurses.so.5: cannot open shared object file: No such file or directory
+[  0% 147/92901] Notice file: external/conscrypt/NOTICE -- /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/NOTICE_FILES/src/bin/conscrypt_generate_constants.txt
+ninja: build stopped: subcommand failed.
+-----------------------------------------------------
+sudo apt-get install -y libncurses5 libncurses5-dev lib32ncurses5-dev
+## sudo apt-get install -y build-essential maven gnupg pngcrush schedtool g++-multilib gcc-multilib ## 多装了 T_T
+
+
+
+
+-----------------------------------------------------
+FAILED: /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/imx298_semco_chromatix.xml 
+/bin/bash -c "(xmllint vendor/xiaomi/gemini/proprietary/etc/camera/imx298_semco_chromatix.xml >/dev/null ) && (mkdir -p /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/ ) && (rm -f /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/imx298_semco_chromatix.xml ) && (cp vendor/xiaomi/gemini/proprietary/etc/camera/imx298_semco_chromatix.xml /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/imx298_semco_chromatix.xml )"
+/bin/bash: xmllint: command not found
+-----------------------------------------------------
+sudo apt-get install libxml2 libxml2-utils
 
 
 
