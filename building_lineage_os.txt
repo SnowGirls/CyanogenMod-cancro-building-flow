@@ -872,7 +872,7 @@ repo init -u git://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
 
 repo sync --force-sync --current-branch -j 4
 
-## repo sync -c -n -j 4 && repo sync -c -l -j 16 for faster syncing
+## repo sync -c -n -j 4 && repo sync -c -l -j 16 ## for faster syncing
 ## https://superuser.com/q/603547
 
 
@@ -995,3 +995,68 @@ service su_daemon /system/xbin/su --daemon
 
 4.往 frameworks/native/libs/binder/include/binder/AppOpsManager.h 的 Line 112 加入:
       OP_SU = 79,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 用的 repo 还是 https://github.com/MoKee/git-repo 
+
+export USE_CCACHE=1
+export CCACHE_SIZE=200G
+export WITH_SU=true
+export PATH=[path_to]/GitHub/git_v2.25.1:$PATH
+
+__________________________________ 重新 lineage-17.1 __________________________________
+
+mkdir lineage-17.1 && cd lineage-17.1
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
+./ReRepoSync.sh
+
+
+
+__________________________________ 重新 lineage-17.0 __________________________________
+
+mkdir lineage-17.0 && cd lineage-17.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.0 --depth=1
+./ReRepoSync.sh
+
+
+
+__________________________________ 重新 lineage-16.0 __________________________________
+
+mkdir lineage-16.0 && cd lineage-16.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-16.0 --depth=1
+./ReRepoSync.sh
+
+
+
+
+__________________________________ 重新 lineage-15.1 __________________________________
+
+mkdir lineage-15.1 && cd lineage-15.1
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.1 --depth=1
+./ReRepoSync.sh
+
+
+
+
+__________________________________ 重新 lineage-15.0 __________________________________
+
+mkdir lineage-15.0 && cd lineage-15.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.0 --depth=1
+./ReRepoSync.sh

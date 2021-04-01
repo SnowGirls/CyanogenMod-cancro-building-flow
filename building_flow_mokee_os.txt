@@ -540,8 +540,9 @@ sudo sysctl -p --system
 ## 换一个定制的repo吧: https://bbs.mokeedev.com/t/topic/21
 
 export USE_CCACHE=1
-export CCACHE_SIZE=50G
+export CCACHE_SIZE=200G
 export WITH_SU=true
+export PATH=[path_to]/GitHub/git_v2.25.1:$PATH
 
 
 ------------------------- repo_sync.sh -------------------------
@@ -569,6 +570,73 @@ chmod 777 repo_sync.sh
 
 
 ## mko 与 mkq 都有 mr1 版本发布，所又只编带 mr1 的，不带 mr1 的 mko 与 mkq 就不要编了，别人不维护，难搞，缺失些库。
+
+
+
+
+
+
+__________________________________ 重新 mkm __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mkm --depth=1
+
+repo sync 
+
+
+---------------------------
+## 有个库拉不了：
+<project path="hardware/qcom/wlan-caf" name="MoKee/android_hardware_qcom_wlan" groups="qcom_wlan" revision="mkm-caf" />
+## 改成从 LineageOS 拉的
+<project path="hardware/qcom/wlan-caf" name="LineageOS/android_hardware_qcom_wlan" groups="qcom_wlan" revision="cm-13.0-caf" />
+
+error: hooks is different in /AOSP/MoKee/mkm/.repo/projects/hardware/qcom/wlan-caf.git vs /AOSP/MoKee/mkm/.repo/project-objects/LineageOS/android_hardware_qcom_wlan.git
+Retrying clone after deleting /AOSP/MoKee/mkm/.repo/projects/hardware/qcom/wlan-caf.git
+---------------------------
+
+
+. build/envsetup.sh
+
+breakfast gemini
+
+---------------------------
+including vendor/mk/vendorsetup.sh
+build/core/product_config.mk:234: *** Can not locate config makefile for product "mk_gemini".  Stop.
+Device gemini not found. Attempting to retrieve device repository from MoKee Open Source Github (https://github.com/MoKee).
+Found repository: android_device_xiaomi_gemini
+Traceback (most recent call last):
+  File "build/tools/roomservice.py", line 253, in <module>
+    default_revision = get_default_revision()
+  File "build/tools/roomservice.py", line 114, in get_default_revision
+    d = m.findall('default')[0]
+IndexError: list index out of range
+build/core/product_config.mk:234: *** Can not locate config makefile for product "mk_gemini".  Stop.
+
+** Don't have a product spec for: 'mk_gemini'
+** Do you have the right repo manifest?
+---------------------------
+# 新版本 repo 问题
+# build/tools/roomservice.py 的 .repo/manifest.xml 全部都包含了 .repo/manifests/default.xml
+# 把上面脚本全部改成就完事了: .repo/manifest.xml  -> .repo/manifests/default.xml 
+
+
+---------------------------
+pngquant is not installed! Builds will be larger!
+---------------------------
+sudo apt install pngquant
+
+
+
+
+
+__________________________________ 重新 mkn-mr1 __________________________________
+
+## 这个也是很多缺失些库，不拉了。
+
+
+
+
+
+
 
 
 
@@ -631,8 +699,6 @@ brunch cancro
 
 
 
-
-
 __________________________________ 重新 mkq-mr1 __________________________________
 
 repo init -u https://github.com/MoKee/android.git -b mkq-mr1 --depth=1
@@ -648,6 +714,8 @@ brunch cancro
 一次性成功
 
 以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
 
 
 
