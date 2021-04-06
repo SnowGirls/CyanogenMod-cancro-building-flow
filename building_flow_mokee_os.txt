@@ -576,6 +576,9 @@ chmod 777 repo_sync.sh
 
 
 
+
+
+
 __________________________________ 重新 mkm __________________________________
 
 repo init -u https://github.com/MoKee/android.git -b mkm --depth=1
@@ -623,6 +626,25 @@ build/core/product_config.mk:234: *** Can not locate config makefile for product
 pngquant is not installed! Builds will be larger!
 ---------------------------
 sudo apt install pngquant
+
+
+brunch gemini
+
+
+
+---------------------------
+ERROR: Communication error with Jack server (2)
+---------------------------
+# 一时还找不到原因
+
+
+
+
+
+
+. build/envsetup.sh && breakfast cancro && brunch cancro
+
+
 
 
 
@@ -714,6 +736,7 @@ brunch cancro
 一次性成功
 
 以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
 
 
 
@@ -872,3 +895,61 @@ sudo apt-get install libxml2 libxml2-utils
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 这是编 mkm 的这些比较低的版本出现的问题:
+-----------------------------------------------------
+flex-2.5.39: loadlocale.c:130: _nl_intern_locale_data: Assertion `cnt < (sizeof (_nl_value_type_LC_TIME) / sizeof (_nl_value_type_LC_TIME[0]))' failed.
+flex-2.5.39: loadlocale.c:130: _nl_intern_locale_data: Assertion `cnt < (sizeof (_nl_value_type_LC_TIME) / sizeof (_nl_value_type_LC_TIME[0]))' failed.
+-----------------------------------------------------
+export LC_ALL=C
+
+
+-----------------------------------------------------
+[ERROR] Plugin org.apache.maven.plugins:maven-dependency-plugin:2.10 or one of its dependencies could not be resolved: Failed to read artifact descriptor for org.apache.maven.plugins:maven-dependency-plugin:jImport includes file: /AOSP/MoKee/mkm/out/target/product/gemini/obj/EXECUTABLES/btsnoop_intermediates/import_includes
+ar:2.10: Could not transfer artifact org.apache.maven.plugins:maven-dependency-plugin:pom:2.10 from/to central (https://repo.maven.apache.org/maven2): Transfer failed for https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-dependency-plugin/2.10/maven-dependency-plugin-2.10.pom: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty -> [Help 1]
+[ERROR] 
+Export includes file: system/bt/tools/btsnoop_dump/Android.mk -- /AOSP/MoKee/mkm/out/target/product/gemini/obj/EXECUTABLES/btsnoop_intermediates/export_includes
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginResolutionException
+-----------------------------------------------------
+# 按此描述: https://stackoverflow.com/q/4764611
+# 现在用着是 openjdk8，把 PATH 换成 sun/oracle jdk8 就行了
+JAVA_HOME=$O_HOME/Workspaces/JDK/jdk-8u172-linux-x64
+JRE_HOME=$JAVA_HOME/jre
+JAVA_BIN=$JAVA_HOME/bin
+CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME JAVA_BIN CLASSPATH
+PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+which java
+
+
+-----------------------------------------------------
+ERROR: Communication error with Jack server (2)
+-----------------------------------------------------
+export JACK_JAR=./out/host/linux-x86/framework/jack.jar
+./out/host/linux-x86/bin/jack-admin stop-server
+./out/host/linux-x86/bin/jack-admin start-server
+
+export JACK_JAR=./prebuilts/sdk/tools/jack.jar
+prebuilts/sdk/tools/jack-admin kill-server
+prebuilts/sdk/tools/jack-admin start-server
+
+
+prebuilts/sdk/tools/jack-admin server-log
+# 然后打开输出的 log 文件，发现在 brunch gemini 不久之后就 Shutdowning admin connection

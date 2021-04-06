@@ -1021,6 +1021,15 @@ export CCACHE_SIZE=200G
 export WITH_SU=true
 export PATH=[path_to]/GitHub/git_v2.25.1:$PATH
 
+
+__________________________________ 重新 lineage-18.0 __________________________________
+
+mkdir lineage-18.0 && cd lineage-18.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-18.0 --depth=1
+./ReRepoSync.sh
+
+
+
 __________________________________ 重新 lineage-17.1 __________________________________
 
 mkdir lineage-17.1 && cd lineage-17.1
@@ -1060,3 +1069,49 @@ __________________________________ 重新 lineage-15.0 _________________________
 mkdir lineage-15.0 && cd lineage-15.0
 repo init -u git://github.com/LineageOS/android.git -b lineage-15.0 --depth=1
 ./ReRepoSync.sh
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 cm-13.0 __________________________________
+
+mkdir cm-13.0 && cd cm-13.0
+repo init -u git://github.com/LineageOS/android.git -b cm-13.0 --depth=1
+./ReRepoSync.sh
+
+
+
+
+
+
+
+
+__________________________________ 重新 cm-13.0 __________________________________
+
+mkdir cm-13.0 && cd cm-13.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-13.0 --depth=1
+./ReRepoSync.sh
+
+
+
+__________________________________ 重新 cm-14.0 __________________________________
+
+mkdir cm-14.0 && cd cm-14.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-14.0 --depth=1
+./ReRepoSync.sh
+
+
+
+__________________________________ 重新 cm-14.1 __________________________________
+
+mkdir cm-14.1 && cd cm-14.1
+repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1 --depth=1
+./ReRepoSync.sh
+
+
+
