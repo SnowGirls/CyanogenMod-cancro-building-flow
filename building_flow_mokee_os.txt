@@ -542,7 +542,7 @@ sudo sysctl -p --system
 export USE_CCACHE=1
 export CCACHE_SIZE=200G
 export WITH_SU=true
-export PATH=[path_to]/GitHub/git_v2.25.1:$PATH
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
 
 
 ------------------------- repo_sync.sh -------------------------
@@ -596,6 +596,7 @@ error: hooks is different in /AOSP/MoKee/mkm/.repo/projects/hardware/qcom/wlan-c
 Retrying clone after deleting /AOSP/MoKee/mkm/.repo/projects/hardware/qcom/wlan-caf.git
 ---------------------------
 
+export LC_ALL=C
 
 . build/envsetup.sh
 
@@ -620,7 +621,9 @@ build/core/product_config.mk:234: *** Can not locate config makefile for product
 # 新版本 repo 问题
 # build/tools/roomservice.py 的 .repo/manifest.xml 全部都包含了 .repo/manifests/default.xml
 # 把上面脚本全部改成就完事了: .repo/manifest.xml  -> .repo/manifests/default.xml 
-
+vim build/tools/roomservice.py
+:%s/\.repo\/manifest\.xml/\.repo\/manifests\/default\.xml/
+# wq 退出
 
 ---------------------------
 pngquant is not installed! Builds will be larger!
@@ -635,8 +638,21 @@ brunch gemini
 ---------------------------
 ERROR: Communication error with Jack server (2)
 ---------------------------
-# 一时还找不到原因
+# https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
+# make ANDROID_COMPILE_WITH_JACK:=false
 
+vim build/core/combo/javac.mk
+ANDROID_COMPILE_WITH_JACK := false
+
+
+---------------------------
+frameworks/base/packages/StatementService/src/com/android/statementservice/DirectStatementService.java:149: error: cannot access OkCacheContainer
+            mHttpResponseCache = HttpResponseCache.install(httpCacheDir, HTTP_CACHE_SIZE_IN_BYTES);
+                                                  ^
+  class file for com.android.okhttp.OkCacheContainer not found
+1 error
+---------------------------
+# https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
 
 
 

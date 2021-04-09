@@ -31,6 +31,42 @@ repo sync
 
 
 
+
+
+breakfast oneplus3
+------------------------------
+including vendor/lineage/vendorsetup.sh
+build/core/product_config.mk:248: *** Can not locate config makefile for product "lineage_oneplus3".  Stop.
+Device oneplus3 not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Found repository: android_device_oneplus_oneplus3
+Traceback (most recent call last):
+  File "vendor/lineage/build/tools/roomservice.py", line 258, in <module>
+    default_revision = get_default_revision()
+  File "vendor/lineage/build/tools/roomservice.py", line 115, in get_default_revision
+    d = m.findall('default')[0]
+IndexError: list index out of range
+build/core/product_config.mk:248: *** Can not locate config makefile for product "lineage_oneplus3".  Stop.
+build/core/product_config.mk:248: *** Can not locate config makefile for product "lineage_oneplus3".  Stop.
+
+** Don't have a product spec for: 'lineage_oneplus3'
+** Do you have the right repo manifest?
+------------------------------
+# 看一下 cat .repo/manifest.xml , 然后
+# 把 roomservice.py 脚本的 .repo/manifest.xml 全部改成 .repo/manifests/default.xml
+vim vendor/lineage/build/tools/roomservice.py
+:%s/\.repo\/manifest\.xml/\.repo\/manifests\/default\.xml/
+# wq 退出
+
+
+
+
+
+
+
+
+
+
+
 ------------------------> lineage-15.1 <------------------------
 
 repo init -u git://github.com/LineageOS/android.git -b lineage-15.1
@@ -51,9 +87,21 @@ breakfast oneplus3
 // https://wiki.lineageos.org/devices/oneplus3/build
 // 把 ./extract-files.sh 的步骤用以下操作代替
 vim .repo/local_manifests/roomservice.xml
+## TheMuppets 的但这会下载许多无关的机型， 用 MinimalAndroidVendor 的吧
 ----- vim -----
-<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" />
+<!-- <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" /> -->
+<project name="MinimalAndroidVendor/proprietary_vendor_oneplus3" path="vendor/oneplus/oneplus3" remote="github" revision="lineage-15.1" />
 ----- vim -----
+## 推荐用 svn
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-15.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+
+or gemini
+----- vim -----
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
+----- vim -----
+
 repo sync --force-sync
 
 
@@ -271,6 +319,10 @@ vim .repo/local_manifests/roomservice.xml
 </manifest>
 ----- vim -----
 repo sync --force-sync
+
+## 但推荐用 svn， 因为上面的下载的包太大，有各种不需要的机型
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-16.0/oneplus3/ ./vendor/oneplus/oneplus3
+
 ---------------------- 专有文件 ----------------------
 
 
@@ -845,6 +897,111 @@ brunch oneplus3 / brunch gemini
 
 
 
+------------------------------
+FAILED: out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.sorted.tmp
+/bin/bash -c "(out/host/linux-x86/bin/checkfc -e out/target/product/gemini/obj/ETC/sepolicy_intermediates/sepolicy out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device
+.tmp ) && (out/host/linux-x86/bin/fc_sort out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.tmp out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/fi
+le_contexts.device.sorted.tmp )"
+out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.tmp: Multiple same specifications for /data/vendor/misc/audio(/.*)?.
+Error: could not load context file from out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.tmp
+[ 79% 79557/100088] build out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts
+FAILED: out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts
+/bin/bash -c "(m4 --fatal-warnings -s     system/sepolicy/vendor/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/qcom/sepolicy-legacy-um/vendor/common
+/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/qcom/sepolicy-legacy-um/vendor/msm8996/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_
+intermediates/sectxfile_nl    device/qcom/sepolicy-legacy-um/vendor/test/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/lineage/sepolicy/qcom/vendor/
+file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/xiaomi/msm8996-common/sepolicy/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermedi
+ates/sectxfile_nl    device/lineage/sepolicy/common/vendor/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl > out/target/product/gemini/obj/ETC/vendor_file_conte
+xts_intermediates/vendor_file_contexts.tmp ) && (out/host/linux-x86/bin/checkfc out/target/product/gemini/obj/ETC/sepolicy_intermediates/sepolicy out/target/product/gemini/obj/ETC/vendor_file_contexts_
+intermediates/vendor_file_contexts.tmp ) && (out/host/linux-x86/bin/fc_sort out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts.tmp out/target/product/gemini/obj/E
+TC/vendor_file_contexts_intermediates/vendor_file_contexts )"
+out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts.tmp: Multiple same specifications for /data/vendor/misc/audio(/.*)?.
+Error: could not load context file from out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts.tmp
+13:39:28 ninja failed with: exit status 1
+------------------------------
+# 打开文件 out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.sorted.tmp
+# 搜索 "/data/vendor/misc/audio" 发现确实定义多个规则了 
+# 初次定义是在 #line 1 "system/sepolicy/vendor/file_contexts"
+# 看最后个定义，往上看发现 #line 1 "device/xiaomi/msm8996-common/sepolicy/file_contexts" 这个文件定义有
+# 打开 device/xiaomi/msm8996-common/sepolicy/file_contexts 搜索 "/data/vendor/misc/audio" 在前面加个 "#" 注释掉
+
+vim device/xiaomi/msm8996-common/sepolicy/file_contexts:
+-------
+# Data vendor files
+# /data/vendor/misc/audio(/.*)?         u:object_r:vendor_audio_data_file:s0
+-------
+
+
+
+
+------------------------------
+ExternalError: Failed to run command '['mkuserimg_mke2fs', '-s', 'lineage-17.0/out/soong/.temp/tmp693BSW', 'l
+ineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.img', 'ext4', '/', '5368709120', '-j', '0', '-T', '1230768000', '-C',
+ 'lineage-17.0/out/soong/.temp/merged_fs_configHjIeou.txt', '-B', 'lineage-17.0/out/target/product/gemini/obj
+/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map', '-L', '/', '-M', '0', '-U', '66aff1d5-dee6-5976-adfb-7c3f39c8c8aa', '-S', '4b1f3b28-8b07-5d53-96df-3c15f
+96aa83c', '--inode_size', '256', 'lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/ME
+TA/file_contexts.bin']' (exit code 4):
+15:08:56 mkuserimg_mke2fs.py INFO: Env: {'E2FSPROGS_FAKE_TIME': '1230768000', 'MKE2FS_CONFIG': './system/extras/ext4_utils/mke2fs.conf'}
+15:08:56 mkuserimg_mke2fs.py INFO: Running: mke2fs -O ^has_journal -L / -I 256 -M / -m 0 -U 66aff1d5-dee6-5976-adfb-7c3f39c8c8aa -E android_sparse,hash_seed=4b1f3b28-8b07-5d53-96df-3c15f96aa83c -t ext4
+ -b 4096 lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.img 1310720
+15:08:57 mkuserimg_mke2fs.py INFO: Env: {'E2FSPROGS_FAKE_TIME': '1230768000'}
+15:08:57 mkuserimg_mke2fs.py INFO: Running: e2fsdroid -T 1230768000 -C lineage-17.0/out/soong/.temp/merged_fs_configHjIeou.txt -B /home/ubuntu/Disk6T/Works
+paces/AOSP/LineageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map -S /home/ubuntu/Disk6T/Workspaces/AOSP/Line
+ageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/META/file_contexts.bin -f line
+age-17.0/out/soong/.temp/tmp693BSW -a / lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubu
+ntu/IMAGES/system.img
+
+15:08:58 mkuserimg_mke2fs.py ERROR: Failed to run e2fsdroid_cmd: set_selinux_xattr: No such file or directory searching for label "/bt_firmware"
+19:10:41 mkuserimg_mke2fs.py ERROR: Failed to run e2fsdroid_cmd: set_selinux_xattr: No such file or directory searching for label "/firmware"
+
+
+set_selinux_xattr: No such file or directory searching for label "/bt_firmware"
+set_selinux_xattr: No such file or directory searching for label "/firmware"
+e2fsdroid: No such file or directory while configuring the file system
+loaded 3558 fs_config entries
+
+
+Out of space? Out of inodes? The tree size of lineage-17.0/out/soong/.temp/tmp693BSW is 1249435648 bytes (1191 MB), with reserved space of 0 bytes (0 MB).
+The max image size for filesystem files is 5368709120 bytes (5120 MB), out of a total partition size of 5368709120 bytes (5120 MB).
+15:08:59 ninja failed with: exit status 1
+
+------------------------------
+# 参考 https://blog.csdn.net/zhangpengfei991023/article/details/109241215
+# 发现 lineage-17.0/device/xiaomi/msm8996-common/BoardConfigCommon.mk 有定义 BOARD_SYSTEMIMAGE_PARTITION_SIZE，刚好也是 3221225472 (3072 MB)
+# 给够 5G 试试吧
+# BOARD_SYSTEMIMAGE_PARTITION_SIZE := 5368709120
+# 但发现不是这个原因
+
+# 搜索关键字，对比 lineage-17.1 发现, file_contexts 少了些东西，于是添加上 bt_firmware 和 firmware:
+
+vim device/xiaomi/msm8996-common/sepolicy/file_contexts
+-------
+# Data vendor files
+# /data/vendor/misc/audio(/.*)?         u:object_r:vendor_audio_data_file:s0
+
+# Root files
+/bt_firmware(/.*)?    u:object_r:bt_firmware_file:s0
+/firmware(/.*)?       u:object_r:firmware_file:s0
+-------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1014,12 +1171,30 @@ service su_daemon /system/xbin/su --daemon
 
 
 
+
+## 专有文件网站:
+https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/
+
+
+
+
+
 ## 用的 repo 还是 https://github.com/MoKee/git-repo 
 
 export USE_CCACHE=1
 export CCACHE_SIZE=200G
 export WITH_SU=true
-export PATH=[path_to]/GitHub/git_v2.25.1:$PATH
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
+
+
+
+__________________________________ 重新 lineage-18.1 __________________________________
+
+mkdir lineage-18.1 && cd lineage-18.1
+repo init -u git://github.com/LineageOS/android.git -b lineage-18.1 --depth=1
+./ReRepoSync.sh
+
+
 
 
 __________________________________ 重新 lineage-18.0 __________________________________
@@ -1027,6 +1202,10 @@ __________________________________ 重新 lineage-18.0 _________________________
 mkdir lineage-18.0 && cd lineage-18.0
 repo init -u git://github.com/LineageOS/android.git -b lineage-18.0 --depth=1
 ./ReRepoSync.sh
+
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/oneplus3/ ./vendor/oneplus/oneplus3
+
 
 
 
@@ -1036,6 +1215,18 @@ mkdir lineage-17.1 && cd lineage-17.1
 repo init -u git://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
 ./ReRepoSync.sh
 
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+gemini:
+vim .repo/local_manifests/roomservice.xml
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mkq-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mkq-mr1" />
+
+# 重新 ./ReRepoSync.sh && . build/envsetup.sh && breakfast oneplus3/gemini && brunch oneplus3/gemini
+
+
+
 
 
 __________________________________ 重新 lineage-17.0 __________________________________
@@ -1044,6 +1235,30 @@ mkdir lineage-17.0 && cd lineage-17.0
 repo init -u git://github.com/LineageOS/android.git -b lineage-17.0 --depth=1
 ./ReRepoSync.sh
 
+. build/envsetup.sh && breakfast oneplus3/gemini
+
+
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.0/oneplus3/ ./vendor/oneplus/oneplus3
+
+## 参考 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/
+
+gemini:
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-lineage-17.0_gemini.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-17.0/proprietary_vendor_xiaomi-lineage-17.0.zip?path=gemini
+curl -o proprietary_vendor_xiaomi-lineage-17.0_msm8996-common.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-17.0/proprietary_vendor_xiaomi-lineage-17.0.zip?path=msm8996-common
+unzip proprietary_vendor_xiaomi-lineage-17.0_gemini.zip -d ./
+unzip proprietary_vendor_xiaomi-lineage-17.0_msm8996-common.zip -d ./
+mv proprietary_vendor_xiaomi-lineage-17.0-gemini/gemini ./
+mv proprietary_vendor_xiaomi-lineage-17.0-msm8996-common/msm8996-common ./
+popd
+
+
+brunch oneplus3/gemini
+
+
+
+
 
 
 __________________________________ 重新 lineage-16.0 __________________________________
@@ -1051,6 +1266,17 @@ __________________________________ 重新 lineage-16.0 _________________________
 mkdir lineage-16.0 && cd lineage-16.0
 repo init -u git://github.com/LineageOS/android.git -b lineage-16.0 --depth=1
 ./ReRepoSync.sh
+
+## 一次性搞掂:
+breakfast oneplus3
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-16.0/oneplus3/ ./vendor/oneplus/oneplus3
+brunch oneplus3
+
+breakfast gemini
+vim .repo/local_manifests/roomservice.xml
+  <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+brunch oneplus3
 
 
 
@@ -1062,6 +1288,16 @@ repo init -u git://github.com/LineageOS/android.git -b lineage-15.1 --depth=1
 ./ReRepoSync.sh
 
 
+## 一次性搞掂:
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-15.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+gemini:
+vim .repo/local_manifests/roomservice.xml
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
+
+
 
 
 __________________________________ 重新 lineage-15.0 __________________________________
@@ -1071,8 +1307,14 @@ repo init -u git://github.com/LineageOS/android.git -b lineage-15.0 --depth=1
 ./ReRepoSync.sh
 
 
+## 一次性搞掂:
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-15.0/oneplus3/ ./vendor/oneplus/oneplus3
 
-
+gemini:
+vim .repo/local_manifests/roomservice.xml
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
 
 
 
@@ -1088,6 +1330,34 @@ repo init -u git://github.com/LineageOS/android.git -b cm-13.0 --depth=1
 
 
 
+
+
+CyanogenMod:
+
+
+
+
+__________________________________ 重新 cm-11.0 __________________________________
+
+mkdir cm-11.0 && cd cm-11.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-11.0 --depth=1
+./ReRepoSync.sh
+
+
+
+__________________________________ 重新 cm-12.0 __________________________________
+
+mkdir cm-12.0 && cd cm-12.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-12.0 --depth=1
+./ReRepoSync.sh
+
+
+
+__________________________________ 重新 cm-12.1 __________________________________
+
+mkdir cm-12.1 && cd cm-12.1
+repo init -u git://github.com/CyanogenMod/android.git -b cm-12.1 --depth=1
+./ReRepoSync.sh
 
 
 
