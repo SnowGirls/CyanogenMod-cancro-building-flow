@@ -261,7 +261,7 @@ chmod a+x ./*.sh
 # 4.3.1 A 可以Github上搜索一下看有没有人上传, keyword:"proprietary_vendor_xiaomi or proprietary_vendor_xiaomi_cancro"
 # 搜索到后，选择自己感兴起的branch看一下
 # https://github.com/TheScarastic/proprietary_vendor_xiaomi  # 这个缺少 libTimeService.so 和 rootdir
-# https://github.com/TheMuppets/proprietary_vendor_xiaomi
+# https://github.com/TheMuppets/proprietary_vendor_xiaomi    # 因DMCA版权原因转去了 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi
 # https://github.com/cancro-ubt/proprietary_vendor_xiaomi_cancro
 
 # 如果直接git clone，仓库太大，很慢，浪费时间，用svn下载指定的目录就好
@@ -299,8 +299,8 @@ chmod a+x sdat2img.py
 
 ## 4.4 设置缓存 &　编译
 cd ~/Workspaces/AOSP/CyanogenMod/android
-source build/envsetup.sh   	# 如果期间退出过Terminal或当前Session不同，需要重新issue这条命令
-croot  						# 如果当前pwd不在项目根目录，可以issue这条命令回到ROM源码目录
+source build/envsetup.sh   	  # 如果期间退出过Terminal或当前Session不同，需要重新issue这条命令
+croot  						            # 如果当前pwd不在项目根目录，可以issue这条命令回到ROM源码目录
 
 export USE_CCACHE=1
 export ANDROID_CCACHE_DIR="$HOME/Workspaces/AOSP/CyanogenMod/.ccache"
@@ -316,12 +316,19 @@ brunch cancro
 
 
 
+
+
+
 -------------------- 编译过程的一些错误摘录 开始 --------------------
+
+
+
 
 ## 一开始 svn checkout 的是 https://github.com/TheScarastic/proprietary_vendor_xiaomi 导致了下面两个错误
 错误1：
+--------------------------------
 make: *** No rule to make target 'vendor/xiaomi/cancro/proprietary/rootdir/chargeonlymode', needed by '~/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/root/sbin/chargeonlymode'.  Stop.
-
+--------------------------------
 解决1：
 cp -r vendor/xiaomi/cancro/sbin vendor/xiaomi/cancro/proprietary/
 mv vendor/xiaomi/cancro/proprietary/sbin vendor/xiaomi/cancro/proprietary/rootdir
@@ -329,14 +336,16 @@ mv vendor/xiaomi/cancro/proprietary/sbin vendor/xiaomi/cancro/proprietary/rootdi
 
 
 错误2：
+--------------------------------
 make: *** No rule to make target 'vendor/xiaomi/cancro/proprietary/vendor/lib/libTimeService.so', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/system/vendor/lib/libTimeService.so'.  Stop.
-
+--------------------------------
 解决2：
 curl https://github.com/TheMuppets/proprietary_vendor_xiaomi/blob/cm-13.0/cancro/proprietary/vendor/lib/libTimeService.so -o vendor/xiaomi/cancro/proprietary/vendor/lib/
 
 
 
 错误3：
+--------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact org.cyanogenmod:gello:apk:40 from/to central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds): Connect to maven.cyanogenmod.org:443 [maven.cyanogenmod.org/216.168.38.166] failed: Connection refused
 [ERROR] org.cyanogenmod:gello:apk:40
 [ERROR] 
@@ -350,7 +359,7 @@ curl https://github.com/TheMuppets/proprietary_vendor_xiaomi/blob/cm-13.0/cancro
 [ERROR] 
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-
+--------------------------------
 解决3：
 # 可参考文章：https://blog.csdn.net/feiniao8651/article/details/70183652
 # 因 CyanogenMod (https://github.com/CyanogenMod/android) 由 LineageOS (https://github.com/LineageOS/android)
@@ -361,10 +370,60 @@ curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-13.0/gello
 
 
 错误4：
+--------------------------------
 make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/kernel', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/boot.img'.  Stop.
+--------------------------------
 解决4：
 # 跟上面的 breakfast 网络出错一样：
 repo sync --force-sync kernel/xiaomi/cancro
+
+
+
+
+
+错误5：
+--------------------------------
+No private recovery resources for TARGET_DEVICE cancro
+...
+...
+...
+Lex: checkpolicy <= external/selinux/checkpolicy/policy_scan.l
+flex-2.5.39: loadlocale.c:130: _nl_intern_locale_data: Assertion `cnt < (sizeof (_nl_value_type_LC_TIME) / sizeof (_nl_value_type_LC_TIME[0]))' failed.
+--------------------------------
+解决5：
+export LC_ALL=C
+
+
+
+
+
+错误6：
+--------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact org.cyanogenmod:gello:apk:40 from/to central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds): Transfer failed for https://maven.cyanogenmod.org/artifactory/gello_prebuilds/org/cyanogenmod/gello/40/gello-40.apk
+[ERROR]   org.cyanogenmod:gello:apk:40
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR]   central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR]   central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds, releases=true, snapshots=true)
+[ERROR] : Connect to maven.cyanogenmod.org:443 [maven.cyanogenmod.org/216.168.38.166] failed: Connection timed out (Connection timed out)
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+--------------------------------
+解决6：
+curl -o ~/Downloads/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-13.0/gello/Android.mk
+meld ~/Downloads/Android.mk vendor/cm/gello/Android.mk
+覆盖它:
+curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-13.0/gello/Android.mk
+
+
+
+
+
 
 -------------------- 编译过程的一些错误摘录 结束 --------------------
 
@@ -1485,5 +1544,28 @@ brunch cancro
 
 
 # 2019-03-05 edited 关于 cm-11.0: 把 ~/Workspaces/AOSP/CyanogenMod/android 改名为  ~/Workspaces/AOSP/CyanogenMod/android_cm-11.0/
+
+
+
+
+
+
+
+
+
+
+-----------------
+/bin/bash: gperf: command not found
+make: *** [external/chromium_org/third_party/WebKit/Source/platform/make_platform_generated.target.linux-arm.mk:48: /AOSP/CyanogenMod/cm-12.1/out/target/product/cancro/obj/GYP/shared_intermediates/blink/platform/ColorData.cpp] Error 127
+-----------------
+sudo apt-get install gperf
+
+
+-----------------
+/home/ubuntu/Disk6T/Workspaces/AOSP/CyanogenMod/cm-12.1/out/host/linux-x86/bin/aapt: error while loading shared libraries: libz.so.1: cannot open shared object file: No such file or directory
+make: *** [build/core/static_java_library.mk:113: /home/ubuntu/Disk6T/Workspaces/AOSP/CyanogenMod/cm-12.1/out/target/common/obj/JAVA_LIBRARIES/com.android.emailcommon_intermediates/src/R.stamp] Error 127
+-----------------
+sudo apt-get install lib32z1
+
 
 

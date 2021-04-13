@@ -1366,6 +1366,10 @@ repo init -u git://github.com/LineageOS/android.git -b cm-13.0 --depth=1
 CyanogenMod:
 
 
+## 因为repo 版本变了，都要改一下 roomservice.py, 都要把里面的 .repo/manifest.xml 全部改成 .repo/manifests/default.xml
+
+
+export LC_ALL=C
 
 
 __________________________________ 重新 cm-11.0 __________________________________
@@ -1391,12 +1395,38 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-12.1 --depth=1
 ./ReRepoSync.sh
 
 
+breakfast cancro
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-12.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-12.1/proprietary_vendor_xiaomi-cm-12.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-12.1_cancro.zip -d ./
+mv proprietary_vendor_xiaomi-cm-12.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-12.1-cancro/
+popd
+
+## The required version is: "1.7.x"
+## vim build/core/main.mk, 把文件里面的 ^java 改成 ^openjdk
+
+brunch cancro
+
 
 __________________________________ 重新 cm-13.0 __________________________________
 
 mkdir cm-13.0 && cd cm-13.0
 repo init -u git://github.com/CyanogenMod/android.git -b cm-13.0 --depth=1
 ./ReRepoSync.sh
+
+
+breakfast cancro
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-13.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-13.0/proprietary_vendor_xiaomi-cm-13.0.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-13.0_cancro.zip -d ./
+mv proprietary_vendor_xiaomi-cm-13.0-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-13.0-cancro/
+popd
+
+brunch cancro
 
 
 
@@ -1407,6 +1437,24 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-14.0 --depth=1
 ./ReRepoSync.sh
 
 
+breakfast cancro
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.0/proprietary_vendor_xiaomi-cm-14.0.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.0_cancro.zip -d ./ > /dev/null 2>&1  # 将标准输出重定向到空设备, 2>&1将标准错误输出重定向到标准输出
+mv proprietary_vendor_xiaomi-cm-14.0-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.0-cancro/
+popd
+
+-------
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/qcom/binaries/msm8974/graphics/graphics-vendor.mk" does not exist.  Stop.
+-------
+svn checkout https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/branches/cm-14.0/msm8974 vendor/qcom/binaries/msm8974 
+or:
+svn checkout https://github.com/MoKee/android_vendor_qcom_binaries/branches/mkn/msm8974 vendor/qcom/binaries/msm8974
+
+brunch cancro
+
 
 __________________________________ 重新 cm-14.1 __________________________________
 
@@ -1415,4 +1463,14 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1 --depth=1
 ./ReRepoSync.sh
 
 
+breakfast cancro
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.1_cancro.zip -d ./ > /dev/null 2>&1
+mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
+popd
+
+svn checkout https://github.com/TheMuppets-Legacy/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974/ vendor/qcom/binaries/msm8974
 

@@ -637,7 +637,40 @@ brunch gemini
 
 ---------------------------
 ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v20_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v14_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
 ---------------------------
+# 搞错了方法，不是 Jack server 的问题，而是 curl 的问题，毕竟以前用的 curl 版本比较低嘛
+# 是 curl 的问题，因为 curl 的版本比较高，低版本时才有 --no-proxy， curl --help 发现只有 --noproxy
+# 搜索 "Communication error with Jack server" 出现在以下两文件, 把两文件：
+mkm/prebuilts/sdk/tools/jack
+mkm/prebuilts/sdk/tools/jack-admin
+# 的 --no-proxy 改成 --noproxy
+
 # https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
 # make ANDROID_COMPILE_WITH_JACK:=false
 
@@ -957,7 +990,40 @@ which java
 
 -----------------------------------------------------
 ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v20_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v14_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
 -----------------------------------------------------
+# 是 curl 的问题，因为 curl 的版本比较高，低版本时才有 --no-proxy， curl --help 发现只有 --noproxy
+# 把文件：
+AOSP/CyanogenMod/cm-13.0/prebuilts/sdk/tools/jack
+AOSP/CyanogenMod/cm-13.0/prebuilts/sdk/tools/jack-admin
+# 的 --no-proxy 改成 --noproxy
+
+
 export JACK_JAR=./out/host/linux-x86/framework/jack.jar
 ./out/host/linux-x86/bin/jack-admin stop-server
 ./out/host/linux-x86/bin/jack-admin start-server
@@ -966,6 +1032,5 @@ export JACK_JAR=./prebuilts/sdk/tools/jack.jar
 prebuilts/sdk/tools/jack-admin kill-server
 prebuilts/sdk/tools/jack-admin start-server
 
-
 prebuilts/sdk/tools/jack-admin server-log
-# 然后打开输出的 log 文件，发现在 brunch gemini 不久之后就 Shutdowning admin connection
+# 然后 tail -f -n 500 打开输出的 log 文件，发现在 brunch gemini 不久之后就 Shutdowning admin connection
