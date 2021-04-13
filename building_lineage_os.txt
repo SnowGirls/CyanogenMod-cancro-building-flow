@@ -1194,6 +1194,7 @@ mkdir lineage-18.1 && cd lineage-18.1
 repo init -u git://github.com/LineageOS/android.git -b lineage-18.1 --depth=1
 ./ReRepoSync.sh
 
+# lineage-18.1 最近还在活跃更新，先不编了
 
 
 
@@ -1203,10 +1204,37 @@ mkdir lineage-18.0 && cd lineage-18.0
 repo init -u git://github.com/LineageOS/android.git -b lineage-18.0 --depth=1
 ./ReRepoSync.sh
 
-oneplus3:
-svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/oneplus3/ ./vendor/oneplus/oneplus3
+# https://download.mokeedev.com/
+# https://github.com/TheMuppets/proprietary_vendor_oneplus, 发现对应的只有一加5/5T可又刷
+# https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-18.0, 支持的小米机就很多
 
 
+========================
+breakfast sagit
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-lineage-18.0_sagit.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-18.0/proprietary_vendor_xiaomi-lineage-18.0.zip?path=sagit
+curl -o proprietary_vendor_xiaomi-lineage-18.0_msm8998-common.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-18.0/proprietary_vendor_xiaomi-lineage-18.0.zip?path=msm8998-common
+
+unzip proprietary_vendor_xiaomi-lineage-18.0_msm8998-common.zip -d ./
+unzip proprietary_vendor_xiaomi-lineage-18.0_sagit.zip -d ./
+mv proprietary_vendor_xiaomi-lineage-18.0-msm8998-common/msm8998-common ./
+mv proprietary_vendor_xiaomi-lineage-18.0-sagit/sagit ./
+
+rmdir proprietary_vendor_xiaomi-lineage-18.0-msm8998-common && rmdir proprietary_vendor_xiaomi-lineage-18.0-sagit
+popd
+brunch sagit
+========================
+
+
+========================
+breakfast cheeseburger/dumpling
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/cheeseburger/ ./vendor/oneplus/cheeseburger
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/dumpling/ ./vendor/oneplus/dumpling
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/msm8998-common/ ./vendor/oneplus/msm8998-common
+
+brunch cheeseburger/dumpling
+========================
 
 
 __________________________________ 重新 lineage-17.1 __________________________________
@@ -1316,8 +1344,11 @@ vim .repo/local_manifests/roomservice.xml
   <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
   <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
 
+===================
+field "arch.arm64.kryo" does not exist
 
-
+https://forum.xda-developers.com/t/rom-kernel-unofficial-unified-lineageos-15-1-8-1-0.3668952/page-47#post-73920910
+===================
 
 
 __________________________________ 重新 cm-13.0 __________________________________
