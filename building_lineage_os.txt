@@ -1363,6 +1363,11 @@ repo init -u git://github.com/LineageOS/android.git -b cm-13.0 --depth=1
 
 
 
+
+
+
+
+
 CyanogenMod:
 
 
@@ -1380,11 +1385,77 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-11.0 --depth=1
 
 
 
+svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm-11.0 device/xiaomi/cancro
+
+# 因为这个库有 cm.dependencies 了，读懂 build/envsetup.sh 和 build/tools/roomservice.py 源码, 
+-------------------------
+vim .repo/local_manifests/roomservice.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project name="mi3-dev/android_kernel_xiaomi_msm8x74pro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" />
+  <project name="mi3-dev/android_device_xiaomi_cancro" path="device/xiaomi/cancro" remote="github" />
+</manifest>
+-------------------------
+./ReRepoSync.sh
+
+# 当 checkout 完，修改 build/envsetup.sh，在调用 build/tools/roomservice.py 那里传多个 true 参数过去
+# Line 858: build/tools/roomservice.py $product true
+# 修改后，重新 . build/envsetup.sh 一下
+
+breakfast cancro  # 拉 roomservice.xml 及 cm.dependencies 里的依赖库，好像不需要 svn checkout 这一步也行, xml里有就会帮你拉了
+
+
+
+svn checkout https://github.com/mi3-dev/proprietary_vendor_xiaomi/branches/cm-11.0/cancro vendor/xiaomi/cancro/
+# OR: 
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-11.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-11.0/proprietary_vendor_xiaomi-cm-11.0.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-11.0_cancro.zip -d ./
+mv proprietary_vendor_xiaomi-cm-11.0-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-11.0-cancro/
+popd
+
+
+
+brunch cancro
+
+--------------
+build/core/config.mk:374: *** Error: could not find jdk tools.jar, please install JDK6, which you can download from java.sun.com.  Stop.
+--------------
+# 下载 jdk6: https://www.oracle.com/java/technologies/javase-java-archive-javase6-downloads.html
+# 网上找个为了下载的 oracle 账号 2696671285@qq.com:Oracle123
+# 下载好解压:
+chmod a+x jdk-6u45-linux-x64.bin
+./jdk-6u45-linux-x64.bin
+# 然后加入 PATH 变量
+java -version 
+# java version "1.6.0_45"
+
+--------------
+/bin/bash: flex: command not found
+--------------
+sudo apt install flex
+
+
+-----------------
+No rule to make target 'vendor/cm/proprietary/Term.apk'
+-----------------
+# 查看 cat vendor/cm/get-prebuilts, 其实就是下载 https://jackpal.github.com/Android-Terminal-Emulator/downloads/Term.apk 并 unzip 解压它里面的 lib
+./vendor/cm/get-prebuilts
+# 发现 curl 下载不了 curl: (7) Failed to connect to jackpal.github.io port 80: Connection refused， 手动下载并手动 unzip 解压吧
+BASEDIR=vendor/cm/
+unzip -o -d $BASEDIR/proprietary $BASEDIR/proprietary/Term.apk lib/*
+
+
+
+
+
+
 __________________________________ 重新 cm-12.0 __________________________________
 
-mkdir cm-12.0 && cd cm-12.0
-repo init -u git://github.com/CyanogenMod/android.git -b cm-12.0 --depth=1
-./ReRepoSync.sh
+## 这个也是很多缺失些库，不拉了。
+
+
 
 
 
@@ -1394,8 +1465,10 @@ mkdir cm-12.1 && cd cm-12.1
 repo init -u git://github.com/CyanogenMod/android.git -b cm-12.1 --depth=1
 ./ReRepoSync.sh
 
+. build/envsetup.sh
 
 breakfast cancro
+
 
 mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
 curl -o proprietary_vendor_xiaomi-cm-12.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-12.1/proprietary_vendor_xiaomi-cm-12.1.zip?path=cancro
@@ -1407,6 +1480,7 @@ popd
 ## The required version is: "1.7.x"
 ## vim build/core/main.mk, 把文件里面的 ^java 改成 ^openjdk
 
+
 brunch cancro
 
 
@@ -1416,8 +1490,10 @@ mkdir cm-13.0 && cd cm-13.0
 repo init -u git://github.com/CyanogenMod/android.git -b cm-13.0 --depth=1
 ./ReRepoSync.sh
 
+. build/envsetup.sh
 
 breakfast cancro
+
 
 mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
 curl -o proprietary_vendor_xiaomi-cm-13.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-13.0/proprietary_vendor_xiaomi-cm-13.0.zip?path=cancro
@@ -1425,6 +1501,7 @@ unzip proprietary_vendor_xiaomi-cm-13.0_cancro.zip -d ./
 mv proprietary_vendor_xiaomi-cm-13.0-cancro/cancro ./
 rmdir proprietary_vendor_xiaomi-cm-13.0-cancro/
 popd
+
 
 brunch cancro
 
@@ -1436,8 +1513,10 @@ mkdir cm-14.0 && cd cm-14.0
 repo init -u git://github.com/CyanogenMod/android.git -b cm-14.0 --depth=1
 ./ReRepoSync.sh
 
+. build/envsetup.sh
 
 breakfast cancro
+
 
 mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
 curl -o proprietary_vendor_xiaomi-cm-14.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.0/proprietary_vendor_xiaomi-cm-14.0.zip?path=cancro
@@ -1453,6 +1532,10 @@ svn checkout https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/bran
 or:
 svn checkout https://github.com/MoKee/android_vendor_qcom_binaries/branches/mkn/msm8974 vendor/qcom/binaries/msm8974
 
+
+curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk
+
+
 brunch cancro
 
 
@@ -1462,8 +1545,10 @@ mkdir cm-14.1 && cd cm-14.1
 repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1 --depth=1
 ./ReRepoSync.sh
 
+. build/envsetup.sh
 
 breakfast cancro
+
 
 mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
 curl -o proprietary_vendor_xiaomi-cm-14.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=cancro
@@ -1473,4 +1558,55 @@ rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
 popd
 
 svn checkout https://github.com/TheMuppets-Legacy/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974/ vendor/qcom/binaries/msm8974
+
+
+curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk
+
+
+brunch cancro
+
+
+错误1: 
+----------------------
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:19: error: package android.support.v14.preference does not exist
+import android.support.v14.preference.SwitchPreference;
+                                     ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:20: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceViewHolder;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:27: error: cannot find symbol
+public class SelfRemovingSwitchPreference extends SwitchPreference {
+                                                  ^
+  symbol: class SwitchPreference
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:27: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.Preference;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:28: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceGroup;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:29: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceManager;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:30: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceViewHolder;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:47: error: cannot find symbol
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+----------------------
+# 查看 vendor/cmsdk/Android.mk 确实已经加入 android-support-v14-preference
+# 再查看 frameworks/support/v14/preference/Android.mk 发现 LOCAL_JAVA_LANGUAGE_VERSION := 1.7
+# 不建议要切回 openjdk 1.7 来编译，因为会出现下面的错误2
+# 所以改成 LOCAL_JAVA_LANGUAGE_VERSION := 1.8 即与当前 session 的java版本一致
+
+
+错误2: 
+----------------------
+javac: invalid source release: 1.8
+Usage: javac <options> <source files>
+[  0% 47/5812] Ensure Jack server is installed and started
+Jack server already installed in "/home/ubuntu/.jack-server"
+Server is already running
+Bad request, see Jack server log
+----------------------
+# 这是因为上个错误把 session 的java版本改成 1.7 导致的
 

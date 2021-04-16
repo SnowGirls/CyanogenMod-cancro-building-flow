@@ -667,16 +667,41 @@ ERROR: Communication error with Jack server (2)
 # 搞错了方法，不是 Jack server 的问题，而是 curl 的问题，毕竟以前用的 curl 版本比较低嘛
 # 是 curl 的问题，因为 curl 的版本比较高，低版本时才有 --no-proxy， curl --help 发现只有 --noproxy
 # 搜索 "Communication error with Jack server" 出现在以下两文件, 把两文件：
-mkm/prebuilts/sdk/tools/jack
-mkm/prebuilts/sdk/tools/jack-admin
+prebuilts/sdk/tools/jack
+prebuilts/sdk/tools/jack-admin
 # 的 --no-proxy 改成 --noproxy
+# 还有些 out 文件:
+out/host/linux-x86/bin/jack
+out/host/linux-x86/bin/jack-admin
+out/host/linux-x86/obj/EXECUTABLES/jack_intermediates/jack
+out/host/linux-x86/obj/EXECUTABLES/jack-admin_intermediates/jack-admin:
 
+
+
+--------------------------
+ERROR: /home/ubuntu/Disk6T/Workspaces/AOSP/MoKee/mkm/packages/providers/MediaProvider/src/com/android/providers/media/MediaProvider.java:4145: The method eraseMiniThumb(long) is undefined for the type MiniThumbFile
+---------------------------
+# 第一种方法： 按他说的，注释掉调用 https://bbs.mokeedev.com/t/topic/17256
+
+# 第一种方法： 搜索 eraseMiniThumb 然后查看新提交 https://github.com/MoKee/android_frameworks_base/commit/6d2096f3889d38da60099b1b5678347de4f042bf
+pushd frameworks/base/
+curl -O https://github.com/MoKee/android_frameworks_base/commit/6d2096f3889d38da60099b1b5678347de4f042bf.patch
+git apply 6d2096f3889d38da60099b1b5678347de4f042bf.patch
+# 发现在 patch 文件 media/java/android/media/MediaScanner.java 的修改对应不上
+# 没事，改动不多，手动改吧，在 media/java/android/media/MediaScanner.java 注释掉commit里减去的代码 
+# 其实也就是在 MediaScanner.java 里 注释掉 实例私有变量 mThumbsUri 及其调用，注释掉 实例私有方法 pruneDeadThumbnailFiles 及其实调用 
+# 然后删除 patch 文件中关于 MediaScanner.java 的修改重新 git apply
+popd
+# 重编后最终编译成功
+
+
+
+-------------------- 不要设置 false, 这里只是参考 --------------------
 # https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
 # make ANDROID_COMPILE_WITH_JACK:=false
 
 vim build/core/combo/javac.mk
 ANDROID_COMPILE_WITH_JACK := false
-
 
 ---------------------------
 frameworks/base/packages/StatementService/src/com/android/statementservice/DirectStatementService.java:149: error: cannot access OkCacheContainer
@@ -687,11 +712,20 @@ frameworks/base/packages/StatementService/src/com/android/statementservice/Direc
 ---------------------------
 # https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
 
+---------------------------
+packages/providers/MediaProvider/src/com/android/providers/media/MediaProvider.java:4145: error: cannot find symbol
+                                        imageMicroThumbs.eraseMiniThumb(id);
+---------------------------
+# 重新把上面 ANDROID_COMPILE_WITH_JACK := false 改为 true
+# 把上面 curl 命令解决了就没这些事了
+--------------------
+-------------------- 不要设置 false, 这里只是参考 --------------------
 
 
 
-
-. build/envsetup.sh && breakfast cancro && brunch cancro
+export LC_ALL=C && . build/envsetup.sh && breakfast cancro && brunch cancro
+export LC_ALL=C && . build/envsetup.sh && breakfast gemini && brunch gemini
+export LC_ALL=C && . build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
 
 
 
