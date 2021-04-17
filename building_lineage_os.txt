@@ -1351,11 +1351,57 @@ https://forum.xda-developers.com/t/rom-kernel-unofficial-unified-lineageos-15-1-
 ===================
 
 
-__________________________________ 重新 cm-13.0 __________________________________
 
-mkdir cm-13.0 && cd cm-13.0
-repo init -u git://github.com/LineageOS/android.git -b cm-13.0 --depth=1
+
+
+
+__________________________________ 重新 cm-14.1__________________________________
+
+mkdir cm-14.1 && cd cm-14.1
+repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
 ./ReRepoSync.sh
+
+
+## 用 openjdk 1.8.x 
+
+. build/envsetup.sh
+
+breakfast cancro
+
+
+vim .repo/local_manifests/roomservice.xml:
+## 添加:
+  <project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+## 再 ./ReRepoSync.sh 一下, 如果觉得下载慢，可以去 cd .repo/project-objects/TheMuppets ，然后不断 du -h -d 1 ./ 看看大小有没有在增加~~~
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.1_cancro.zip -d ./ > /dev/null 2>&1
+mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
+popd
+
+
+brunch cancro
+
+
+-------------------------
+frameworks/av/camera/cameraserver/Android.mk:18: Target has integrated cameraserver into mediaserver. This is weakening security measures introduced in 7.0
+find: '/home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/cm-14.1/out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates': No such file or directory
+./vendor/qcom/binaries/Android.mk:1: *** This repo is now deprecated. Move your blobs to your device's vendor repo..
+make: *** [build/core/ninja.mk:167: /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/cm-14.1/out/build-lineage_cancro.ninja] Error 1
+make: Leaving directory '/home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/cm-14.1'
+-------------------------
+# 错误是 This repo is now deprecated. Move your blobs to your device's vendor repo
+vim ./vendor/qcom/binaries/Android.mk  ## 注释掉第1行抛出的 error 就可以了
+
+
+
+
+
+
+
 
 
 
@@ -1375,6 +1421,14 @@ CyanogenMod:
 
 
 export LC_ALL=C
+
+
+export USE_CCACHE=1
+export CCACHE_SIZE=200G
+export WITH_SU=true
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
+
+
 
 
 __________________________________ 重新 cm-11.0 __________________________________
@@ -1539,6 +1593,54 @@ curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/a
 brunch cancro
 
 
+
+错误1: 
+----------------------
+ninja: error: 'cm-14.0/out/target/product/cancro/obj/lib/libtime_genoff.so.toc', needed by 'cm-14.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libandroid_servers_intermediates/LINKED/libandroid_servers.so', missing and no known rule to make it
+----------------------
+# https://forum.xda-developers.com/t/ninja-error-missing-out-target-product-cancro-obj-lib-libtime_genoff-so-toc.3488154/
+# put this below in vendor/xiaomi/cancro/Android.mk can solve the problem:
+----------------------
+include $(CLEAR_VARS)
+LOCAL_MODULE := libtime_genoff
+LOCAL_MODULE_OWNER := xiaomi
+LOCAL_SRC_FILES := proprietary/vendor/lib/libtime_genoff.so
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_SUFFIX := .so
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+include $(BUILD_PREBUILT)
+----------------------
+# https://forum.xda-developers.com/t/q-no-rule-to-make-target-libtime_genoff-so.2647435/
+
+
+
+错误2: 
+----------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact com.cyngn.ambient:ambientsdk:aar:1.5.11 from/to central (https://repo.maven.apache.org/maven2): Transfer failed for https://repo.maven.apache.org/maven2/com/cyngn/ambient/ambientsdk/1.5.11/ambientsdk-1.5.11.aar
+[ERROR]   com.cyngn.ambient:ambientsdk:aar:1.5.11
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR]   central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR]   central (https://repo1.maven.org/maven2, releases=true, snapshots=true)
+[ERROR] : java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+----------------------
+## the trustAnchors parameter must be non-empty 关键是这个错误
+## 用回 sun/oracle 的 java 8 就行了，之前一直用 openjdk 8 来编， 这跟 mkq-mr1 出现的"the trustAnchors parameter must be non-empty"问题是一样的。
+
+
+
+## 最终成功编译ROM成功通过
+
+
+
+
 __________________________________ 重新 cm-14.1 __________________________________
 
 mkdir cm-14.1 && cd cm-14.1
@@ -1557,8 +1659,8 @@ mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
 rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
 popd
 
-svn checkout https://github.com/TheMuppets-Legacy/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974/ vendor/qcom/binaries/msm8974
 
+svn checkout https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974 vendor/qcom/binaries/msm8974 
 
 curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk
 
