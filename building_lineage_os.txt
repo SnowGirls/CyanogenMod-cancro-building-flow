@@ -1362,7 +1362,7 @@ repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
 ./ReRepoSync.sh
 
 
-## 用 openjdk 1.8.x 
+## 用 sun/oracle jdk 1.8.x , 不要用 openjdk 
 
 . build/envsetup.sh
 
@@ -1649,6 +1649,11 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1 --depth=1
 
 . build/envsetup.sh
 
+
+## 用 sun/oracle jdk 1.8.x , 不要用 openjdk  ## 原因看下面的 错误1
+
+
+
 breakfast cancro
 
 
@@ -1690,15 +1695,25 @@ vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:29: erro
 import android.support.v7.preference.PreferenceManager;
                                     ^
 vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:30: error: package android.support.v7.preference does not exist
-import android.support.v7.preference.PreferenceViewHolder;
-                                    ^
-vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:47: error: cannot find symbol
+import android.support.v7.preference.PreferenceViewHolder;                                ^
+....
+      symbol: class Preference
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingPreference.java:52: error: cannot find symbol
     public void onBindViewHolder(PreferenceViewHolder holder) {
+                                 ^
+  symbol:   class PreferenceViewHolder
+  location: class SelfRemovingPreference
+javadoc: error - In doclet class com.google.doclava.Doclava,  method start has thrown an exception java.lang.reflect.InvocationTargetException
+com.sun.tools.javac.code.Symbol$CompletionFailure: class file for com.android.okhttp.ConnectionPool not found
+1 error
 ----------------------
-# 查看 vendor/cmsdk/Android.mk 确实已经加入 android-support-v14-preference
-# 再查看 frameworks/support/v14/preference/Android.mk 发现 LOCAL_JAVA_LANGUAGE_VERSION := 1.7
-# 不建议要切回 openjdk 1.7 来编译，因为会出现下面的错误2
-# 所以改成 LOCAL_JAVA_LANGUAGE_VERSION := 1.8 即与当前 session 的java版本一致
+# 解决方法: 切回 sun/oracle jdk 8 来编译
+# https://blog.csdn.net/ztguang/article/details/80435314
+# 真实错误是这个 javadoc: error - In doclet class com.google.doclava.Doclava
+# 确实是 openjdk 的问题。无论是 openjdk 7 还是 openjdk 8 都不对，用回 sun/oracle jdk 8 。
+
+
+
 
 
 错误2: 
@@ -1710,5 +1725,8 @@ Jack server already installed in "/home/ubuntu/.jack-server"
 Server is already running
 Bad request, see Jack server log
 ----------------------
-# 这是因为上个错误把 session 的java版本改成 1.7 导致的
+# 这是因为上个错误把 session 的java版本改成 1.7 导致的, 用 sun/oracle jdk 8 不会出现这种问题
+
+
+## 最终成功编译ROM成功通过
 
