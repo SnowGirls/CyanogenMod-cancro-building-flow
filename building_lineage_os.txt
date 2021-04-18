@@ -945,7 +945,7 @@ TA/file_contexts.bin']' (exit code 4):
  -b 4096 lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.img 1310720
 15:08:57 mkuserimg_mke2fs.py INFO: Env: {'E2FSPROGS_FAKE_TIME': '1230768000'}
 15:08:57 mkuserimg_mke2fs.py INFO: Running: e2fsdroid -T 1230768000 -C lineage-17.0/out/soong/.temp/merged_fs_configHjIeou.txt -B /home/ubuntu/Disk6T/Works
-paces/AOSP/LineageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map -S /home/ubuntu/Disk6T/Workspaces/AOSP/Line
+paces/AOSP/LineageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map -S /AOSP/Line
 ageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/META/file_contexts.bin -f line
 age-17.0/out/soong/.temp/tmp693BSW -a / lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubu
 ntu/IMAGES/system.img
@@ -1388,10 +1388,10 @@ brunch cancro
 
 -------------------------
 frameworks/av/camera/cameraserver/Android.mk:18: Target has integrated cameraserver into mediaserver. This is weakening security measures introduced in 7.0
-find: '/home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/cm-14.1/out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates': No such file or directory
+find: '/AOSP/LineageOS/cm-14.1/out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates': No such file or directory
 ./vendor/qcom/binaries/Android.mk:1: *** This repo is now deprecated. Move your blobs to your device's vendor repo..
-make: *** [build/core/ninja.mk:167: /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/cm-14.1/out/build-lineage_cancro.ninja] Error 1
-make: Leaving directory '/home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/cm-14.1'
+make: *** [build/core/ninja.mk:167: /AOSP/LineageOS/cm-14.1/out/build-lineage_cancro.ninja] Error 1
+make: Leaving directory '/AOSP/LineageOS/cm-14.1'
 -------------------------
 # 错误是 This repo is now deprecated. Move your blobs to your device's vendor repo
 vim ./vendor/qcom/binaries/Android.mk  ## 注释掉第1行抛出的 error 就可以了
@@ -1439,6 +1439,11 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-11.0 --depth=1
 
 
 
+## 用 sun/oracle jdk: java version "1.6.0_45"
+
+
+
+
 svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm-11.0 device/xiaomi/cancro
 
 # 因为这个库有 cm.dependencies 了，读懂 build/envsetup.sh 和 build/tools/roomservice.py 源码, 
@@ -1446,7 +1451,8 @@ svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm
 vim .repo/local_manifests/roomservice.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <project name="mi3-dev/android_kernel_xiaomi_msm8x74pro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" />
+  <!-- <project name="mi3-dev/android_kernel_xiaomi_msm8x74pro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" /> -->
+  <project name="rud0lf/android_kernel_xiaomi_cancro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" />
   <project name="mi3-dev/android_device_xiaomi_cancro" path="device/xiaomi/cancro" remote="github" />
 </manifest>
 -------------------------
@@ -1470,9 +1476,38 @@ rmdir proprietary_vendor_xiaomi-cm-11.0-cancro/
 popd
 
 
+##  mi3-dev 的 kernel 也是 fork MiCode/Xiaomi_Kernel_OpenSource 的，我们点击它所有的 fork, Ctrl-F 搜 cancro
+##  发现 rud0lf/android_kernel_xiaomi_cancro 的对应 branch 的 arch/arm/configs 里有 cyanogenmod_cancro_defconfig，那么就用它了
+## 重新 ReRepoSync.sh 之后 cd .repo/project-objects/rud0lf 不断 du -h -d 1 ./ 发现会在下载，只是下载慢，别 Ctrl-C 就行
+
+vim device/xiaomi/cancro/BoardConfig.mk
+在第 Line 40 行插入（40gg）:
+TARGET_KERNEL_SOURCE               := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH                 := arm
+TARGET_KERNEL_CONFIG               := cyanogenmod_cancro_defconfig
+
+
 
 brunch cancro
 
+
+# 有个编 Kernel 的错误:
+--------------------
+Can't use 'defined(@array)' (Maybe you should just omit the defined()?) at /AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/kernel/timeconst.pl line 373.
+make[3]: *** [/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/kernel/Makefile:129: kernel/timeconst.h] Error 255
+make[2]: *** [/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/Makefile:950: kernel] Error 2
+make[3]: *** Waiting for unfinished jobs....
+make[1]: Leaving directory '/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro'
+make: *** [build/core/tasks/kernel.mk:188: TARGET_KERNEL_BINARIES] Error 2
+--------------------
+# 把 kernel/xiaomi/cancro/kernel/timeconst.pl 文件中 373行的：
+if (!defined(@val)) { 
+# 改为 
+if (!@val) {
+
+
+
+错误1:
 --------------
 build/core/config.mk:374: *** Error: could not find jdk tools.jar, please install JDK6, which you can download from java.sun.com.  Stop.
 --------------
@@ -1485,12 +1520,17 @@ chmod a+x jdk-6u45-linux-x64.bin
 java -version 
 # java version "1.6.0_45"
 
+
+错误2:
 --------------
 /bin/bash: flex: command not found
 --------------
 sudo apt install flex
 
 
+
+
+错误3:
 -----------------
 No rule to make target 'vendor/cm/proprietary/Term.apk'
 -----------------
