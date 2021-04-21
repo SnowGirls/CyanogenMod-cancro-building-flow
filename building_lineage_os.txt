@@ -1304,7 +1304,7 @@ breakfast gemini
 vim .repo/local_manifests/roomservice.xml
   <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
   <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
-brunch oneplus3
+brunch gemini
 
 
 
