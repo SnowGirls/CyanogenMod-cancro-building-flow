@@ -945,7 +945,7 @@ TA/file_contexts.bin']' (exit code 4):
  -b 4096 lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.img 1310720
 15:08:57 mkuserimg_mke2fs.py INFO: Env: {'E2FSPROGS_FAKE_TIME': '1230768000'}
 15:08:57 mkuserimg_mke2fs.py INFO: Running: e2fsdroid -T 1230768000 -C lineage-17.0/out/soong/.temp/merged_fs_configHjIeou.txt -B /home/ubuntu/Disk6T/Works
-paces/AOSP/LineageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map -S /home/ubuntu/Disk6T/Workspaces/AOSP/Line
+paces/AOSP/LineageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map -S /AOSP/Line
 ageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/META/file_contexts.bin -f line
 age-17.0/out/soong/.temp/tmp693BSW -a / lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubu
 ntu/IMAGES/system.img
@@ -1351,11 +1351,57 @@ https://forum.xda-developers.com/t/rom-kernel-unofficial-unified-lineageos-15-1-
 ===================
 
 
-__________________________________ 重新 cm-13.0 __________________________________
 
-mkdir cm-13.0 && cd cm-13.0
-repo init -u git://github.com/LineageOS/android.git -b cm-13.0 --depth=1
+
+
+
+__________________________________ 重新 cm-14.1__________________________________
+
+mkdir cm-14.1 && cd cm-14.1
+repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
 ./ReRepoSync.sh
+
+
+## 用 sun/oracle jdk 1.8.x , 不要用 openjdk 
+
+. build/envsetup.sh
+
+breakfast cancro
+
+
+vim .repo/local_manifests/roomservice.xml:
+## 添加:
+  <project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+## 再 ./ReRepoSync.sh 一下, 如果觉得下载慢，可以去 cd .repo/project-objects/TheMuppets ，然后不断 du -h -d 1 ./ 看看大小有没有在增加~~~
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.1_cancro.zip -d ./ > /dev/null 2>&1
+mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
+popd
+
+
+brunch cancro
+
+
+-------------------------
+frameworks/av/camera/cameraserver/Android.mk:18: Target has integrated cameraserver into mediaserver. This is weakening security measures introduced in 7.0
+find: '/AOSP/LineageOS/cm-14.1/out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates': No such file or directory
+./vendor/qcom/binaries/Android.mk:1: *** This repo is now deprecated. Move your blobs to your device's vendor repo..
+make: *** [build/core/ninja.mk:167: /AOSP/LineageOS/cm-14.1/out/build-lineage_cancro.ninja] Error 1
+make: Leaving directory '/AOSP/LineageOS/cm-14.1'
+-------------------------
+# 错误是 This repo is now deprecated. Move your blobs to your device's vendor repo
+vim ./vendor/qcom/binaries/Android.mk  ## 注释掉第1行抛出的 error 就可以了
+
+
+
+
+
+
+
 
 
 
@@ -1377,11 +1423,24 @@ CyanogenMod:
 export LC_ALL=C
 
 
+export USE_CCACHE=1
+export CCACHE_SIZE=200G
+export WITH_SU=true
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
+
+
+
+
 __________________________________ 重新 cm-11.0 __________________________________
 
 mkdir cm-11.0 && cd cm-11.0
 repo init -u git://github.com/CyanogenMod/android.git -b cm-11.0 --depth=1
 ./ReRepoSync.sh
+
+
+
+## 用 sun/oracle jdk: java version "1.6.0_45"
+
 
 
 
@@ -1392,7 +1451,8 @@ svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm
 vim .repo/local_manifests/roomservice.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <project name="mi3-dev/android_kernel_xiaomi_msm8x74pro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" />
+  <!-- <project name="mi3-dev/android_kernel_xiaomi_msm8x74pro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" /> -->
+  <project name="rud0lf/android_kernel_xiaomi_cancro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" />
   <project name="mi3-dev/android_device_xiaomi_cancro" path="device/xiaomi/cancro" remote="github" />
 </manifest>
 -------------------------
@@ -1416,9 +1476,38 @@ rmdir proprietary_vendor_xiaomi-cm-11.0-cancro/
 popd
 
 
+##  mi3-dev 的 kernel 也是 fork MiCode/Xiaomi_Kernel_OpenSource 的，我们点击它所有的 fork, Ctrl-F 搜 cancro
+##  发现 rud0lf/android_kernel_xiaomi_cancro 的对应 branch 的 arch/arm/configs 里有 cyanogenmod_cancro_defconfig，那么就用它了
+## 重新 ReRepoSync.sh 之后 cd .repo/project-objects/rud0lf 不断 du -h -d 1 ./ 发现会在下载，只是下载慢，别 Ctrl-C 就行
+
+vim device/xiaomi/cancro/BoardConfig.mk
+在第 Line 40 行插入（40gg）:
+TARGET_KERNEL_SOURCE               := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH                 := arm
+TARGET_KERNEL_CONFIG               := cyanogenmod_cancro_defconfig
+
+
 
 brunch cancro
 
+
+# 有个编 Kernel 的错误:
+--------------------
+Can't use 'defined(@array)' (Maybe you should just omit the defined()?) at /AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/kernel/timeconst.pl line 373.
+make[3]: *** [/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/kernel/Makefile:129: kernel/timeconst.h] Error 255
+make[2]: *** [/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/Makefile:950: kernel] Error 2
+make[3]: *** Waiting for unfinished jobs....
+make[1]: Leaving directory '/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro'
+make: *** [build/core/tasks/kernel.mk:188: TARGET_KERNEL_BINARIES] Error 2
+--------------------
+# 把 kernel/xiaomi/cancro/kernel/timeconst.pl 文件中 373行的：
+if (!defined(@val)) { 
+# 改为 
+if (!@val) {
+
+
+
+错误1:
 --------------
 build/core/config.mk:374: *** Error: could not find jdk tools.jar, please install JDK6, which you can download from java.sun.com.  Stop.
 --------------
@@ -1431,12 +1520,17 @@ chmod a+x jdk-6u45-linux-x64.bin
 java -version 
 # java version "1.6.0_45"
 
+
+错误2:
 --------------
 /bin/bash: flex: command not found
 --------------
 sudo apt install flex
 
 
+
+
+错误3:
 -----------------
 No rule to make target 'vendor/cm/proprietary/Term.apk'
 -----------------
@@ -1539,6 +1633,54 @@ curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/a
 brunch cancro
 
 
+
+错误1: 
+----------------------
+ninja: error: 'cm-14.0/out/target/product/cancro/obj/lib/libtime_genoff.so.toc', needed by 'cm-14.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libandroid_servers_intermediates/LINKED/libandroid_servers.so', missing and no known rule to make it
+----------------------
+# https://forum.xda-developers.com/t/ninja-error-missing-out-target-product-cancro-obj-lib-libtime_genoff-so-toc.3488154/
+# put this below in vendor/xiaomi/cancro/Android.mk can solve the problem:
+----------------------
+include $(CLEAR_VARS)
+LOCAL_MODULE := libtime_genoff
+LOCAL_MODULE_OWNER := xiaomi
+LOCAL_SRC_FILES := proprietary/vendor/lib/libtime_genoff.so
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_SUFFIX := .so
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+include $(BUILD_PREBUILT)
+----------------------
+# https://forum.xda-developers.com/t/q-no-rule-to-make-target-libtime_genoff-so.2647435/
+
+
+
+错误2: 
+----------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact com.cyngn.ambient:ambientsdk:aar:1.5.11 from/to central (https://repo.maven.apache.org/maven2): Transfer failed for https://repo.maven.apache.org/maven2/com/cyngn/ambient/ambientsdk/1.5.11/ambientsdk-1.5.11.aar
+[ERROR]   com.cyngn.ambient:ambientsdk:aar:1.5.11
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR]   central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR]   central (https://repo1.maven.org/maven2, releases=true, snapshots=true)
+[ERROR] : java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+----------------------
+## the trustAnchors parameter must be non-empty 关键是这个错误
+## 用回 sun/oracle 的 java 8 就行了，之前一直用 openjdk 8 来编， 这跟 mkq-mr1 出现的"the trustAnchors parameter must be non-empty"问题是一样的。
+
+
+
+## 最终成功编译ROM成功通过
+
+
+
+
 __________________________________ 重新 cm-14.1 __________________________________
 
 mkdir cm-14.1 && cd cm-14.1
@@ -1546,6 +1688,11 @@ repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1 --depth=1
 ./ReRepoSync.sh
 
 . build/envsetup.sh
+
+
+## 用 sun/oracle jdk 1.8.x , 不要用 openjdk  ## 原因看下面的 错误1
+
+
 
 breakfast cancro
 
@@ -1557,8 +1704,8 @@ mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
 rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
 popd
 
-svn checkout https://github.com/TheMuppets-Legacy/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974/ vendor/qcom/binaries/msm8974
 
+svn checkout https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974 vendor/qcom/binaries/msm8974 
 
 curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk
 
@@ -1588,15 +1735,25 @@ vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:29: erro
 import android.support.v7.preference.PreferenceManager;
                                     ^
 vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:30: error: package android.support.v7.preference does not exist
-import android.support.v7.preference.PreferenceViewHolder;
-                                    ^
-vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:47: error: cannot find symbol
+import android.support.v7.preference.PreferenceViewHolder;                                ^
+....
+      symbol: class Preference
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingPreference.java:52: error: cannot find symbol
     public void onBindViewHolder(PreferenceViewHolder holder) {
+                                 ^
+  symbol:   class PreferenceViewHolder
+  location: class SelfRemovingPreference
+javadoc: error - In doclet class com.google.doclava.Doclava,  method start has thrown an exception java.lang.reflect.InvocationTargetException
+com.sun.tools.javac.code.Symbol$CompletionFailure: class file for com.android.okhttp.ConnectionPool not found
+1 error
 ----------------------
-# 查看 vendor/cmsdk/Android.mk 确实已经加入 android-support-v14-preference
-# 再查看 frameworks/support/v14/preference/Android.mk 发现 LOCAL_JAVA_LANGUAGE_VERSION := 1.7
-# 不建议要切回 openjdk 1.7 来编译，因为会出现下面的错误2
-# 所以改成 LOCAL_JAVA_LANGUAGE_VERSION := 1.8 即与当前 session 的java版本一致
+# 解决方法: 切回 sun/oracle jdk 8 来编译
+# https://blog.csdn.net/ztguang/article/details/80435314
+# 真实错误是这个 javadoc: error - In doclet class com.google.doclava.Doclava
+# 确实是 openjdk 的问题。无论是 openjdk 7 还是 openjdk 8 都不对，用回 sun/oracle jdk 8 。
+
+
+
 
 
 错误2: 
@@ -1608,5 +1765,8 @@ Jack server already installed in "/home/ubuntu/.jack-server"
 Server is already running
 Bad request, see Jack server log
 ----------------------
-# 这是因为上个错误把 session 的java版本改成 1.7 导致的
+# 这是因为上个错误把 session 的java版本改成 1.7 导致的, 用 sun/oracle jdk 8 不会出现这种问题
+
+
+## 最终成功编译ROM成功通过
 

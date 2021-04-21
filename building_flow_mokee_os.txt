@@ -127,9 +127,9 @@ pushd .repo/project-objects/platform/tools/external/ && rm -rf gradle.git && pop
 
 
 ----------------------------------------
-Checking out projects:  83% (591/709) platform/prebuilts/clang-toolsfatal: Unable to create '/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock': File exists.
+Checking out projects:  83% (591/709) platform/prebuilts/clang-toolsfatal: Unable to create '/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock': File exists.
 ----------------------------------------
-rm -rf '/home/ubuntu/Workspaces/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock'
+rm -rf '/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock'
 pushd prebuilts/clang/host/darwin-x86/ && git status && popd
 ## 一般这种情况都是 sync 不完整:
 
@@ -790,9 +790,10 @@ brunch cancro
 
 一次性成功
 
-以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
-
-
+以后就: 
+. build/envsetup.sh && breakfast cancro && brunch cancro
+. build/envsetup.sh && breakfast gemini && brunch gemini
+. build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
 
 
 
@@ -888,11 +889,11 @@ error: failed linking references
 
 -----------------------------------------------------
 [  0% 178/20545] RenderScript: Snap <= packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs
-FAILED: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp 
-/bin/bash -c "(rm -rf /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript )
+FAILED: /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp 
+/bin/bash -c "(rm -rf /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript )
 ...
-(touch /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp )"
-/bin/bash: line 1: 18598 Bus error               (core dumped) ( ASAN_OPTIONS=detect_leaks=0:detect_container_overflow=0 /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/host/linux-x86/bin/llvm-rs-cc -o /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/res/raw -p /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/src -d /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript -a /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp -MD -target-api 23 -Wall -Werror -I external/clang/lib/Headers -I frameworks/rs/script_api/include packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs )
+(touch /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp )"
+/bin/bash: line 1: 18598 Bus error               (core dumped) ( ASAN_OPTIONS=detect_leaks=0:detect_container_overflow=0 /AOSP/MoKee/mko-mr1/out/host/linux-x86/bin/llvm-rs-cc -o /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/res/raw -p /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/src -d /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript -a /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp -MD -target-api 23 -Wall -Werror -I external/clang/lib/Headers -I frameworks/rs/script_api/include packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs )
 -----------------------------------------------------
 
 ulimit -c unlimited
@@ -917,15 +918,15 @@ prebuilts/misc/linux-x86/ccache/ccache -s
 [ 87% 81769/92955] //frameworks/rs:libRS header-abi-linker libRS.so.lsdump
 Couldn't find end of symbol
 [ 88% 82098/92955] //frameworks/compile/libbcc/bcinfo:libbcinfo header-abi-linker libbcinfo.so.lsdump
-FAILED: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump 
-prebuilts/build-tools/linux-x86/bin/header-abi-linker -o /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump -v frameworks/compile/libbcc/bcinfo/libbcinfo.map -arch arm64 -api current -Iframeworks/compile/libbcc/bcinfo/include @/home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump.rsp 
+FAILED: /AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump 
+prebuilts/build-tools/linux-x86/bin/header-abi-linker -o /AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump -v frameworks/compile/libbcc/bcinfo/libbcinfo.map -arch arm64 -api current -Iframeworks/compile/libbcc/bcinfo/include @/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump.rsp 
 [libprotobuf ERROR external/protobuf/src/google/protobuf/text_format.cc:274] Error parsing text-format abi_dump.TranslationUnit: 189563:327: Unexpected end of string.
 [libprotobuf ERROR external/protobuf/src/google/protobuf/text_format.cc:274] Error parsing text-format abi_dump.TranslationUnit: 189563:327: Expected identifier.
 Failed to link elements
-[ 88% 82106/92955] Docs droiddoc: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
-DroidDoc took 25 sec. to write docs to /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
-[ 88% 82107/92955] Docs droiddoc: /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
-DroidDoc took 25 sec. to write docs to /home/ubuntu/Workspaces/AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
+[ 88% 82106/92955] Docs droiddoc: /AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
+DroidDoc took 25 sec. to write docs to /AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
+[ 88% 82107/92955] Docs droiddoc: /AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
+DroidDoc took 25 sec. to write docs to /AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
 ninja: build stopped: subcommand failed.
 11:57:03 ninja failed with: exit status 1
 -----------------------------------------------------
