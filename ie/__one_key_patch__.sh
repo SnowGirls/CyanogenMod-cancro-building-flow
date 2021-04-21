@@ -1,6 +1,14 @@
 #!/bin/bash
 
+# __one_key_patch__.sh [path_to_patches_dir] [path_to_aosp_dir]
+
 if [ "$1" = "" ]
+then
+	echo -e "\033[31m 请带上 git diff 输出目录路径[由 modified_source_to_patch.sh 生成] \033[0m"
+	exit 0
+fi
+
+if [ "$2" = "" ]
 then
 	echo -e "\033[31m 请带上需要PATCH的AOSP路径 \033[0m"
 	exit 0
@@ -8,16 +16,12 @@ fi
 
 
 
-script_path_name=$0
-script_dir=$(dirname ${script_path_name})
-pushd ${script_dir}
+path_to_aosp_dir=$2
 
-
-
-
+path_to_patches_dir=$1
+pushd ${path_to_patches_dir}
 
 PWD=$(pwd)
-aosp_dir=$1
 
 
 echo -e "\033[32m Resting... \033[0m"
@@ -29,7 +33,7 @@ do
 	kGitPath=${file//_/\/};
 	kGitPath=${kGitPath//.patch/\/};
 	echo ${kGitPath}
-	kAospGitPath=${aosp_dir}/${kGitPath}
+	kAospGitPath=${path_to_aosp_dir}/${kGitPath}
 	echo ${kAospGitPath}
 
 	patch_path=${PWD}/${file}
@@ -55,7 +59,7 @@ do
 	kGitPath=${file//_/\/};
 	kGitPath=${kGitPath//.patch/\/};
 	echo ${kGitPath}
-	kAospGitPath=${aosp_dir}/${kGitPath}
+	kAospGitPath=${path_to_aosp_dir}/${kGitPath}
 	echo ${kAospGitPath}
 
 	patch_path=${PWD}/${file}
@@ -85,7 +89,7 @@ do
 	kGitPath=${kGitPath//_/\/};
 	kGitPath=${kGitPath//.status/\/};
 	echo ${kGitPath}
-	kAospGitPath=${aosp_dir}/${kGitPath}
+	kAospGitPath=${path_to_aosp_dir}/${kGitPath}
 	echo ${kAospGitPath}
 
 	echo "cat ${file} | grep ??"
@@ -125,7 +129,8 @@ popd
 
 
 
-pushd ${aosp_dir}/bionic/
+pushd ${path_to_aosp_dir}/bionic/
+echo -e "\033[32m checkout out ing ... bionic/*.map \033[0m"
 git checkout *.map
 popd
 
