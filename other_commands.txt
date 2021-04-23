@@ -58,3 +58,39 @@ ____________________________________________________
 
 
 
+
+
+
+
+Diff & Merge Rom Sources:
+
+A=$HOME/Disk6T/Workspaces/AOSP/MoKee/mkp
+B=$HOME/Disk6T/Workspaces/AOSP/LineageOS/lineage-16.0
+STATUS=$HOME/Downloads/repo_statu.txt
+
+rm $STATUS; pushd $A && repo status > $STATUS && popd
+
+
+## git status -s
+# preview:
+for d in `cat $STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "M " | awk -F " " '{print $2}'`;do echo meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+for d in `cat $STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "? " | awk -F " " '{print $2}'`;do echo cp $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+# do it:
+for d in `cat $STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "M " | awk -F " " '{print $2}'`;do meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+for d in `cat $STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "? " | awk -F " " '{print $2}'`;do cp $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+
+## git status
+# preview:
+for d in `cat $STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status | grep modified | awk -F " " '{print $2}'`;do echo meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+# do it:
+for d in `cat $STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status | grep modified | awk -F " " '{print $2}'`;do meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+
+
+
+
