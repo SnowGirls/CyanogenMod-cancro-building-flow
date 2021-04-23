@@ -45,6 +45,16 @@ appimagetool-x86_64.AppImage [mount后 cp -r 的文件夹]
 
 
 
+Xposed 相关
+____________________________________________________
+https://forum.xda-developers.com/m/rovo89.4419114/#recent-content
+https://forum.xda-developers.com/t/official-xposed-for-lollipop-marshmallow-nougat-oreo-v90-beta3-2018-01-29.3034811/page-3#post-75375298
+____________________________________________________
+
+
+
+
+
 Charles 抓 HTTPS 包
 ____________________________________________________
 
