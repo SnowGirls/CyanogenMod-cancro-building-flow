@@ -1254,6 +1254,17 @@ vim .repo/local_manifests/roomservice.xml
 # 重新 ./ReRepoSync.sh && . build/envsetup.sh && breakfast oneplus3/gemini && brunch oneplus3/gemini
 
 
+cp -r ../lineage-16.0/system/extras/su/* ../lineage-17.1/system/extras/su/
+
+
+
+. build/envsetup.sh && breakfast gemini && brunch gemini
+
+sleep 2h && . build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
+
+
+
+
 
 
 
