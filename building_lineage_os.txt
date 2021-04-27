@@ -1263,6 +1263,40 @@ cp -r ../lineage-16.0/system/extras/su/* ../lineage-17.1/system/extras/su/
 sleep 2h && . build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
 
 
+-------------------------
+FAILED: out/soong/build.ninja
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -globFile out/soong/.bootstrap/build-globs.ninja -o out/soong/build
+.ninja Android.bp
+error: bionic/libc/system_properties/Android.bp:1:1: dependency "libjson_static" of "libsystemproperties" missing variant:
+  arch:android_arm64_armv8-a, image:recovery, link:static
+available variants:
+  arch:android_arm64_armv8-a, image:core, link:static, version:
+  arch:android_arm_armv8-a, image:core, link:static, version:
+14:10:45 soong bootstrap failed with: exit status 1
+-------------------------
+# 查找同样被 "libsystemproperties" 引用的 "libpropertyinfoparser" 发现在编译的 Android.bp 加上:
+# vendor: true,   ## vendor_available: doesn't make sense at the same time as `vendor: true`, `proprietary: true`, or `device_specific:true`
+# host_supported: true,   ## 有些 函数symbol 没有
+  vendor_available: true,
+  recovery_available: true,
+
+readelf -d out/target/product/gemini/obj_arm/SHARED_LIBRARIES/libjson_intermediates/libjson.so  # 查看依赖库
+
+-------------------------
+error: bionic/libc/Android.bp:1527:1: encountered dependency cycle:
+error: bionic/libc/Android.bp:1527:1:     "libc" depends on "libc"
+error: bionic/libc/Android.bp:1527:1:     "libc" depends on "libc_common_static"
+error: bionic/libc/Android.bp:1404:1:     "libc_common_static" depends on "libc_common"
+error: bionic/libc/Android.bp:1391:1:     "libc_common" depends on "libc_nopthread"
+error: bionic/libc/Android.bp:1351:1:     "libc_nopthread" depends on "libc_bionic_ndk"
+error: bionic/libc/Android.bp:1001:1:     "libc_bionic_ndk" depends on "libsystemproperties"
+error: bionic/libc/system_properties/Android.bp:1:1:     "libsystemproperties" depends on "libjson_static"
+error: external/json-c/Android.bp:13:1:     "libjson_static" depends on "libm"
+-------------------------
+# 把 "libpropertyinfoparser" 的 Android.bp 拷过来，改 name 改 cpp_flags 改 src 去掉一些不必要的，重新删除 out 再编就OK通过了。
+# 是以前旧的 “libjson” 的 Android.bp 不适用了，依照 "libpropertyinfoparser" 的 Android.bp 写一份就好。
+
+
 
 
 
