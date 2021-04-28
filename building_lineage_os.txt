@@ -1263,6 +1263,7 @@ cp -r ../lineage-16.0/system/extras/su/* ../lineage-17.1/system/extras/su/
 sleep 2h && . build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
 
 
+
 -------------------------
 FAILED: out/soong/build.ninja
 out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -globFile out/soong/.bootstrap/build-globs.ninja -o out/soong/build
@@ -1282,6 +1283,8 @@ available variants:
 
 readelf -d out/target/product/gemini/obj_arm/SHARED_LIBRARIES/libjson_intermediates/libjson.so  # 查看依赖库
 
+
+
 -------------------------
 error: bionic/libc/Android.bp:1527:1: encountered dependency cycle:
 error: bionic/libc/Android.bp:1527:1:     "libc" depends on "libc"
@@ -1298,6 +1301,46 @@ error: external/json-c/Android.bp:13:1:     "libjson_static" depends on "libm"
 # 估计是要多加下面两个配置:
     stl: "none",
     system_shared_libs: [],
+
+
+
+-------------------------
+******************************************************
+error: VNDK library: libc's ABI has EXTENDING CHANGES Please check compatibility report at: out/soong/.intermediates/bionic/libc/libc/android_arm64_armv8-a_recovery_shared/libc.so.abidiff
+******************************************************
+error: Please update ABI references with: $ANDROID_BUILD_TOP/development/vndk/tools/header-checker/utils/create_reference_dumps.py --llndk -l libc
+15:48:44 ninja failed with: exit status 1
+-------------------------
+## 1 第一种方式，直接执行:  
+  $ANDROID_BUILD_TOP/development/vndk/tools/header-checker/utils/create_reference_dumps.py --llndk -l libc
+# 这会导致 prebuilts/abi-dumps/ndk/ 出现很多修改~~~
+
+## 2 第二种方式:
+# https://blog.csdn.net/tkwxty/article/details/105834911
+# 注释掉 development/vndk/tools/header-checker/src/diff/header_abi_diff.cpp 的:
+  /*
+    bool should_emit_warning_message = ShouldEmitWarningMessage(status);
+
+    if (should_emit_warning_message) {
+      llvm::errs() << "******************************************************\n"
+                   << error_or_warning_str
+                   << "VNDK library: "
+                   << lib_name
+                   << "'s ABI has "
+                   << status_str
+                   << unreferenced_change_str
+                   << " Please check compatibility report at: "
+                   << compatibility_report << "\n"
+                   << "******************************************************\n";
+    }
+
+    if (!advice_only && should_emit_warning_message) {
+      return status;
+    }
+  */
+# 单独编译 mmm development/vndk/tools/header-checker/
+# 但是遇到错误: FAILED: ninja: unknown target 'MODULES-IN-development-vndk-tools-header-checker'
+
 
 
 
