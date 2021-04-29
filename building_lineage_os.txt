@@ -1153,7 +1153,25 @@ service su_daemon /system/xbin/su --daemon
 4.往 frameworks/native/libs/binder/include/binder/AppOpsManager.h 的 Line 112 加入:
       OP_SU = 79,
 
+# 比如 79 这个值，会有个所有APP都能获取su权限了的问题。首先要看 frameworks/base/core/java/android/app/AppOpsManager.java 里定义的最大值: 
+  public static final int OP_ACTIVITY_RECOGNITION = 79;
+  ...
+  ...
+  public static final int _NUM_OP = 91;
+  ...
+  ...
+  private static int[] sOpDefaultMode = new int[] {...}; # 这里会发现 79 这个是默认允许，所以会发现所有APP都能 su 了
 
+  ## 所以我们追加一个值，并对 _NUM_OP 增 1
+  ## 再查看本类中 _NUM_OP 的调用 static {...} 块中，发现许多sOp为前缀的数组变量的长度要跟着 _NUM_OP 变，所以要一并改埋
+
+
+5.手动 push 编出来的上去
+
+  adb root && adb remount
+  adb push out/target/product/oneplus3/system/xbin/su /system/xbin/su
+  adb push out/target/product/oneplus3/system/etc/init/superuser.rc /etc/init/superuser.rc
+  adb reboot
 
 
 
