@@ -69,6 +69,22 @@ ____________________________________________________
 
 
 
+Copy the diff Rom Sources out:
+
+B=$HOME/Downloads/out
+A=/home/ubuntu/Disk16.04/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1
+REPO_STATUS=$HOME/Downloads/repo_status.txt
+
+rm $REPO_STATUS; pushd $A && repo status > $REPO_STATUS && popd
+
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | awk -F " " '{print $2}'`;do echo mkdir -p $(dirname $B/$d/$f) && echo cp -R  $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | awk -F " " '{print $2}'`;do mkdir -p $(dirname $B/$d/$f) && cp -R  $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+
+pushd $B
+for f in `find  -type f`;do echo meld $f $A/$f; done;
+popd
 
 
 

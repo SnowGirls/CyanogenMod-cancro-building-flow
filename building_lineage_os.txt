@@ -1255,6 +1255,8 @@ brunch cheeseburger/dumpling
 ========================
 
 
+
+
 __________________________________ 重新 lineage-17.1 __________________________________
 
 mkdir lineage-17.1 && cd lineage-17.1
@@ -1472,6 +1474,8 @@ repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
 
 ## 用 sun/oracle jdk 1.8.x , 不要用 openjdk 
 
+export LC_ALL=C
+
 . build/envsetup.sh
 
 
@@ -1533,14 +1537,25 @@ build/core/base_rules.mk:183: *** vendor/qcom/binaries/msm8996/graphics: MODULE.
 
 breakfast gemini
 
+gemini:
+mkdir vendor/xiaomi/ ; pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_gemini.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=gemini
+curl -o proprietary_vendor_xiaomi-cm-14.1_msm8996-common.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=msm8996-common
+unzip proprietary_vendor_xiaomi-cm-14.1_gemini.zip -d ./
+unzip proprietary_vendor_xiaomi-cm-14.1_msm8996-common.zip -d ./
+mv proprietary_vendor_xiaomi-cm-14.1-gemini/gemini ./
+mv proprietary_vendor_xiaomi-cm-14.1-msm8996-common/msm8996-common ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-gemini
+rmdir proprietary_vendor_xiaomi-cm-14.1-msm8996-common
+popd
+
+brunch gemini
 
 
-
-
-
-
-
-
+-------------------------
+build/core/base_rules.mk:183: *** vendor/xiaomi/msm8996-common: MODULE.TARGET.SHARED_LIBRARIES.libsdm-disp-apis already defined by vendor/qcom/binaries/msm8996/graphics.
+-------------------------
+# 同上处理把 vendor/xiaomi/msm8996-common/Android.mk 中的 libsdm-disp-apis 模块定义行都注释掉
 
 
 
