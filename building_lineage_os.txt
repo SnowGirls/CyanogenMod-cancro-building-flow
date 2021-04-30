@@ -1463,7 +1463,7 @@ https://forum.xda-developers.com/t/rom-kernel-unofficial-unified-lineageos-15-1-
 
 
 
-__________________________________ 重新 cm-14.1__________________________________
+__________________________________ 重新 cm-14.1 __________________________________
 
 mkdir cm-14.1 && cd cm-14.1
 repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
@@ -1473,6 +1473,8 @@ repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
 ## 用 sun/oracle jdk 1.8.x , 不要用 openjdk 
 
 . build/envsetup.sh
+
+
 
 breakfast cancro
 
@@ -1503,6 +1505,40 @@ make: Leaving directory '/AOSP/LineageOS/cm-14.1'
 -------------------------
 # 错误是 This repo is now deprecated. Move your blobs to your device's vendor repo
 vim ./vendor/qcom/binaries/Android.mk  ## 注释掉第1行抛出的 error 就可以了
+
+
+
+breakfast oneplus3
+
+vim ~/.subversion/servers
+------------
+http-proxy-host=127.0.0.1
+http-proxy-port=41091
+------------
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/cm-14.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+brunch oneplus3
+
+
+-------------------------
+build/core/base_rules.mk:183: *** vendor/qcom/binaries/msm8996/graphics: MODULE.TARGET.SHARED_LIBRARIES.libsdm-disp-apis already defined by vendor/oneplus/oneplus3.
+-------------------------
+# 重复定义了 LOCAL_MODULE := libsdm-disp-apis 了， 注释掉 
+# vendor/qcom/binaries/msm8996/graphics/Android.mk 或 vendor/oneplus/oneplus3/Android.mk 中的
+# LOCAL_MODULE := libsdm-disp-apis 的相关行
+# 这里我注释掉了 vendor/oneplus/oneplus3/Android.mk 的 Line 44-54 行:
+
+
+
+breakfast gemini
+
+
+
+
+
+
+
 
 
 
