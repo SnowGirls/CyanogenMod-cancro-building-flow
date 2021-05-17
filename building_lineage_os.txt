@@ -1405,6 +1405,8 @@ mkdir lineage-16.0 && cd lineage-16.0
 repo init -u git://github.com/LineageOS/android.git -b lineage-16.0 --depth=1
 ./ReRepoSync.sh
 
+. build/envsetup.sh
+
 ## 一次性搞掂:
 breakfast oneplus3
 svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-16.0/oneplus3/ ./vendor/oneplus/oneplus3
