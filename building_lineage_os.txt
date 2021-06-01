@@ -167,17 +167,18 @@ mmm frameworks/base/:framework
 
 // Than push all modified/complied to device
 export OUT=__path_to_your_aosp_dir__/out/target/product/oneplus3
-ls -al $OUT/system/framework/*.{jar,vdex} | grep "__modify_time_string__" | awk -F " " '{print $9}'
-ls -al $OUT/system/framework/*.{jar,vdex} | grep "__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/
 
-ls -al $OUT/system/framework/arm/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}'
-ls -al $OUT/system/framework/arm/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/
 
-ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}'
-ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
 
 i.e.
-ls -al $OUT/system/framework/*.{jar,vdex} | grep "May 29 06" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "May 29 06" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "May 29 06" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+__modify_time_string__="May 31"
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
 
 
 adb shell sync
