@@ -1205,6 +1205,11 @@ export CCACHE_SIZE=200G
 export WITH_SU=true
 export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
 
+export SOONG_GEN_CMAKEFILES=1
+export SOONG_GEN_CMAKEFILES_DEBUG=1
+
+
+
 
 
 __________________________________ 重新 lineage-18.1 __________________________________

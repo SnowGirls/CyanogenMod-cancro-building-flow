@@ -56,13 +56,35 @@ https://www.zzzmode.com/mytools/charles/
 2. Help - SSL Proxying - Save Charles Root Certificate ...
 
 3. 把证书 adb push charles-ssl-proxying-certificate.cer 到手机上, 然后安装用户证书
-把安装好的用户证书从 /data/misc/user/0/cacerts-added/ 移动到 /system/etc/security/cacerts 下重启手机就OK了
+把安装好的用户证书从 /data/misc/user/0/cacerts-added/ 移动到 /system/etc/security/cacerts/ 下重启手机就OK了
 
 4. Proxy - SSL Proxying Setting 加个 *.* 在 include 规则里
 
-5. 有时候看不见，Charles 开个新的 Session 来看
+5. 有时候看不见，Charles 里开个新的 Session 来看
 
 ____________________________________________________
+
+
+
+
+
+
+IDE Eval Resetter：JetBrains 全家桶无限试用插件
+____________________________________________________
+
+https://gitee.com/pengzhile/ide-eval-resetter
+https://github.com/zhilepeng/ide-eval-resetter
+
+
+1. Add "Custom Plugin Repository": https://plugins.zhile.io manually (Settings/Preferences -> Plugins)
+2. Search and install plugin: IDE Eval Reset
+
+已尝试对 IntelliJ 及 Clion 都能无限试用
+____________________________________________________
+
+
+
+
 
 
 
