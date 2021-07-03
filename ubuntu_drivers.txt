@@ -1,0 +1,50 @@
+
+ip a
+# only has lo, that means your new board new network device do not upported by Ubuntu 20.04 now
+
+# 1. Find your network device version, for example: Realtek RTL8125B
+# 2. Use Another PC, go to Realtek offical website, download r8125-9.005.06.tar.bz2 sources
+# 3. For compile the driver source, your need gcc & make command environment, so download the ubuntu-20.04.2.0-desktop-amd64.iso for apt source
+# 4. Copy r8125-9.005.06.tar.bz2 & ubuntu-20.04.2.0-desktop-amd64.iso to your ubuntu PC, then
+	
+	sudo mkdir /media/cdrom
+	sudo mount -o loop /home/ubuntu/Downloads/ubuntu-20.04.2.0-desktop-amd64.iso /media/cdrom
+	
+	sudo cp /etc/apt/sources.list /etc/apt/sources.list.default
+	sudo vi /etc/apt/sources.list
+	
+# 5. Insert lines below into first:
+	deb cdrom:[Ubuntu 20.04.2.0 LTS _Focal Fossa_ - Release amd64 (20210209.1)]/ focal main restricted
+	deb cdrom:[Ubuntu 20.04.2.0 LTS amd64]/ focal main restricted
+	
+# 6. Issue:
+
+	sudo apt-cdrom -m -d /media/cdrom add
+	sudo apt-get install build-essential	 # for install gcc & make env
+	gcc -v 				 # for check gcc & make 
+	which make 
+	
+	unzip r8125-9.005.06.tar.bz2
+	cd r8125-9.005.06/src/
+	sudo ls -al /lib/modules/5.8.0-43-generic/kernel/drivers/net/ethernet/realtek/
+	sudo make install
+	sudo ls -al /lib/modules/5.8.0-43-generic/kernel/drivers/net/ethernet/realtek/
+	
+	# then you will found new file r8125.ko was installed, and the r8169.ko was moved to r8169.bak
+	
+	cd ..
+	./autorun.sh
+	
+	# then wait for a minutes, you will found the network icon appeared on the right corner of Desktop
+	
+	ip a
+	
+	# you will see you network device appeared, not only lo now~~~
+	
+	sudo umount /media/cdrom
+	sudo rm /var/lib/apt/cdroms.list
+	sudo vi /etc/apt/sources.list	  # remove the lines your inserted aboved
+	
+	
+# 7. Run ./autorun.sh again after reboot if question resumed.
+

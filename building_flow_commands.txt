@@ -466,6 +466,28 @@ fastboot reboot
 
 
 
+______________________________
+
+adb: insufficient permissions for device: missing udev rules? user is in the plugdev group
+See [http://developer.android.com/tools/device.html] for more information
+
+______________________________
+
+sudo sh -c "echo 'SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0666\", GROUP=\"plugdev\"' >> /etc/udev/rules.d/51-android.rules"
+
+adb shell
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 小米4 cm-13.0 刷时Baseband upgrade错误，基带问题
 # http://www.miui.com/forum.php?mod=viewthread&tid=4265979
