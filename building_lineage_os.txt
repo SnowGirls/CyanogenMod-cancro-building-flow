@@ -391,7 +391,7 @@ Traversed tree: 148649ms
 ## ERROR: Users are strongly recommended to migrate to the new APIs.
 
 ## 原因是 Ubuntu 18.04 一些环境及开发包没装好: 
-sudo apt install -y gnupg flex bison gperf build-essential zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc ccache
+sudo apt install -y build-essential ccache gnupg flex bison gperf zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc 
 --------------------------------------------------------------------------------------------------
 
 
@@ -1011,7 +1011,8 @@ vim device/xiaomi/msm8996-common/sepolicy/file_contexts
 ----------------------------------------- LineageOS 17.1 -----------------------------------------
 
 
-
+# sudo apt install python2
+# sudo apt install python3
 # python2 与 python3　的自由切换:
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 100
 sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
@@ -1423,6 +1424,36 @@ vim .repo/local_manifests/roomservice.xml
   <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
   <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
 brunch gemini
+
+
+
+
+******************************************************
+prebuilts/clang/host/linux-x86/clang-4691093/bin/clang++.real: error while loading shared libraries: libtinfo.so.5: cannot open shared object file: No such file or directory
+******************************************************
+find /usr/lib -name libtinfo*
+sudo apt install libncurses5
+find /usr/lib -name libtinfo*
+
+
+******************************************************
+FAILED: out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/classes.dex 
+/bin/bash -c "(rm -rf out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ ) && (mkdir -p out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ ) && (find out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex/ -maxdepth 1 -name \"classes*.dex\" | sort | xargs -I{} cp -f {} out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ ) && (find out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ -name \"classes*.dex\" | sort | sed 's/^/--dex=/' | xargs out/host/linux-x86/bin/hiddenapi --light-greylist=out/target/common/obj/PACKAGING/hiddenapi-light-greylist.txt --dark-greylist=out/target/common/obj/PACKAGING/hiddenapi-dark-greylist.txt --blacklist=out/target/common/obj/PACKAGING/hiddenapi-blacklist.txt )"
+hiddenapi E 07-03 22:40:51 642260 642260 hiddenapi.cc:47] No DEX files specified
+hiddenapi E 07-03 22:40:51 642260 642260 hiddenapi.cc:47] Command: out/host/linux-x86/bin/hiddenapi --light-greylist=out/target/common/obj/PACKAGING/hiddenapi-light-greylist.txt --dark-greylist=out/target/common/obj/PACKAGING/hiddenapi-dark-greylist.txt --blacklist=out/target/common/obj/PACKAGING/hiddenapi-blacklist.txt
+******************************************************
+# apache-xml 模块编译出错，导致 hiddenapi 命令出错
+# https://stackoverflow.com/a/66055065
+ls -al out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex/  ## 发现确实是空的
+
+$ make clean-apache-xml
+$ make clean-ims-common
+$ make ims-common
+$ make apache-xml
+
+
+
+
 
 
 
