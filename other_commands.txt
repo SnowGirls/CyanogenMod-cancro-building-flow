@@ -159,3 +159,79 @@ for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $
 
 
 
+
+
+
+
+
+
+
+
+
+## ____________________________ 编译 sqlcipher ____________________________
+
+git clone https://github.com/sqlcipher/sqlcipher.git
+cd sqlcipher
+sudo sudo apt install tcl
+yum install -y openssl-devel	## for centos
+./configure --enable-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC" LDFLAGS="-lcrypto"
+make
+
+1. 如果有报错类似：
+error: unknown type name ‘sqlite3’
+
+检查当前目录下 sqlite3.h 是否为空，如果空的文件就删除再重复上面编译sqlcipher步骤
+
+2. 如果有报错类似：
+error: unknown type name ‘u64’ 或 error: unknown type name ‘sqlite3_mutex’
+
+重新 clone 工程在编译
+
+
+3. 用法，就拿我们常用聊天工具 WeChat 研究一下吧:
+
+## 参考: https://github.com/ppwwyyxx/wechat-dump/blob/master/decrypt-db.py
+PWD_KEY=MD5(deviceId + uin).subString(0, 7);
+
+读:
+./sqlcipher -cmd "PRAGMA key = 'PWD_KEY'; PRAGMA cipher_compatibility = 1;" ~/Downloads/EnMicroMsg.db
+sqlite> .header on
+sqlite> select * from sqlite_master where type="table" and name="rcontact";
+
+导出:
+./sqlcipher ~/Downloads/EnMicroMsg.db
+sqlite> PRAGMA key = 'PWD_KEY'; PRAGMA cipher_compatibility = 1;
+sqlite> ATTACH DATABASE '~/Downloads/DeMicroMsg.db' AS db KEY '';
+ls -al ~/Downloads/DeMicroMsg.db  									## Now DeMicroMsg.db is Empty
+sqlite> SELECT sqlcipher_export('db');
+ls -al ~/Downloads/DeMicroMsg.db 									## Now DeMicroMsg.db had data filled in
+sqlite> DETACH DATABASE db;
+
+sqlite3 ~/Downloads/DeMicroMsg.db  						# 得到解密的数据库，用 sqlite3 命令就可以打开
+sqlite> select * from message;
+
+
+写:
+./sqlcipher test.db 									#创建一个db文件  
+sqlite> PRAGMA key = 'key_test';  						#设置密码  
+sqlite> create table tb_test(id,name);  				#创建数据表
+sqlite> insert into tb_test(id,name) values(1,"小明");  	#插入一条数据
+sqlite> .exit 											#退出
+
+./sqlcipher -cmd "PRAGMA key = 'key_test';" test.db 
+sqlite> .table
+sqlite> select * from tb_test;
+tb_test .exit
+
+
+
+
+
+
+
+
+
+
+
+
+
