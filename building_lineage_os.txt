@@ -253,7 +253,10 @@ system.img: make snod (snod: System NO Dependent)
 
 
 adb reboot bootloader
-fastboot boot boot.img
+fastboot boot boot.img          # 暂时
+fastboot flash boot boot.img    # 永久替换了
+fastboot reboot
+
 
 
 
