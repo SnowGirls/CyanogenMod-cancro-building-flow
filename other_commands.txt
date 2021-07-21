@@ -199,9 +199,9 @@ sqlite> .header on
 sqlite> select * from sqlite_master where type="table" and name="rcontact";
 
 导出:
-./sqlcipher ~/Downloads/EnMicroMsg.db
+./sqlcipher /Downloads/EnMicroMsg.db
 sqlite> PRAGMA key = 'PWD_KEY'; PRAGMA cipher_compatibility = 1;
-sqlite> ATTACH DATABASE '~/Downloads/DeMicroMsg.db' AS db KEY '';
+sqlite> ATTACH DATABASE '/Downloads/DeMicroMsg.db' AS db KEY '';
 ls -al ~/Downloads/DeMicroMsg.db  									## Now DeMicroMsg.db is Empty
 sqlite> SELECT sqlcipher_export('db');
 ls -al ~/Downloads/DeMicroMsg.db 									## Now DeMicroMsg.db had data filled in

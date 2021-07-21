@@ -46,5 +46,15 @@ ip a
 	sudo vi /etc/apt/sources.list	  # remove the lines your inserted aboved
 	
 	
-# 7. Run ./autorun.sh again after reboot if question resumed.
+# 7. Run 'sudo ./autorun.sh' again after reboot if question resumed.
 
+
+# 8. 过了几天后有重现吧, 执行一下 
+	
+	cd Sources/Drivers/r8125-9.005.06/
+	sudo ./autorun.sh
+
+	##### 就解决了 #####
+
+
+	
