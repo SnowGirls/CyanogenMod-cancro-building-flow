@@ -1,0 +1,185 @@
+
+### Build Flutter Engine
+
+https://github.com/flutter/flutter/wiki/Setting-up-the-Engine-development-environment
+https://github.com/flutter/flutter/wiki/Compiling-the-engine
+https://www.codingsky.com/doc/2020/5/28/649.html
+https://juejin.cn/post/7123765829929762847
+
+
+
+# Simplified steps below:
+
+1. Download Oracle's Java JDK zip/tar and uncompress it, set it to JAVA_HOME & PATH
+2. git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git & export PATH=/path/to/depot_tools:$PATH
+3. fork https://github.com/flutter/engine to your account's repository
+4. 
+TOP_DIR=`pwd`
+cd $TOP_DIR
+mkdir flutter_engine && cd flutter_engine
+vim .gclient :
+solutions = [
+  {
+    "managed": False,
+    "name": "src/flutter",
+    "url": "git@github.com:<your_github_name_here>/engine.git",		 # git@github.com:flutter/engine.git , use the official recommended if u not modified, for convenient switch latest revision
+    "custom_deps": {},
+    "deps_file": "DEPS",
+    "safesync_url": "",
+  },
+]
+
+5. save and exit vim, then issue: gclient sync
+6. when sync done, then issue: cd src/flutter && git remote add upstream git@github.com:flutter/engine.git
+## git pull upstream master && cd ../.. && gclient sync  ## sync again for make sure that codes are updated
+
+8. cd src
+
+## ./flutter/tools/gn --android --unoptimized --android-cpu=arm64 && ninja -C out/android_debug_unopt_arm64
+## May need to fix macosx sdk error, edit build/config/mac/mac_sdk.gni file set `mac_sdk_min = "11.0"` from `mac_sdk_min = "10.12"`
+## May need unset ANDROID_SDK_ROOT if you exported in env
+
+
+
+
+### 9. Compiled 64 Bit Archs belows:
+(with --no-stripped, if not the stripped libflutter.so in lib.stripped/ will put into flutter.jar and package to your app )
+
+Android:
+./flutter/tools/gn --android --unoptimized --android-cpu=arm64 --no-stripped
+ninja -C out/android_debug_unopt_arm64
+
+./flutter/tools/gn --android --unoptimized --android-cpu x64 --no-stripped
+ninja -C out/android_debug_unopt_x64
+
+
+iOS:
+./flutter/tools/gn --ios --unoptimized --no-stripped
+ninja -C out/ios_debug_unopt
+
+./flutter/tools/gn --ios --unoptimized --no-stripped --simulator
+ninja -C out/ios_debug_sim_unopt
+
+
+
+MacOSX or Linux:
+./flutter/tools/gn --unoptimized --no-stripped
+ninja -C out/host_debug_unopt
+
+
+
+Future Build:
+cd src/flutter && git fetch upstream && git rebase upstream/master && cd - && gclient sync
+
+
+
+file $TOP_DIR/flutter_engine/src/out/ios_debug_unopt/Flutter.framework/Flutter
+lipo -info $TOP_DIR/flutter_engine/src/out/ios_debug_unopt/Flutter.framework/Flutter
+otool -L $TOP_DIR/flutter_engine/src/out/ios_debug_unopt/Flutter.framework/Flutter
+size -m $TOP_DIR/flutter_engine/src/out/ios_debug_unopt/Flutter.framework/Flutter
+
+
+
+## Use the engine with debug symbols
+# Assume that your flutter version is 3.3.x, do not match with the engine source, cd src/flutter && git checkout __commit_id__ && cd .. && gclient sync, then rebuild
+# __commit_id__ = cat [your_flutter_sdk_path]/bin/internal/engine.version  -> flutter sdk and engine version mapping
+
+# in your flutter sample project, run it in 
+iOS simulator:
+flutter run --local-engine=ios_debug_sim_unopt --local-engine-src-path=/path_to_your_dir/flutter_engine/src
+iOS device:
+flutter run --local-engine=ios_debug_unopt --local-engine-src-path=/path_to_your_dir/flutter_engine/src
+Android emulator:
+flutter run --local-engine=android_debug_unopt_x64 --local-engine-src-path=/path_to_your_dir/flutter_engine/src
+Android device:
+flutter run --local-engine=android_debug_unopt_arm64 --local-engine-src-path=/path_to_your_dir/flutter_engine/src
+
+
+
+### 11. 32 Bit
+./flutter/tools/gn --android --unoptimized    ## maybe is --android-cpu=arm, please see the source code of ./flutter/tools/gn
+ninja -C out/android_debug_unopt
+
+./flutter/tools/gn --android --unoptimized --android-cpu x86      ## failed !!! tried Download XCode 9.4, but i failed !!!
+
+
+
+
+## Debug Flutter Engine
+
+Create the debug flutter project using your compiled engine
+
+    flutter create flutter_it_debug
+    cd flutter_it_debug/
+    flutter run --local-engine=ios_debug_sim_unopt --local-engine-src-path=__PATH_TO_YOUR_/flutter_engine/src
+    ## run once, then stop or CTRL-C the process
+    ## use Xcode open the flutter_it_debug/ios/Runner.xcworkspace project file
+    ## drag the __PATH_TO_YOUR_/flutter_engine to Xcode and make a refrence, delete engin folder in Build Phase -> Copy Bundle Resources, for do not package it into ipa
+    ## or drag /src/out/ios_debug_unopt/flutter_engine.xcodeproj to your Runner project
+    ## set a breakpoint on shell.cc:619 Shell::Setup method, the Run & Debug
+
+1. 用 Android Studio 新建一个 Flutter sample工程/或者 flutter create 来建
+2. 然后先 flutter run 一遍到iOS设备上：
+   flutter run --local-engine=ios_debug_unopt --local-engine-src-path=~/Workspaces/FlutterSDK/Compile_Sources/engine/src
+3. 再用Xcode打开 sample/ios/Runner.xcworkspace, 直接在 main 设置断点，然后利用 lldb 来设置engine源码断点/或者把源码引进工程，直接鼠标点击设断点，
+   有符号表了 lldb 会自动映射并断点在源码上的了
+
+
+
+## Note
+https://stackoverflow.com/a/23727235
+https://stackoverflow.com/a/31124996
+objdump -t ios/Build/Products/Debug-iphoneos/Runner.app/Frameworks/Flutter.framework/Flutter
+nm -ap ios/Build/Products/Debug-iphoneos/Runner.app/Frameworks/Flutter.framework/Flutter
+Also as IDA do:
+There's ONLY ONE underscore in the mangled name, their output will list a leading underscore that you need to omit. 
+br s -n _ZN2pf11WebViewImplD1Ev ## 只有一个下划线 readelf -s, objdump -t, na -ap 都会多了一个下划线
+
+image list Flutter
+br set -n "-[FlutterAppDelegate application:didFinishLaunchingWithOptions:]"
+br set -n _ZN7flutter17DartCallbackCache12GetCachePathEv
+br set -f /path_to_source/engine/src/flutter/shell/common/shell.cc -l 549
+Breakpoint 18: where = Flutter`flutter::Shell::RunEngine(flutter::RunConfiguration, std::__1::function<void (flutter::Engine::RunStatus)> const&) + 52 at shell.cc:550:36, address = 0x0000000101b7ff5c
+源码映射:
+settings set target.source-map /buildbot/path /my/path
+https://lldb.llvm.org/use/symbolication.html
+https://developer.apple.com/library/archive/documentation/IDEs/Conceptual/gdb_to_lldb_transition_guide/document/lldb-command-examples.html
+https://opensource.apple.com/source/lldb/lldb-300.2.47/www/symbolication.html
+
+settings show 
+settings show target.source-map
+settings list target.source-map
+
+
+
+
+
+## VSCode To Navigate Source Codes
+用 VSCode 打开 engine/ 目录
+在 include error 处 Command + . 或者编辑 engine/.vscode/c_cpp_properties.json。写入 includePath: 
+"includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/flutter/**",
+                "$HOME/Workspaces/FlutterSDK/Compile_Sources/engine/src/third_party/**",
+                "$HOME/Workspaces/FlutterSDK/Compile_Sources/engine/src/third_party/skia",
+                "$HOME/Workspaces/AndroidSDK/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/**",
+                "$HOME/Workspaces/AndroidSDK/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android/**"
+            ],
+
+
+
+# flutter engine 源码拖进 xcode sample工程时，注意别copy，用reference，并且之后去到Build Phase -> Copy Bundle Resources里把 engine 减掉，
+# Run/Debug起来，可以随意在 engine 源码下断点了，当然也可以继续用 lldb 的 br set -f ...file.cc -l LINE_NUMBER
+
+
+
+
+调试源码方法二:
+
+1. [__PATH_TO__]/flutter_macos_3.3.8-stable/bin/flutter run --local-engine-src-path=[__PATH_TO__]]/GoogleOpenSource/flutter_engine/src --local-engine=ios_debug_sim_unopt
+
+2. 接着把  [__PATH_TO__]]/GoogleOpenSource/flutter_engine/src/out/ios_debug_unopt/flutter_engine.xcodeproj 拖到 Runner 项目中 Runner 目录下
+
+3. 在 shell.cc 的方法 void Shell::RunEngine 打个断点，然后 Command + R .
+
+

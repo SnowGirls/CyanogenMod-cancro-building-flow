@@ -1,0 +1,26 @@
+frida -p 3543
+
+[Local::PID::3543 ]-> ObjC.classes.NSApplication.sharedApplication().windows().objectAtIndex_(0).contentView().subviews().objectAtIndex_(3).subviews().objectAtIndex_(0).subviews().objectAtIndex_(0).subviews().objectAtIndex_(1).title().valueOf();
+
+[Local::PID::3543 ]-> ObjC.classes.NSApplication.sharedApplication().windows().objectAtIndex_(0).contentView().subviews().objectAtIndex_(3).subviews().objectAtIndex_(0).subviews().objectAtIndex_(0).subviews().objectAtIndex_(1).title().toString();
+
+[Local::PID::3543 ]-> ObjC.classes.NSApplication.sharedApplication().windows().objectAtIndex_(0).contentView().subviews().objectAtIndex_(3).subviews().objectAtIndex_(0).subviews().objectAtIndex_(0).subviews().objectAtIndex_(1).$methods
+
+[Local::PID::3543 ]-> a.objectAtIndex_(2).title().toString()
+"Activate"
+
+[Local::PID::3543 ]-> a.objectAtIndex_(2).action()
+"0x10d4f801f"
+
+
+
+lldb
+
+(lldb) platform list
+
+(lldb) platform select host
+
+(lldb) process attach -p 3543
+
+(lldb) p (char *)0x10d4f801f
+(char *) $1 = 0x000000010d4f801f "checkActivate:"

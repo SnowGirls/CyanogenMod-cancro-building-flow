@@ -1,0 +1,26 @@
+
+
+Install python2.7 in macos
+# https://blog.tericcabrel.com/install-python2-on-macos/
+# https://www.python.org/downloads/release/python-2718/
+
+
+Install pip of python2.7
+# https://stackoverflow.com/questions/17271319/how-do-i-install-pip-on-macos-or-os-x
+
+
+
+
+
+
+openssl genrsa -out my.key 2048
+
+openssl req -new -key my.key -out my.csr   # 密码留空吧，其他的测试随便输
+
+keytool -genkeypair -keyalg RSA -keysize 2048 -keystore my.keystore -alias "my.keystore"  # 这里的密码不能空，其他的测试随便输
+
+apksigner sign --ks my.keystore  __path_to_apk__
+
+apksigner verify __path_to_apk__
+
+

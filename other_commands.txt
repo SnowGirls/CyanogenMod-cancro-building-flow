@@ -1,0 +1,287 @@
+
+sudo fdisk -l
+ls -al /dev/disk/by-uuid/
+cat /etc/fstab
+
+mkdir Disk6T
+sudo mount /dev/sda Disk6T/
+
+
+
+gcc --version
+g++ --version
+
+sudo apt-get install gcc-6
+sudo apt-get install g++-6
+
+sudo apt-get install gcc-5
+sudo apt-get install g++-5
+
+sudo apt-get install gcc-4.8
+sudo apt-get install g++-4.8
+
+ls -al /usr/bin/gcc*
+ls -al /usr/bin/g++*
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 100
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
+
+sudo update-alternatives --config gcc
+
+
+
+
+---------------------------------------------------
+
+
+sudo apt-get install openjdk-8-jdk openjdk-11 openjdk-13
+sudo apt install openjdk-8-source openjdk-11-source openjdk-13-source
+sudo update-alternatives --config java
+
+
+
+
+
+
+Xposed 相关
+____________________________________________________
+https://forum.xda-developers.com/m/rovo89.4419114/#recent-content
+https://forum.xda-developers.com/t/official-xposed-for-lollipop-marshmallow-nougat-oreo-v90-beta3-2018-01-29.3034811/page-3#post-75375298
+____________________________________________________
+
+
+
+
+
+Charles 抓 HTTPS 包
+____________________________________________________
+
+1. 解压软件后，去此网站生成 name & license key 来破解
+https://www.zzzmode.com/mytools/charles/
+
+2. Help - SSL Proxying - Save Charles Root Certificate ...
+
+3. 把证书 adb push charles-ssl-proxying-certificate.cer 到手机上, 然后安装用户证书
+把安装好的用户证书从 /data/misc/user/0/cacerts-added/ 移动到 /system/etc/security/cacerts/ 下重启手机就OK了
+
+   
+   chown root:root HASH.0
+   计算 HASH: openssl x509 -subject_hash_old -in charles-ssl-proxying-certificate.pem
+   # 关于 App 设置了 PROXY_NO: https://www.cnblogs.com/lulianqi/p/11380794.html#%E9%83%A8%E5%88%86%E5%BA%94%E7%94%A8%E4%B8%8D%E8%83%BD%E6%8A%93%E5%8C%85%E7%9A%84%E5%8E%9F%E5%9B%A0%20%E4%BD%9C%E8%80%85%EF%BC%9A%E6%8E%8C%E6%8E%A7%E5%AE%89%E5%85%A8%E5%AD%A6%E9%99%A2%20https://www.bilibili.com/read/cv12745937%20%E5%87%BA%E5%A4%84%EF%BC%9Abilibili
+   # 还有一篇参考: https://www.bilibili.com/read/cv12745937
+
+4. Proxy - SSL Proxying Setting 加个 *.* 在 include 规则里
+
+5. 有时候看不见，Charles 里开个新的 Session 来看
+
+____________________________________________________
+
+
+
+
+
+
+IDE Eval Resetter：JetBrains 全家桶无限试用插件
+____________________________________________________
+
+https://gitee.com/pengzhile/ide-eval-resetter
+https://github.com/zhilepeng/ide-eval-resetter
+
+
+1. Add "Custom Plugin Repository": https://plugins.zhile.io manually (Settings/Preferences -> Plugins)
+2. Search and install plugin: IDE Eval Reset
+
+已尝试对 IntelliJ 及 Clion 都能无限试用
+____________________________________________________
+
+
+
+
+
+
+
+
+Frida
+
+____________________________________________________
+
+
+
+pip install frida-tools  ## pip install frida-tools==1.3.2
+
+pip list | grep frida
+
+## 安装 frida-tools 会安装了 frida 命令，无需 pip install frida，但如果要安装特定版本的 frida
+## 需要当前 frida-tools 可容纳的 frida 版本, i.e: pip install frida==12.4.0
+
+pip install frida-tools==10.5.4
+pip install frida-tools==10.0.0
+
+pip install frida==12.4.0  && pip install frida-tools==2.0.0
+pip install frida==12.4.8  && pip install frida-tools==4.0.0
+pip install frida==12.8.6  && pip install frida-tools==7.0.0
+pip install frida==14.2.18 && pip install frida-tools==9.2.5
+pip install frida==15.0.13 && pip install frida-tools==10.0.0
+pip install frida==15.1.17
+
+
+# 查看两者日期来对应版本
+https://pypi.org/project/frida/#history
+https://pypi.org/project/frida-tools/10.5.4/#history
+____________________________________________________
+
+
+
+
+
+
+
+
+Copy the diff Rom Sources out:
+
+B=$HOME/Downloads/out
+A=/home/ubuntu/Disk16.04/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-14.1
+REPO_STATUS=$HOME/Downloads/repo_status.txt
+
+rm $REPO_STATUS; pushd $A && repo status > $REPO_STATUS && popd
+
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | awk -F " " '{print $2}'`;do echo mkdir -p $(dirname $B/$d/$f) && echo cp -R  $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | awk -F " " '{print $2}'`;do mkdir -p $(dirname $B/$d/$f) && cp -R  $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+
+pushd $B
+for f in `find  -type f`;do echo meld $f $A/$f; done;
+popd
+
+
+
+Diff & Merge Rom Sources:
+
+A=$HOME/Disk6T/Workspaces/AOSP/MoKee/mkp
+B=$HOME/Disk6T/Workspaces/AOSP/LineageOS/lineage-16.0
+REPO_STATUS=$HOME/Downloads/repo_status.txt
+
+rm $REPO_STATUS; pushd $A && repo status > $REPO_STATUS && popd
+
+
+## git status -s
+# preview:
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "M " | awk -F " " '{print $2}'`;do echo meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "? " | awk -F " " '{print $2}'`;do echo cp $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+# do it:
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "M " | awk -F " " '{print $2}'`;do meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status -s | grep "? " | awk -F " " '{print $2}'`;do cp $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+
+## git status
+# preview:
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status | grep modified | awk -F " " '{print $2}'`;do echo meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+# do it:
+for d in `cat $REPO_STATUS | grep project | awk -F " " '{print $2}'`; do pushd $A/$d && for f in `git status | grep modified | awk -F " " '{print $2}'`;do meld $A/$d/$f $B/$d/$f ;done && echo "++++++++++++++++++++++++++++" && popd; done;
+
+
+
+
+
+
+
+
+
+A=$HOME/Disk6T/Workspaces/AOSP/LineageOS/lineage-16.0
+B=$HOME/Disk6T/Workspaces/AOSP/LineageOS/lineage-17.1
+GIT_STATUS=$HOME/Downloads/git_status.txt
+
+SUB=frameworks/base/
+cd $SUB
+git status -s > $GIT_STATUS
+
+for f in `cat $GIT_STATUS | grep "M " | awk -F " " '{print $2}'`;do echo meld $A/$SUB/$f $B/$SUB/$f ;done;
+for f in `cat $GIT_STATUS | grep "? " | awk -F " " '{print $2}'`;do meld $A/$SUB/$f $B/$SUB/$f ;done;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## ____________________________ 编译 sqlcipher ____________________________
+
+git clone https://github.com/sqlcipher/sqlcipher.git
+cd sqlcipher
+sudo sudo apt install tcl
+yum install -y openssl-devel	## for centos
+./configure --enable-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC" LDFLAGS="-lcrypto"
+make
+
+1. 如果有报错类似：
+error: unknown type name ‘sqlite3’
+
+检查当前目录下 sqlite3.h 是否为空，如果空的文件就删除再重复上面编译sqlcipher步骤
+
+2. 如果有报错类似：
+error: unknown type name ‘u64’ 或 error: unknown type name ‘sqlite3_mutex’
+
+重新 clone 工程在编译
+
+
+3. 用法，就拿我们常用聊天工具 WeChat 研究一下吧:
+
+## 参考: https://github.com/ppwwyyxx/wechat-dump/blob/master/decrypt-db.py
+PWD_KEY=MD5(deviceId + uin).subString(0, 7);
+
+读:
+./sqlcipher -cmd "PRAGMA key = 'PWD_KEY'; PRAGMA cipher_compatibility = 1;" ~/Downloads/EnMicroMsg.db
+sqlite> .header on
+sqlite> select * from sqlite_master where type="table" and name="rcontact";
+
+导出:
+./sqlcipher /Downloads/EnMicroMsg.db
+sqlite> PRAGMA key = 'PWD_KEY'; PRAGMA cipher_compatibility = 1;
+sqlite> ATTACH DATABASE '/Downloads/DeMicroMsg.db' AS db KEY '';
+ls -al ~/Downloads/DeMicroMsg.db  									## Now DeMicroMsg.db is Empty
+sqlite> SELECT sqlcipher_export('db');
+ls -al ~/Downloads/DeMicroMsg.db 									## Now DeMicroMsg.db had data filled in
+sqlite> DETACH DATABASE db;
+
+sqlite3 ~/Downloads/DeMicroMsg.db  						# 得到解密的数据库，用 sqlite3 命令就可以打开
+sqlite> select * from message;
+
+
+写:
+./sqlcipher test.db 									#创建一个db文件  
+sqlite> PRAGMA key = 'key_test';  						#设置密码  
+sqlite> create table tb_test(id,name);  				#创建数据表
+sqlite> insert into tb_test(id,name) values(1,"小明");  	#插入一条数据
+sqlite> .exit 											#退出
+
+./sqlcipher -cmd "PRAGMA key = 'key_test';" test.db 
+sqlite> .table
+sqlite> select * from tb_test;
+tb_test .exit
+
+
+
+
+
+
+
+
+
+
+
+
+

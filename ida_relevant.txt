@@ -1,0 +1,61 @@
+
+Reference: 
+https://bbs.pediy.com/thread-259304.htm
+
+
+JPWD 相关:
+https://bbs.pediy.com/thread-266378.htm
+https://tech.meituan.com/2017/07/20/android-remote-debug.html
+
+
+
+## IDA 端:
+
+1. 将 dbgsrv push 到 Android 上
+adb push [IDA_7.0_PATH]\dbgsrv\android_server /data/local/tmp
+
+adb push [IDA_7.0_PATH]\dbgsrv\android_server64 /data/local/tmp
+
+adb root && adb shell 
+cd /data/local/tmp && chmod 777 android_server*
+./android_server &
+
+2. 开启调试进程
+adb forward tcp:23946 tcp:23946
+adb shell am start -D -n com.u.packagename/.MainActivity
+[ adb shell am force-stop packagename ## 停止进程]
+
+3. 打开 IDA
+Debugger -> Debugger Options -> Checked 'Suspend on process/thread/library' and checked 'Use hardward temporary breakpoints'
+Debugger -> Process Options -> Hostname: 127.0.0.1 and port: 23946
+
+4. IDA 附着: Debugger -> Attach to process
+
+
+## Android Studio 端
+
+1. 因为 android.app.ActivityThread 中 Debug.waitForDebugger 一直在等待 jdwp 的连接，所以：
+2. 用 jadx 打开 程序APK，然后 保存成 gradle project: File -> Save as gradle project
+3. 用 Android Studio 打开 上一步保存的 gradle project, 修改 build.gradle/Project Struct 把
+   Gradle Version 及其 Android Gradle Plugin Version 改到最新，然后编译gradle sync
+4. 点击 Android Studio 调试按键 "Attach Debugger to Android Process" 附着到设备调试进程。此时
+   IDA 端会 继续了 ~~~  设备上的 "Waiting For Debugger" 弹出框就会消失了 ~~~
+
+又或者不用 Android Studio 直接命令: jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=9713
+但此时得知道 port，port 有时候是会变的。
+
+
+
+
+##  
+
+打印 【鼠标当前行】 地址: hex(ScreenEA())
+打印当前模块开始地址: hex(SegStart(ScreenEA()))
+打印当前模块结束地址: hex(SegEnd(ScreenEA()))
+
+打印 【鼠标当前行】 offset 地址: hex( ScreenEA() - SegStart(ScreenEA()) )
+
+
+
+有时候，跳转到指定地址的时候全是DCB 数据，这怎么办? 这个时候可以按 C 键识别为代码，或者按 P 键识别为函数。
+

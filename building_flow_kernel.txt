@@ -1,0 +1,92 @@
+
+## 参考 
+https://forum.xda-developers.com/t/reference-how-to-compile-an-android-kernel.3627297/
+
+https://www.cnblogs.com/zifeiniu/p/9233123.html
+
+https://bitbucket.org/jonascardoso/toolchain_aarch64_travis/src/master/
+
+https://github.com/JonasCardoso/android_kernel_xiaomi_msm8996/blob/hmp-r/build.sh
+https://bitbucket.org/jonascardoso/toolchain_aarch64_travis/src/master/aptess.sh
+
+https://www.cnblogs.com/wxishang1991/p/5322499.html
+
+
+
+## 下载 
+
+git clone --depth 1 -b hmp-r https://github.com/JonasCardoso/android_kernel_xiaomi_msm8996.git
+
+git clone --depth 1 -b lineage-16.0 https://github.com/mi5-dev/kernel_xiaomi_msm8996.git
+
+git clone --depth 1 -b master https://bitbucket.org/jonascardoso/toolchain_aarch64_travis.git Toolchain
+
+
+
+## 进入 Kernel 目录
+cd ~/AOSP/kernel_xiaomi_msm8996
+
+## 设置交叉编译环境
+
+# 1. use google_gcc
+
+export CROSS_COMPILE="$(pwd)/../Toolchain/google_gcc/aarch64-linux-android-4.9/bin/aarch64-linux-android-";  export LD_LIBRARY_PATH="$(pwd)/../Toolchain/google_gcc/aarch64-linux-android-4.9/lib/"; ToolchainName="Google"; ToolchainCompile="Google GCC 4.9.0";
+
+# 2. use linaro_gcc 
+
+export CROSS_COMPILE="$(pwd)/../Toolchain/linaro_gcc/aarch64-linux-gnu-7.4.1-2019.02/bin/aarch64-linux-gnu-";  export LD_LIBRARY_PATH="$(pwd)/../Toolchain/linaro_gcc/aarch64-linux-gnu-7.4.1-2019.02/lib/"; ToolchainName="Linaro"; ToolchainCompile="Linaro GCC 7.4.1";
+
+export ARCH=arm64 && export SUBARCH=arm64
+
+## 清除并编译
+make clean && make mrproper && make gemini_defconfig && make -j$(nproc --all)
+
+make clean && make mrproper && make gemini_defconfig && make -w -j$(nproc --all)
+
+## 减少编译时间编译
+
+make gemini_defconfig && make -j$(nproc --all)
+
+
+
+
+### 去除编译错误 
+
+all warnings being treated as errors
+删掉: -Wall -Werror 
+加上: -Wno-error
+
+头文件找不到错误: 新建文件夹 include_ex， 然后在Makefile 的 Line 383 行变量追加 USERINCLUDE: -Iinclude_ex 
+注意新建的文件夹不要有大写 如 includeEx， 这样会失效的。然后 find -name missing.h，无条件复制到 include_ex 去。
+并且把一些在当前文件夹有头文件的，却用了 include <> 尖括号 改成 include "" 冒号。
+
+
+
+### 错误 prepare3 
+
+make clean 一下，并且不 make O=out 到 out 目录 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######
+
+https://forum.xda-developers.com/t/kernel-patch-usb-otg-host-mode-simultaneous-charging.3668119/
+
+https://github.com/sollapse/opo_dwc3_otg/blob/master/dwc3_otg.c
+
+
+

@@ -1,0 +1,7 @@
+
+为什么radare2普及度不及ida
+https://www.zhihu.com/question/64632088
+
+各种开源汇编、反汇编引擎的非专业比较
+https://bbs.pediy.com/thread-205590-1.htm
+

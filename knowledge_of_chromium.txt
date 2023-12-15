@@ -1,0 +1,172 @@
+
+
+
+######### pdfium on Chromium #########
+
+
+## 1. Get the code
+
+mkdir pdfium_chromium ; cd pdfium_chromium
+
+gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
+gclient sync
+
+# In other ternimal:  
+for i in {1..1000}; do sleep 6; du -h -d 1 ./; done;
+
+
+## 2. Build configuration
+
+cd pdfium
+
+# ./build/install-build-deps.sh  // no need to do this on macosx: https://groups.google.com/g/pdfium/c/csH00lRKVLo
+
+gn gen out/Debug
+gn args out/Debug
+
+
+## 3. Building the code
+
+ninja -C out/Debug pdfium_all
+
+
+
+
+
+
+
+
+
+######### pdfium on Android #########
+
+
+## Refrence: https://medium.com/@raju.kandasamy/how-to-build-pdfium-library-for-android-70e42ad31f6c
+
+
+## 1. Get the code
+
+
+# https://android.googlesource.com/platform/external/pdfium/
+
+mkdir pdfium_android ; cd pdfium_android
+
+# gclient config --unmanaged  https://android.googlesource.com/platform/external/pdfium.git@cba196def40ec0d42950cd5df22c9a908eaebcb8
+gclient config --unmanaged  https://android.googlesource.com/platform/external/pdfium.git
+
+
+
+gclient sync
+
+
+
+------------------------------------------------------
+________ running 'python pdfium/build/mac_toolchain.py' in '__path_to__/pdfium_android/pdfium'
+/usr/local/bin/python: can't open file '__path_to__/pdfium_android/pdfium/pdfium/build/mac_toolchain.py': [Errno 2] No such file or directory
+Error: Command 'python pdfium/build/mac_toolchain.py' returned non-zero exit status 2 in __path_to__/pdfium_android/pdfium
+/usr/local/bin/python: can't open file '__path_to__/pdfium_android/pdfium/pdfium/build/mac_toolchain.py': [Errno 2] No such file or directory
+------------------------------------------------------
+# 两个 pdfium/pdfium/ 了，去 __path_to__/pdfium_android/pdfium/DEPS 删掉一个 pdfium/ 路径
+
+
+
+------------------------------------------------------
+________ running 'python build/mac_toolchain.py' in '__path_to__/pdfium_android/pdfium'
+__path_to__/pdfium_android/pdfium/build/mac_toolchain.py:23: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  import pkg_resources
+Traceback (most recent call last):
+  File "__path_to__/pdfium_android/pdfium/build/mac_toolchain.py", line 200, in <module>
+    sys.exit(main())
+  File "__path_to__/pdfium_android/pdfium/build/mac_toolchain.py", line 179, in main
+    if not _UseHermeticToolchain():
+  File "__path_to__/pdfium_android/pdfium/build/mac_toolchain.py", line 61, in _UseHermeticToolchain
+    return '1' in proc.stdout.readline()
+------------------------------------------------------
+# 要用 python 2.7
+export PATH=/Library/Frameworks/Python.framework/Versions/2.7/bin:$PATH
+
+
+------------------------------------------------------
+________ running 'python tools/clang/scripts/update.py' in '__path_to__/pdfium_android/pdfium'
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/Mac/clang-n332890-c2443155-1.tgz 
+<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:727)>
+Retrying in 5 s ...
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/Mac/clang-n332890-c2443155-1.tgz 
+<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:727)>
+Retrying in 10 s ...
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/Mac/clang-n332890-c2443155-1.tgz 
+<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:727)>
+Retrying in 20 s ...
+Downloading https://commondatastorage.googleapis.com/chromium-browser-clang/Mac/clang-n332890-c2443155-1.tgz 
+<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:727)>
+Failed to download prebuilt clang package clang-n332890-c2443155-1.tgz
+Use build.py if you want to build locally.
+Exiting.
+Error: Command 'python tools/clang/scripts/update.py' returned non-zero exit status 1 in __path_to__/pdfium_android/pdfium
+------------------------------------------------------
+python -c "import ssl; print(ssl.get_default_verify_paths())"  # 看看 ssl 路径
+# 在 /Applications/Python 2.7 文件夹中双击 Install Certificates.command 文件可解决这个问题
+
+
+
+## 2. Build configuration
+
+cd pdfium
+
+# ./build/install-build-deps.sh  // no need to do this on macosx: https://groups.google.com/g/pdfium/c/csH00lRKVLo
+
+
+gclient runhooks
+
+
+gn gen out/Debug
+
+
+------------------------------------------------------
+iMac pdfium % gn gen out/Debug                                                                          
+ERROR at //build/config/mac/mac_sdk.gni:85:5: Script returned non-zero exit code.
+    exec_script("//build/mac/find_sdk.py", find_sdk_args, "list lines")
+    ^----------
+Current dir: __path_to__/pdfium_android/pdfium/out/Debug/
+Command: python __path_to__/pdfium_android/pdfium/build/mac/find_sdk.py --print_sdk_path --print_bin_path 10.14
+Returned 1.
+stderr:
+
+Traceback (most recent call last):
+  File "__path_to__/pdfium_android/pdfium/build/mac/find_sdk.py", line 127, in <module>
+    print(main())
+  File "__path_to__/pdfium_android/pdfium/build/mac/find_sdk.py", line 96, in main
+    raise Exception('No %s+ SDK found' % min_sdk_version)
+Exception: No 10.14+ SDK found
+
+See //build/toolchain/mac/BUILD.gn:15:1: whence it was imported.
+import("//build/config/mac/mac_sdk.gni")
+^--------------------------------------
+See //BUILD.gn:8:1: which caused the file to be included.
+group("freetype_common") {
+^-------------------------
+------------------------------------------------------
+# /build/mac/find_sdk.py 查找 MacOSX 有 Bug, 改一下:
+sdks = [re.findall('^MacOSX(10\.\d+)\.sdk$', s) for s in os.listdir(sdk_dir)] 
+改成:
+sdks = [re.findall('^MacOSX(1\d+)\.sdk$', s) for s in os.listdir(sdk_dir)]
+
+
+
+gn args out/Debug
+
+
+------------------------------------------------------
+Waiting for editor on "__path_to__/pdfium_android/pdfium/out/Debug/args.gn"...
+Generating files...
+
+ERROR at //third_party/zlib/BUILD.gn:101:13: Unable to load "__path_to__/pdfium_android/pdfium/third_party/android_ndk/BUILD.gn".
+            "//third_party/android_ndk:cpu_features",
+            ^---------------------------------------
+------------------------------------------------------
+# 因为没有走这一步
+echo "target_os = [ 'android' ]" >> .gclient
+# 走了之后重新  gclient sync  一下
+
+
+
+

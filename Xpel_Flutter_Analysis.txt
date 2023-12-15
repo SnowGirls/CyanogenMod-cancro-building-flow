@@ -1,0 +1,100 @@
+
+
+Widget
+Element
+RenderObject
+
+RenderObjectWidget
+RenderObjectElement
+
+
+RenderObject - 笛卡尔坐标系 的 RenderBox 
+
+
+还有几个单例要注意的：
+
+PlatformDispatcher      ## 注意一下它拥有众多 Closure，它的单例 _instance 一加载类就生成，同时它是下面 window 的一个属性
+SingletonFlutterWindow  ## 它的实例在 window.dart 有个全局的公共变量： final SingletonFlutterWindow window = SingletonFlutterWindow._(0, PlatformDispatcher.instance); import 即可用如 runApp 一样
+
+
+记住 WidgetsFlutterBinding 单例 中的两个owner:
+RendererBinding 里有个 pipelineOwner, 紧跟着实例个 (RenderView)renderView, 这是 RenderView就是渲染树（render tree）的根节点， 以及 之后的 _renderViewElement
+WidgetsBinding 里有个 buildOwner
+
+
+
+runApp 调用 WidgetsFlutterBinding.ensureInitialized() 
+
+ensureInitialized()时:
+初始化一个 实例，并保存个静态引用在 WidgetsBinding._instance 中, 外部可通过 WidgetsBinding.instance 获取这个 WidgetsFlutterBinding 单例
+
+
+attachRootWidget() 时:
+实例了 RenderObjectToWidgetAdapter[_widget] -> attachToRenderTree() 时实例了 RenderObjectToWidgetElement(_renderViewElement), 同时 _renderViewElement 的 widget 引用就是前面的 RenderObjectToWidgetAdapter[_widget]
+
+
+
+
+WidgetsFlutterBinding 单例的 Mixin 的 RendererBinding.drawFrame() 方法被调用，其属性 pipelineOwner 实例调用 flushLayout() 方法
+PipelineOwner.flushLayout() -> 取出所有 dirty 的 RenderObject [RenderView实例] 调用其 _layoutWithoutResize() -> performLayout() 
+里面调 child.layout() [即方法RenderObject.layout(), mixin RenderSemanticsAnnotations] -> performLayout() [RenderProxyBoxMixin.performLayout (proxy_box.dart:116)]
+
+
+
+
+
+Rendering Pipline： Animate -> Build -> Layout -> Paint
+
+
+
+
+
+############################################# 有 Widget 需要 Rebuild 时:
+
+@pragma('vm:entry-point')
+// ignore: unused_element
+void _drawFrame() {
+  PlatformDispatcher.instance._drawFrame();
+}
+
+-> PlatformDispatcher.onDrawFrame 即 SingletonFlutterWindow set onDrawFrame 里设置过来的 platformDispatcher.onDrawFrame 也即  SchedulerBinding void ensureFrameCallbacksRegistered() { window.onBeginFrame ??= _handleBeginFrame; window.onDrawFrame ??= _handleDrawFrame; } 设置过来的方法
+
+-> PlatformDispatcher.onDrawFrame 也即实质上是  SchedulerBinding._handleDrawFrame 方法.     (ensureFrameCallbacksRegistered 什么时候被调用后面再看)
+-> SchedulerBinding._handleDrawFrame -> SchedulerBinding.handleDrawFrame 
+-> 处理 _persistentCallbacks 中的 RendererBinding._handlePersistentFrameCallback (在 RendererBinding 的 initInstances 时被加入 addPersistentFrameCallback(_handlePersistentFrameCallback);)
+
+## 注意实例是它 WidgetsFlutterBinding extends BindingBase with GestureBinding, SchedulerBinding, ServicesBinding, PaintingBinding, SemanticsBinding, RendererBinding, WidgetsBinding
+
+-> RendererBinding._handlePersistentFrameCallback -> drawFrame [# 这里注意g下一步不是走 RendererBinding.drawFrame, 因为 minxin 生成的中间class] -> WidgetsBinding.drawFrame -> buildOwner!.buildScope(renderViewElement!)  [# 这里的 buildOwner & renderViewElement 就是上面分析时生成的]
+
+-> 在这里的 buildScope 就开始处理 _dirtyElements 了 -> 按深度排序一下 _dirtyElements.sort(Element._sort) -> while(index < dirtyCount) _dirtyElements[index].rebuild() # 遍历调用 element 的 rebuild 方法
+
+-> Element.rebuild -> StatefulElement.performRebuild -> ComponentElement.performRebuild -> built = build() #这里调用build方法了，拿到了返回的新Widget（也可能是旧的, 看build里开发者返回什么了）， 仅接着走 Element.updateChild() -> child.update(newWidget) [# 对于 child 是 MultiChildRenderObjectElement 会 -> RenderObjectElement.updateChildren]
+#  在 built = build() 这里，跳入是 -> StatefulElement.build() -> state.build(this);
+
+
+
+一个完整的 Stack 是这样子的: 
+
+Element.updateChild (framework.dart:3290)
+RenderObjectElement.updateChildren (framework.dart:5503)
+MultiChildRenderObjectElement.update (framework.dart:6105)
+Element.updateChild (framework.dart:3293)
+ComponentElement.performRebuild (framework.dart:4520)
+StatefulElement.performRebuild (framework.dart:4667)
+Element.rebuild (framework.dart:4189)
+BuildOwner.buildScope (framework.dart:2694)             -----> 排序 & 遍历 _dirtyElements，调用各 element.rebuild();
+WidgetsBinding.drawFrame (binding.dart:873)
+RendererBinding._handlePersistentFrameCallback (binding.dart:319)
+SchedulerBinding._invokeFrameCallback (binding.dart:1144)
+SchedulerBinding.handleDrawFrame (binding.dart:1082)
+SchedulerBinding._handleDrawFrame (binding.dart:998)
+_rootRun (zone.dart:1354)
+_CustomZone.run (zone.dart:1258)
+_CustomZone.runGuarded (zone.dart:1162)
+_invoke (hooks.dart:161)
+PlatformDispatcher._drawFrame (platform_dispatcher.dart:253)
+_drawFrame (hooks.dart:120)
+
+
+

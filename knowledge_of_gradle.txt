@@ -1,0 +1,24 @@
+
+
+************ set sdk & ndk path ************
+
+local.properties
+
+sdk.dir=~/Workspaces/AndroidSDK
+ndk.dir=~/Workspaces/AndroidSDK/ndk/17.2.4988734
+
+
+************ Gradle build only one module ************
+
+# https://proandroiddev.com/tip-work-with-third-party-projects-locally-with-gradle-961d6c9efb02
+# https://stackoverflow.com/a/16987319/1749293
+
+./gradlew app:build  # ./gradlew :app:build  也行 
+
+./gradlew app:dependencies  # 查看App所有依赖树
+
+
+./gradlew tasks --all | less   # 查看所有 task, or just `./gradlew tasks --all > ~/Downloads/gradlew_tasks-all.txt`
+
+
+

@@ -1,0 +1,52 @@
+
+which gem 
+
+where gem 
+
+gem source -l
+
+gem env
+
+gem environment
+
+
+drag it to sublime_text and search the configs: /System/Library/Frameworks/Ruby.framework/Versions/2.6/
+
+
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby --version
+
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/gem list
+
+ls -al /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/gems/2.6.0/gems 
+
+
+
+cat .gemrc
+
+cat .config/gem/gemrc
+
+
+
+# https://github.com/CocoaPods/CocoaPods/issues/1686
+
+	pod --version
+	/usr/local/Gemfile not found
+
+	export COCOAPODS_NO_BUNDLER=1
+
+	pod --version                
+	1.12.1
+
+	小提示：1.11.0 以上版本的 RVM 在安装 Ruby 时，默认会安装 rubygems-Bundler。你可以通过 gem list rubygems-Bundler 来检查自己是否安装了这个 gem。如果你用 homebrew 安装 Ruby，则不会享受到这个隐藏的福利。详情看【https://juejin.cn/post/6844903745822670861】
+
+	gem search rubygems 
+	gem install rubygems-bundler   # 安装成功后就可以去掉 COCOAPODS_NO_BUNDLER 设置了
+	## need to chmod g+w following files:
+	## /usr/local/lib/ruby/gems/3.2.0/bin/pod /usr/local/lib/ruby/gems/3.2.0/bin/sandbox-pod /usr/local/lib/ruby/gems/3.2.0/bin/erb
+	## /usr/local/Cellar/ruby/3.2.2/bin/irb /usr/local/Cellar/ruby/3.2.2/bin/racc /usr/local/Cellar/ruby/3.2.2/bin/rdoc
+	## /usr/local/Cellar/ruby/3.2.2/bin/ri
+
+
+# https://juejin.cn/post/6844903745822670861
+	
+	ruby -e 'puts $LOAD_PATH'

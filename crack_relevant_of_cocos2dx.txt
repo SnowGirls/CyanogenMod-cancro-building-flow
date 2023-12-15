@@ -1,0 +1,19 @@
+
+## Error android jni: call to OpenGL ES API with no current context (logged once per thread)
+
+## 更新 UI 线程不一致的原因，Java这边先postDelayed一下，然后调 org.cocos2dx.lib.Cocos2dxActivity 的 runOnGLThread 方法，把执行放到 GLThread 去。
+
+new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+    @Override
+    public void run() {
+        Activity activity = Api.getCurrentActitiy();  // org.cocos2dx.lib.Cocos2dxActivity
+        Log.d("__check_it_out__", "activity class: " + activity.getClass().getName());
+        IReflectUtil.invokeMethod(activity, "runOnGLThread", new Class[]{Runnable.class}, new Object[]{new Runnable() {
+	            @Override
+	            public void run() {
+					GameEvents.__native_refresh_ui__(1, 1);
+	            }
+	        }
+        });
+    }
+}, 1000);

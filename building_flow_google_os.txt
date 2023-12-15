@@ -1,0 +1,220 @@
+
+
+https://source.android.com/setup/build/downloading
+https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
+https://source.android.com/setup/start/build-numbers#source-code-tags-and-builds
+https://source.android.google.cn/setup/start/build-numbers#source-code-tags-and-builds
+https://developers.google.cn/android/drivers
+https://developers.google.com/android/drivers
+https://storage.googleapis.com/play_public/supported_devices.html
+
+
+
+mkdir Google && cd Google
+
+################################### android-9.0.0_r57 ###################################
+
+git config --global http.proxy 'socks5://127.0.0.1:1090'
+git config --global https.proxy 'socks5://127.0.0.1:1090'
+
+
+mkdir android-9.0.0_r57 && cd android-9.0.0_r57
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-9.0.0_r57
+
+
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+./ReRepoSync.sh
+
+
+source build/envsetup.sh
+
+lunch aosp_taimen-userdebug
+
+make update-api
+
+make
+
+
+
+
+----------------------------------------------------------------------------
+FAILED: out/soong/build.ninja 
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp
+error: bionic/libc/system_properties/Android.bp:1:1: dependency "libjson" of "libsystemproperties" missing variant:
+  arch:android_arm64_armv8-a_cortex-a73, image:core, link:static
+available variants:
+  arch:android_arm64_armv8-a_cortex-a73, image:vendor, link:static
+  arch:android_arm_armv8-a_cortex-a73, image:vendor, link:static
+ninja: build stopped: subcommand failed.
+22:24:29 soong bootstrap failed with: exit status 1
+----------------------------------------------------------------------------
+vim external/json-c/Android.bp
+## 加上: 
+vendor_available: true,
+## 如果有 vendor: true, 则删掉
+
+
+
+----------------------------------------------------------------------------
+FAILED: out/soong/build.ninja 
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp
+error: frameworks/base/core/jni/Android.bp:11:1: dependency "sandhook" of "libandroid_runtime" missing variant:
+  arch:android_arm64_armv8-a_cortex-a73, image:core, link:static
+available variants:
+  arch:android_arm64_armv8-a_cortex-a73, image:vendor, link:static
+  arch:android_arm_armv8-a_cortex-a73, image:vendor, link:static
+ninja: build stopped: subcommand failed.
+22:18:35 soong bootstrap failed with: exit status 1
+----------------------------------------------------------------------------
+vim external/sandhook/Android.bp
+## 如果有 vendor: true, 则删掉，替换或加上:
+vendor_available: true,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################### android-9.0.0_r42 ###################################
+
+mkdir android-9.0.0_r42 && cd android-9.0.0_r42
+
+mkdir .repo && cp -r ../android-9.0.0_r57/.repo/repo ./.repo/
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-9.0.0_r42
+
+./ReRepoSync.sh
+
+
+
+# According https://source.android.com/setup/start/build-numbers#source-code-tags-and-builds, we got 
+# android-9.0.0_r42 的 Build ID is PQ3B.190605.006 , so go to https://developers.google.cn/android/drivers#sargopq3b.190605.006, then 
+# search PQ3B.190605.006 and download:
+
+mkdir -p $HOME/Disk6T/Workspaces/Resources/sargo_Pixel3a/
+cd $HOME/Disk6T/Workspaces/Resources/sargo_Pixel3a/
+curl -O https://dl.google.com/dl/android/aosp/google_devices-sargo-pq3b.190605.006-cdb783e8.tgz
+curl -O https://dl.google.com/dl/android/aosp/qcom-sargo-pq3b.190605.006-dc3c5790.tgz
+tar zxvf google_devices-sargo-pq3b.190605.006-cdb783e8.tgz
+tar zxvf qcom-sargo-pq3b.190605.006-dc3c5790.tgz
+./extract-google_devices-sargo.sh
+./extract-qcom-sargo.sh
+
+mv vendor/ $HOME/Disk6T/Workspaces/AOSP/Google/android-9.0.0_r42
+
+
+
+source build/envsetup.sh
+
+lunch aosp_sargo-userdebug
+
+make update-api
+
+make
+
+
+# For Android Studio:
+mmm development/tools/idegen/
+development/tools/idegen/idegen.sh  # open android.ipr [setting for android.iml] in Android Studio
+
+
+
+# 刷机到 Pixel 3a : 
+echo $ANDROID_PRODUCT_OUT  # 如果没有请设置, 注意要用 export，直接=不行，环境变量没带到环境中去
+export ANDROID_PRODUCT_OUT=$HOME/Disk6T/Workspaces/AOSP/Google/android-9.0.0_r42/out/target/product/sargo/
+adb reboot bootloader
+fastboot flashing unlock   # fastboot oem unlock
+fastboot flashall -w
+
+
+adb disable-verity
+
+
+
+# 制件刷机包zip, # Package OTA: out/target/product/sargo/aosp_sargo-ota-eng.ubuntu.zip
+make otapackage
+
+# 制件刷机增量包zip
+./build/tools/releasetools/ota_from_target_files -v -i out/target/product/sargo/aosp_sargo-ota-eng.ubuntu_last.zip out/target/product/sargo/aosp_sargo-ota-eng.ubuntu_now.zip out/target/product/sargo/oat_incremental.zip
+
+adb push aosp_sargo-ota-eng.ubuntu.zip /cache/
+echo "--update_package=/cache/aosp_sargo-ota-eng.ubuntu.zip" > /cache/recovery/command
+# adb push oat_incremental.zip /cache/
+# echo "--update_package=/cache/oat_incremental.zip" > /cache/recovery/command
+
+adb reboot recovery
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################### android-10.0.0_r41 ###################################
+
+mkdir android-10.0.0_r41 && cd android-10.0.0_r41
+
+mkdir .repo && cp -r ../android-9.0.0_r57/.repo/repo ./.repo/ && cp ../android-9.0.0_r57/ReRepoSync.sh ./
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-10.0.0_r41
+
+./ReRepoSync.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################### android-11.0.0_r46 ###################################
+
+mkdir android-11.0.0_r46 && cd android-11.0.0_r46
+
+mkdir .repo && cp -r ../android-9.0.0_r57/.repo/repo ./.repo/ && cp ../android-9.0.0_r57/ReRepoSync.sh ./
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-11.0.0_r46
+
+./ReRepoSync.sh
+
+
+

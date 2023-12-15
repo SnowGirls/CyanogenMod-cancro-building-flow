@@ -1,0 +1,136 @@
+
+------------------------------------------- 参考 -------------------------------------------
+
+https://www.bilibili.com/read/cv6547509
+https://www.jianshu.com/p/b6b30ed9f1b6
+
+https://github.com/HeQuanX/navicat-keygen-tools
+https://github.com/Lesmm/navicat15-premium-zips
+
+
+cd /usr/lib/x86_64-linux-gnu
+ls -al libstdc++*
+sudo rm libstdc++.so.6 && sudo ln -s '[path_to_your_download]/libstdc++.so.6.0.26' libstdc++.so.6
+sudo rm libstdc++.so.6 && sudo ln -s libstdc++.so.6.0.25 libstdc++.so.6
+
+
+wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+chmod a+x appimagetool-x86_64.AppImage
+appimagetool-x86_64.AppImage [mount后 cp -r 的文件夹]
+
+
+
+
+
+About Windows:
+
+https://cracksurl.com/premiumsoft-navicat-premium/
+https://github.com/faustz/Deltafox79
+
+
+
+
+
+
+
+
+
+
+------------------------------------------- 下面是一键步骤 -------------------------------------------
+Navicat 15 CS 破解:
+
+# sudo apt-get install libcapstone-dev rapidjson-dev
+
+CURDIR=`pwd`
+mkdir navicat15-premium-cs && cd navicat15-premium-cs
+
+# Download https://github.com/HeQuanX/navicat-keygen-tools/releases
+curl --socks5 127.0.0.1:1090 -L -O https://github.com/HeQuanX/navicat-keygen-tools/releases/download/recommended/navicat15-premium-cs.zip
+curl --socks5 127.0.0.1:1090 -L -O https://github.com/HeQuanX/navicat-keygen-tools/archive/refs/tags/recommended.zip
+
+mv recommended.zip navicat-keygen-tools-recommended.zip 
+unzip navicat15-premium-cs.zip 					## Got navicat15-premium-cs.AppImage
+unzip navicat-keygen-tools-recommended.zip		## Got navicat-keygen-tools-recommended/
+
+# rm navicat15-premium-cs.zip
+# rm navicat-keygen-tools-recommended.zip
+
+
+
+# Download https://github.com/keystone-engine/keystone and make
+curl -L -O https://github.com/keystone-engine/keystone/archive/refs/heads/master.zip
+unzip master.zip
+rm master.zip
+pushd keystone-master
+mkdir build
+pushd build
+../make-share.sh
+
+popd
+popd
+
+
+# Make keygen & patcher
+pushd navicat-keygen-tools-recommended/
+vim Makefile
+--------------
+KEYSTONE_INCLUDE_PATH = ../keystone-master/include
+KEYSTONE_LIB_PATH = ../keystone-master/build/llvm/lib
+--------------
+make all
+popd
+
+
+
+##以后重装了系统后从这里开始:
+# 
+mkdir navicat15-premium-cs_AppImage
+
+sudo mount -o loop navicat15-premium-cs.AppImage navicat15-premium-cs_AppImage
+cp -r navicat15-premium-cs_AppImage navicat15-premium-cs_AppImage_patched
+
+sudo umount navicat15-premium-cs_AppImage
+rmdir navicat15-premium-cs_AppImage
+
+
+# run patcher
+export LD_LIBRARY_PATH=./keystone-master/build/llvm/lib
+./navicat-keygen-tools-recommended/bin/navicat-patcher ./navicat15-premium-cs_AppImage_patched/
+
+
+# package your .AppImage
+wget 'https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage'
+chmod +x appimagetool-x86_64.AppImage
+./appimagetool-x86_64.AppImage ./navicat15-premium-cs_AppImage_patched/ navicat15-premium-cs_patched.AppImage
+
+
+# 断网!!!
+# 然后双击运行 navicat15-premium-cs_patched.AppImage，或用命令运行：
+./navicat15-premium-cs_patched.AppImage &
+
+
+
+./navicat-keygen-tools-recommended/bin/navicat-keygen --text RegPrivateKey.pem
+1. Premium
+1. Simplified Chinese
+Input major version number: 15
+## 然后复制 Serial number 
+[*] Serial number:
+NAVL-QQE7-XXXX-XXX
+[*] Your name: GG
+[*] Your organization: GG
+[*] Input request code in Base64: (Double press ENTER to end)	
+## Terminal在此停止，回到上面的「运行」的「Navicat窗口」界面，点击「注册」，粘贴刚刚复制的「Serial number」，点击「激活」，因断网了此时会弹出「手动激活」，再次点击「手动激活」，然后复制「请求码」
+
+## 回到 Terminal, 粘贴「请求码」, 然后 Double press ENTER 按两次回车，得到「[*] Activation Code:」，把这个「激活码」复制，然后粘贴到「Navicat窗口」的「激活码」下，点击「OK」即可激活成功
+
+
+
+
+
+
+
+
+
+
+

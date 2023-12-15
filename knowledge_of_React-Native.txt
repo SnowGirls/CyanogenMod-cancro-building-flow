@@ -1,0 +1,28 @@
+
+
+npm --version
+
+
+# 降 npm 版本
+npm install npm@6.14.12 -g
+
+
+# 安装依赖
+npm install
+
+
+# 启动项目
+yarn start --port 8082
+
+
+
+
+
+# 增加/修改 tsx 文件后 同步/重新生成 js 文件, 假设你的ts文件是 index.ts 
+npm install typescript -g 
+
+tsc index.ts 
+
+
+
+

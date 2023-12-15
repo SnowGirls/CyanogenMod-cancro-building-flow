@@ -1,0 +1,105 @@
+
+# [git checkout]
+git checkout <sha1-commit-hash>^ -- <path-to-file>
+
+
+# [git diff]
+git diff --name-only
+
+git diff --name-status SHA1 SHA2  ## git diff --name-status HEAD~4 HEAD~1
+
+git diff --stat SHA1 SHA2
+
+git diff --shortstat SHA1 SHA2
+
+
+# [git show]
+git show --name-only <sha1-commit-hash>
+
+git show <sha1-commit-hash> -- <path-to-file>
+
+
+# [git log]
+git log --all --full-history -- <path-to-file>
+
+
+
+
+
+
+
+
+# [关于 ^ 和 ~]
+https://stackoverflow.com/a/2222920/1749293
+https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-rev-parse.html
+
+G   H   I   J
+ \ /     \ /
+  D   E   F
+   \  |  / \
+    \ | /   |
+     \|/    |
+      B     C
+       \   /
+        \ /
+         A
+
+A =      = A^0
+B = A^   = A^1     = A~1
+C = A^2
+D = A^^  = A^1^1   = A~2
+E = B^2  = A^^2
+F = B^3  = A^^3
+G = A^^^ = A^1^1^1 = A~3
+H = D^2  = B^^2    = A^^^2  = A~2^2
+I = F^   = B^3^    = A^^3^
+J = F^2  = B^3^2   = A^^3^2
+
+
+
+
+
+
+
+---------------- 压缩提交 ----------------
+##### Pre-condiction: feature/doing_patching is megered origin/develop
+
+##### 1. 用 Patch 方式来压缩所以修改成一个 commit 
+
+git pull 
+
+git checkout feature/doing_patching && git clean -fd
+
+git diff origin/develop --binary > ~/Downloads/doing.patch
+
+git checkout -b target_branch origin/develop --no-track 
+
+git apply ~/Downloads/doing.patch
+
+git add . && git commit -m "modify: all modified to one commit"
+
+git log -n 5
+
+git diff feature/doing_patching
+
+
+##### 2. 用 squash
+
+git checkout -b target_branch origin/develop --no-track 
+
+git merge --squash feature/doing_patching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

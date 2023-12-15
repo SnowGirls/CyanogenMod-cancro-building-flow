@@ -1,0 +1,201 @@
+
+# 1. Download Flutter Sdk and Unzip it
+
+https://docs.flutter.dev/development/tools/sdk/releases
+
+
+mkdir $W_PATH/Flutter_Sdk ; cd $W_PATH/Flutter_Sdk
+curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.10.1-stable.tar.xz
+curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.8.1-stable.tar.xz
+
+xz -d -k flutter_linux_2.10.1-stable.tar.xz    # 解压 .xz 并保留原文件
+tar xvf flutter_linux_2.10.1-stable.tar
+# or just use `tar xf flutter_linux_2.10.1-stable.tar.xz`
+mv flutter flutter_linux_2.10.1-stable
+rm flutter_linux_2.10.1-stable.tar
+
+
+# 2. run `flutter precache`
+pushd flutter_linux_2.10.1-stable/bin && ./flutter precache && popd
+
+
+## one command at all:
+FluVer=2.8.1
+tar xf flutter_linux_${FluVer}-stable.tar.xz && mv flutter flutter_linux_${FluVer}-stable && pushd flutter_linux_${FluVer}-stable/bin && ./flutter precache && popd
+FluVer=2.10.1
+tar xf flutter_linux_${FluVer}-stable.tar.xz && mv flutter flutter_linux_${FluVer}-stable && pushd flutter_linux_${FluVer}-stable/bin && ./flutter precache && popd
+
+
+
+# 3. Setup PATH env
+
+vim ~/.bash_aliases
+-----------------------------------
+# Flutter
+export CHROME_EXECUTABLE=/snap/bin/chromium  # for Linux
+# PATH=$PATH:$W_PATH/Flutter_Sdk/flutter_linux_2.8.1-stable/bin
+PATH=$PATH:$W_PATH/Flutter_Sdk/flutter_linux_2.10.1-stable/bin
+-----------------------------------
+
+
+touch ~/.android/repositories.cfg
+sdkmanager --update
+
+flutter doctor       ## export ANDROID_SDK_ROOT, to you android sdk path, need export!!!
+flutter doctor --android-licenses
+flutter --version
+
+
+
+
+# 4. In Android Studio Plugin, search 'flutter' & 'dart' then download this two plugins
+
+
+
+
+
+
+################################ 获取 Flutter engine (Flutter.framework) 的 DSYM ################################ 
+
+echo "https://storage.cloud.google.com/flutter_infra_release/flutter/$(cat ${$(which flutter)%bin*}/bin/internal/engine.version)/ios-release/Flutter.dSYM.zip"
+
+
+# 1. iOS Flutter 引擎 Crash 方法符号
+# https://www.jianshu.com/p/97901a3f29eb
+Flutter_DSYM=__your_unzip_dsym_path__
+xcrun atos -o $Flutter_DSYM/Contents/Resources/DWARF/Flutter --arch arm64 -offset 0x043858
+# xcrun atos -o Flutter.dSYM/Contents/Resources/DWARF/Flutter --arch arm64 -l 0x107278000
+
+
+
+# 2. 上传 sentry
+brew install getsentry/tools/sentry-cli 
+export SENTRY_URL=https://io.sentry.com/
+sentry-cli debug-files upload --auth-token [SENTRY_AUTH_TOKEN] \
+--include-sources \
+--org [SENTRY_ORG] \
+--project [SENTRY_PROJECT] \
+/__path_to_your_downloaded_dsym_zip_file__/flutter_9aa7816315095c86410527932918c718cb35e7d6_ios-release_Flutter.dSYM.zip 
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################ Build a new flutter_tools.snapshot  ################################
+
+
+__path_to__/flutter_macos_2.0.4-stable/bin/cache/dart-sdk/bin/dart --verbosity=error --disable-dart-dev  --snapshot=__path_to__/flutter_macos_2.0.4-stable/bin/cache/flutter_tools_new.snapshot --packages=__path_to__/flutter_macos_2.0.4-stable/packages/flutter_tools/.packages --no-enable-mirrors __path_to__/flutter_macos_2.0.4-stable/packages/flutter_tools/bin/flutter_tools.dart
+
+
+# 1. Debugging flutter_tools:
+
+https://www.alibabacloud.com/blog/an-in-depth-understanding-of-flutter-compilation-principles-and-optimizations_597747
+
+# 1.1 Add `Dart Command Line App` in `Run/Debug Configuration` menu -> in [Dart file]: select the `bin/flutter_tools.dart`
+
+
+# 1.2 In [Program arguments], fill with:
+	`run --device-id=macos --project-root=__path_to_your_project_/ --target=__path_to_your_project_/lib/main.dart`
+
+	i.e.
+		run -d [__device_id__] --project-root=__path_to_your_project_ --target=__path_to_your_project_/lib/main.dart --flavor development --dart-define=App.env=test --dart-define=App.experiment=true --dart-define=App.phase=DEV
+
+	# [__device_id__] values: `flutter devices`
+
+
+# 1.3 Click 'OK', save configuration and exit
+
+# 1.4 Modify the `lib/src/resident_runner.dart` source Line 404, (for version flutter_macos_3.0.5-stable), insert below code to change the `globals.fs.currentDirectory` to our specified in `--project-root` arguments:
+	
+	globals.fs.currentDirectory = globals.fs.directory(hotRunner.projectRootPath);
+
+	## 原因在于后面调用的 FlutterProject.current() 依然取 globals.fs.currentDirectory 为 pwd 的路径，并不取 --project-root 参数传入的。
+	## 另外还有 lib/src/runner/flutter_command.dart 的 verifyThenRunCommand 调的 await validateCommand() 方法里检查的 globals.fs.isFileSync('pubspec.yaml') 也还是 pwd 路径的 「pubspec.yaml」是否存在，并不是拿 --project-root 的。
+	## 所以感觉 --project-root 的支持并不完善/完美。
+
+# 1.5 Modify the `lib/src/base/logger.dart` source Line 550, 输出更多日志信息:
+    @override
+  	void printTrace(String message) => _stdio.stdoutWrite('$message\n');
+
+
+
+
+
+
+
+################################ Run flutter project from android app project  ################################
+
+## In your android project: 
+## Pass the dart-define arguments on build:
+
+Run/Debug Configurations -> Before launch -> '+' a task below 'Gradle-aware Make' -> Gradle project: android:app,  Tasks: assembleDevelopmentDebug,  Arguments: -Pdart-defines=app.env%3Dproduction,app.experiment%3Dtrue,app.phase%3DDEV
+
+
+
+
+
+
+
+################################ Debug flutter project's gradle file: flutter.gradle  ################################
+
+// https://stackoverflow.com/a/63550785/1749293
+// https://docs.gradle.org/current/userguide/troubleshooting.html#sec:troubleshooting_build_logic
+
+## In your android project:
+
+Run/Debug Configurations -> "+" -> Remote JVM Debug -> Enter a random Name for example: "Remote Debug Gradle", and leave other settings default -> "OK"
+
+fn + option + F12 key open Terminal -> cd android -> ./gradlew assembleDevelopmentDebug -Pdart-defines=xdragon.env%3Dproduction,xdragon.experiment%3Dtrue,xdragon.phase%3DDEV -Dorg.gradle.debug=true --no-daemon -> Click the 'Debug' icon on toolbar on android studio to attach.
+
+
+
+
+
+
+
+
+
+################### 发布到 pub.dev ###################
+
+README.md         // 介绍
+pubspec.yaml      // 库名、版本、描述、环境版本、依赖
+LICENSE   	      // MIT License
+CHANGELOG.md      // 版本历史
+
+
+## 发布 dart 库到 pub.dev
+
+dart format .
+dart pub publish --dry-run 
+dart pub publish 
+
+
+
+## 发布 Flutter 库到 pub.dev
+
+dart format . -l 138
+flutter pub publish --dry-run 
+flutter pub publish 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

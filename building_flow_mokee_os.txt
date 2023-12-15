@@ -1,0 +1,1123 @@
+
+
+
+
+----------------------------------------- MoKee mkp -----------------------------------------
+
+
+mkdir mkp && cd mkp
+
+# repo init -u https://github.com/MoKee/android.git -b mkp
+repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
+
+
+
+vim .repo/manifest.xml or vim .repo/manifests/default.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+
+vim ReRepoSync.sh
+------------------------- ReRepoSync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- ReRepoSync.sh -------------------------
+ chmod 777 ReRepoSync.sh
+
+
+
+## repo sync
+./ReRepoSync.sh
+
+
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+(注意: 先lunch再brunch,单独lunch和brunch都会出现错误)
+
+
+
+## 刷机：
+fastboot devices
+fastboot flash recovery twrp-3.2.3-0-cancro.img
+fastboot boot twrp-3.2.3-0-cancro.img
+## 如果出现这个错误： FAILED (remote: 'dtb not found'), 升级一下基带！
+## 即解包 cm13BaseBandUpgrade.zip 然后在 fastboot 模式下运行它文件夹下的 flash_all.sh 脚本
+
+
+
+fastboot flash recovery twrp-3.2.3-0-cancro.img
+fastboot boot twrp-3.2.3-0-cancro.img
+## 如果 boot 不了 twrp-3.2.3-0-cancro.img， 先在bootloader模式升级一下基带！ (cm13BaseBandUpgrade.zip)
+## 同样，如果用了低版本的 twrp 刷不了 ROM，先升级基带，再用高版本的 twrp-3.2.3-0-cancro.img 来刷 ROM
+
+
+
+
+## 给应用有su权限: (Download addonsu zip from: https://download.mokeedev.com/extension.html#addonsu)
+adb push addonsu-installer-MK90.0-arm-signed.zip  /sdcard/
+adb reboot bootloader
+fastboot flash recovery twrp-3.3.0-0-cancro.img
+fastboot boot twrp-3.3.0-0-cancro.img
+## 然后点击 INSTALL 这个 zip (addonsu-installer-MK90.0-arm-signed.zip ) 就行了
+## 重开机，去开发者选项Root授权那里就可看到有‘应用与ADB’选项了。
+
+
+
+
+
+
+
+
+
+
+
+----------------- 错误集合 -----------------
+
+
+
+## https://blog.csdn.net/xuangelouzhu/article/details/112566485
+----------------------------------------
+error: prebuilts/clang/host/darwin-x86/: platform/prebuilts/clang/host/darwin-x86 checkout 86b722f7355235c0c1521d4420791280f91f2b59 
+error: Cannot checkout platform/prebuilts/clang/host/darwin-x86
+Checking out projects:  95% (678/709) platform/tools/external/fat32liberror: The following untracked working tree files would be overwritten by checkout:
+	BUILD
+	MODULE_LICENSE_APACHE2
+	OWNERS
+	PREBUILT
+	gradle-2.10-all.zip
+Please move or remove them before you switch branches.
+Aborting
+error: tools/external/gradle/: platform/tools/external/gradle checkout 67bfb32dc68fac519a27e93bcedb32dc6c060475 
+error: Cannot checkout platform/tools/external/gradle
+----------------------------------------
+
+pushd prebuilts/clang/host/ && rm -rf darwin-x86/ && popd
+pushd tools/external/ && rm -rf gradle/ && popd
+
+pushd .repo/projects/prebuilts/clang/host && rm -rf darwin-x86.git && popd
+pushd .repo/projects/tools/external && rm -rf gradle.git && popd
+
+pushd .repo/project-objects/platform/prebuilts/clang/host/ && rm -rf darwin-x86.git && popd
+pushd .repo/project-objects/platform/tools/external/ && rm -rf gradle.git && popd
+
+
+
+
+
+----------------------------------------
+Checking out projects:  83% (591/709) platform/prebuilts/clang-toolsfatal: Unable to create '/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock': File exists.
+----------------------------------------
+rm -rf '/AOSP/MoKee/mkp/prebuilts/clang/host/darwin-x86/.git/index.lock'
+pushd prebuilts/clang/host/darwin-x86/ && git status && popd
+## 一般这种情况都是 sync 不完整:
+
+pushd prebuilts/clang/host/ && rm -rf darwin-x86/ && popd
+pushd .repo/projects/prebuilts/clang/host && rm -rf darwin-x86.git/ && popd
+pushd .repo/project-objects/platform/prebuilts/clang/host/ && rm -rf darwin-x86.git && popd
+
+./ReRepoSync.sh
+
+
+
+
+----------------------------------------
+Aborting
+error: prebuilts/clang/host/darwin-x86/: platform/prebuilts/clang/host/darwin-x86 checkout 86b722f7355235c0c1521d4420791280f91f2b59 
+error: Cannot checkout platform/prebuilts/clang/host/darwin-x86
+Checking out projects:  99% (708/709), done.
+----------------------------------------
+pushd prebuilts/clang/host/darwin-x86/ && git status && popd
+## 同样情况都是 sync 不完整:
+
+pushd prebuilts/clang/host && rm -rf darwin-x86/ && popd
+pushd .repo/projects/prebuilts/clang/host/ && rm -rf darwin-x86.git/ && popd
+pushd .repo/project-objects/platform/prebuilts/clang/host/ && rm -rf darwin-x86.git && popd
+
+./ReRepoSync.sh
+
+
+
+
+----------------------------------------
+system/sepolicy/Android.mk:88: warning: Be careful when using the SELINUX_IGNORE_NEVERALLOWS flag. It does not work in user builds and using it will not stop you from failing CTS.
+[1025/1036] including vendor/mk-priv/prebuilt/mokee/app/Gallery2/Android.mk ...
+  End-of-central-directory signature not found.  Either this file is not
+  a zipfile, or it constitutes one disk of a multi-part archive.  In the
+  latter case the central directory and zipfile comment will be found on
+  the last disk(s) of this archive.
+unzip:  cannot find zipfile directory in one of vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk or
+        vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk.zip, and cannot find vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk.ZIP, period.
+----------------------------------------
+pushd vendor/mk-priv/
+git status
+## 发现有未 commit ???
+
+git checkout .
+
+## fatal: Unable to create 'vendor/mk-priv/.git/index.lock': File exists.
+## 发现 .git/index.lock 存在，checkout 不了，那么删除掉这个 .git/index.lock ，说明此 .git 是下载不完的,
+## ls -al vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk 发现 0 byte 果然如此
+## 删掉 working_tree/, .repo/projects/, .repo/project-objects 下对应的 git 目录
+
+pushd vendor/ && rm -rf mk-priv/ && popd
+pushd .repo/projects/vendor/ && rm -rf mk-priv.git/ && popd
+pushd .repo/project-objects/MoKee && rm -rf android_vendor_mk-priv.git && popd
+
+## 然后重新 sync 一次
+./ReRepoSync.sh
+
+
+## 成功同步后发现 ls -al vendor/mk-priv/prebuilt/mokee/app/Gallery2/Gallery2.apk 的大小不会再是 0 byte了
+
+
+
+
+
+----------------------------------------
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: protocol error: bad pack header
+platform/prebuilts/clang/host/darwin-x86:
+remote: Counting objects: 4954, done        
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: protocol error: bad pack header
+
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: early EOF
+fatal: unpack-objects failed
+platform/tools/external/gradle:
+remote: Counting objects: 20, done        
+remote: Finding sources: 100% (20/20)           
+error: RPC failed; curl 56 GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+fatal: The remote end hung up unexpectedly
+fatal: early EOF
+fatal: unpack-objects failed
+----------------------------------------
+## sync 过程中出现 RPC failed; curl 56 GnuTLS recv error (-110)
+## 查看一下 git 的设置:
+git config --system --list
+git config --global --list
+git config --local --list
+
+git config --global http.postBuffer 524288000
+git config --global https.postBuffer 524288000
+
+## 发现还是不行，改了成清华源再试试:
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+
+
+----------------------------------------
+  File "libcore/annotations/generate_annotated_java_files.py", line 34
+    print '// Do not edit; generated using libcore/annotations/generate_annotated_java_files.py'
+                                                                                               ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('// Do not edit)?
+  File "build/make/tools/merge-event-log-tags.py", line 51
+    except getopt.GetoptError, err:
+                             ^
+SyntaxError: invalid syntax
+----------------------------------------
+python --version ## Python 3.6.9
+## 转回 python 2.7 看看
+sudo update-alternatives --config python
+
+
+
+
+
+解决每上面的一个问题后:
+
+brunch cancro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- MoKee mko-mr1 -----------------------------------------
+
+
+repo init -u https://github.com/MoKee/android.git -b mko-mr1
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
+. build/envsetup.sh
+
+
+lunch cancro
+
+
+
+--------------------
+build/core/product_config.mk:238: *** Can not locate config makefile for product "cancro".  Stop.
+build/core/product_config.mk:238: *** Can not locate config makefile for product "cancro".  Stop.
+
+** Don't have a product spec for: 'cancro'
+** Do you have the right repo manifest?
+--------------------
+# 先不管, 用 brunch cancro 来编译，可以不管这个错误
+ 
+brunch cancro
+
+
+--------------------
+You are attempting to build with an unsupported JDK.
+
+Only an OpenJDK based JDK is supported.
+
+The required version is: 1.8.x
+--------------------
+# 换成open-jdk
+# https://jdk.java.net/java-se-ri/8
+
+curl -O https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_linux-x64_bin.tar.gz
+curl -O https://download.java.net/openjdk/jdk8u40/ri/openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz
+
+sudo mv openjdk-9.0.4_linux-x64_bin.tar.gz /usr/local/java/
+sudo mv openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz /usr/local/java/
+
+pushd /usr/local/java/
+
+sudo tar zxvf ./openjdk-9.0.4_linux-x64_bin.tar.gz
+sudo tar zxvf ./openjdk-8u40-b25-linux-x64-10_feb_2015.tar.gz
+
+sudo mv jdk-9.0.4 openjdk-9.0.4
+sudo mv java-se-8u40-ri openjdk-1.8.0_40
+
+
+------------ vim ~/.bash_aliases ------------
+
+# JAVA_HOME=/usr/local/java/jdk1.7.0_80
+# JAVA_HOME=/usr/local/java/jdk1.8.0_172
+# JAVA_HOME=/usr/local/java/openjdk-9.0.4
+JAVA_HOME=/usr/local/java/openjdk-1.8.0_40
+
+------------ vim ~/.bash_aliases ------------
+
+source ~/.bash_aliases
+java -version
+
+
+
+# Recovery 用 TWRP 3.2.3 版本
+# https://dl.twrp.me/cancro/
+fastboot flash recovery twrp-3.2.3-0-cancro.img && fastboot boot twrp-3.2.3-0-cancro.img
+
+
+# 去魔趣论坛 下载 addonsu-xxx.zip 包，进入 recovery 刷入此包。重启后进入开发者模式，就可以选择 应用与ADB 都ROOT了。  
+
+
+
+
+
+
+
+
+
+
+
+
+## 修改 libc 代码加入 jsonc，注意先编译出了 libjson.so & libjson.a 再修改 libc 源码来编译 libc。
+
+
+
+
+
+
+
+
+
+----------------------- gemini -----------------------
+
+. build/envsetup.sh && lunch gemini && brunch gemini
+
+
+
+
+
+
+
+
+
+
+
+----------------------- oneplus3 -----------------------
+
+. build/envsetup.sh
+
+breakfast oneplus3
+
+
+# 用 openjdk version "1.8.0_40"
+
+
+lunch oneplus3
+----------------------------------------- 错误 -----------------------------------------
+build/core/product_config.mk:238: *** Can not locate config makefile for product "oneplus3".  Stop.
+build/core/product_config.mk:238: *** Can not locate config makefile for product "oneplus3".  Stop.
+
+** Don't have a product spec for: 'oneplus3'
+** Do you have the right repo manifest?
+----------------------------------------- 错误 -----------------------------------------
+## lunch oneplus3 会出上面的错后，用 brunch oneplus3
+
+brunch oneplus3  
+
+
+
+
+# 打印指针: 
+  const uint8_t* const begin_ = dex_file.Begin();
+  LOG(ERROR) << "ClassLinker::DefineClass " << std::hex << /*static_cast<void*>(ptr)*/(void *)begin_ << " ,Size " << dex_file.Size() << " !";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------- Android Studio 配置浏览 MoKee mko-mr1 的源码  ----------------------------
+
+
+# 1. 在上面成功编译过一次之后
+
+
+# 2. 生成 idengen.jar 后执行 idegen.sh 来生成 android.ipr、android.iml 
+
+source build/envsetup.sh
+breakfast cancro
+mmm development/tools/idegen/				# 为了得到这个 out/host/linux-x86/framework/idegen.jar 这个 jar
+sudo env "PATH=$PATH" development/tools/idegen/idegen.sh
+# sudo development/tools/idegen/idegen.sh 	# 这 sh 其实就是执行上一步生成的 idengen.jar (这命令会出现下面的错误)
+
+
+Error:
+----------------------------------
+Couldn't find idegen.jar. Please run make first.
+----------------------------------
+# https://stackoverflow.com/questions/16582112/aosp-and-intellij-idea
+source build/envsetup.sh && cd development/tools/idegen && croot
+# then try again
+
+
+
+
+# 出现错误: Exception in thread "main" java.lang.UnsupportedClassVersionError: Main : Unsupported major.minor version 52.0
+
+# 修改脚本在 development/tools/idegen/idegen.sh 加入 java -version 命令，发现执行 idegen.sh 的jvm版本与我们外部命令 java -version 是不一致的:
+java version "1.7.0_95"
+OpenJDK Runtime Environment (IcedTea 2.6.4) (7u95-2.6.4-3)
+OpenJDK 64-Bit Server VM (build 24.95-b01, mixed mode)
+Exception in thread "main" java.lang.UnsupportedClassVersionError: Main : Unsupported major.minor version 52.0
+
+# 而我们编译的是用:
+java -version
+openjdk version "1.8.0_40"
+OpenJDK Runtime Environment (build 1.8.0_40-b25)
+OpenJDK 64-Bit Server VM (build 25.40-b25, mixed mode)
+
+# 去掉 sudo, 只用 development/tools/idegen/idegen.sh 版本一致了，但全出现很多 Permission denied, 访问不了 /sys/kernel/debug 这个目录 
+# 所以，正确的应该用:
+
+sudo env "PATH=$PATH" development/tools/idegen/idegen.sh
+
+
+
+
+
+
+
+# 3. Android Studio -> File -> Open -> 选择刚刚生成的android.ipr就好了
+
+Android Studio -> Help -> Edit Custom VM Options:
+-Xms1024m
+-Xmx4096m
+
+
+Android Studio -> Help -> Edit Custom Properties:
+idea.max.intellisense.filesize=5000
+
+
+Android Studio -> File -> Project Structure -> Project -> Select one SDK 
+
+Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 把最底下的 <Module source> 移到最前，那么就会优先跳到源码上，而不是反编前面jar的类
+Android Studio -> File -> Project Structure -> Modules -> Dependencies -> 又或者把所有jar都选择，然后点-号全删掉
+
+
+// Android Studio 提示 Inotify Watches Limit！ 
+// 参考: https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
+sudo vim /etc/sysctl.d/idea.conf
+--------- contents ---------
+fs.inotify.max_user_watches = 8388608
+--------- contents ---------
+sudo sysctl -p --system
+
+
+// https://www.2cto.com/kf/201710/692109.html
+// https://wiki.lineageos.org/import-android-studio-howto.html
+// https://shuhaowu.com/blog/setting_up_intellij_with_aosp_development.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 换一个定制的repo吧: https://bbs.mokeedev.com/t/topic/21
+
+export USE_CCACHE=1
+export CCACHE_SIZE=200G
+export WITH_SU=true
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
+
+
+------------------------- repo_sync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- repo_sync.sh -------------------------
+chmod 777 repo_sync.sh
+./repo_sync.sh
+
+
+
+## mko 与 mkq 都有 mr1 版本发布，所又只编带 mr1 的，不带 mr1 的 mko 与 mkq 就不要编了，别人不维护，难搞，缺失些库。
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 mkm __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mkm --depth=1
+
+repo sync 
+
+
+---------------------------
+## 有个库拉不了：
+<project path="hardware/qcom/wlan-caf" name="MoKee/android_hardware_qcom_wlan" groups="qcom_wlan" revision="mkm-caf" />
+## 改成从 LineageOS 拉的
+<project path="hardware/qcom/wlan-caf" name="LineageOS/android_hardware_qcom_wlan" groups="qcom_wlan" revision="cm-13.0-caf" />
+
+error: hooks is different in /AOSP/MoKee/mkm/.repo/projects/hardware/qcom/wlan-caf.git vs /AOSP/MoKee/mkm/.repo/project-objects/LineageOS/android_hardware_qcom_wlan.git
+Retrying clone after deleting /AOSP/MoKee/mkm/.repo/projects/hardware/qcom/wlan-caf.git
+---------------------------
+
+export LC_ALL=C
+
+. build/envsetup.sh
+
+breakfast gemini
+
+---------------------------
+including vendor/mk/vendorsetup.sh
+build/core/product_config.mk:234: *** Can not locate config makefile for product "mk_gemini".  Stop.
+Device gemini not found. Attempting to retrieve device repository from MoKee Open Source Github (https://github.com/MoKee).
+Found repository: android_device_xiaomi_gemini
+Traceback (most recent call last):
+  File "build/tools/roomservice.py", line 253, in <module>
+    default_revision = get_default_revision()
+  File "build/tools/roomservice.py", line 114, in get_default_revision
+    d = m.findall('default')[0]
+IndexError: list index out of range
+build/core/product_config.mk:234: *** Can not locate config makefile for product "mk_gemini".  Stop.
+
+** Don't have a product spec for: 'mk_gemini'
+** Do you have the right repo manifest?
+---------------------------
+# 新版本 repo 问题
+# build/tools/roomservice.py 的 .repo/manifest.xml 全部都包含了 .repo/manifests/default.xml
+# 把上面脚本全部改成就完事了: .repo/manifest.xml  -> .repo/manifests/default.xml 
+vim build/tools/roomservice.py
+:%s/\.repo\/manifest\.xml/\.repo\/manifests\/default\.xml/
+# wq 退出
+
+---------------------------
+pngquant is not installed! Builds will be larger!
+---------------------------
+sudo apt install pngquant
+
+
+brunch gemini
+
+
+
+---------------------------
+ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v20_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v14_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
+---------------------------
+# 搞错了方法，不是 Jack server 的问题，而是 curl 的问题，毕竟以前用的 curl 版本比较低嘛
+# 是 curl 的问题，因为 curl 的版本比较高，低版本时才有 --no-proxy， curl --help 发现只有 --noproxy
+# 搜索 "Communication error with Jack server" 出现在以下两文件, 把两文件：
+prebuilts/sdk/tools/jack
+prebuilts/sdk/tools/jack-admin
+# 的 --no-proxy 改成 --noproxy
+# 还有些 out 文件:
+out/host/linux-x86/bin/jack
+out/host/linux-x86/bin/jack-admin
+out/host/linux-x86/obj/EXECUTABLES/jack_intermediates/jack
+out/host/linux-x86/obj/EXECUTABLES/jack-admin_intermediates/jack-admin:
+
+
+
+--------------------------
+ERROR: /home/ubuntu/Disk6T/Workspaces/AOSP/MoKee/mkm/packages/providers/MediaProvider/src/com/android/providers/media/MediaProvider.java:4145: The method eraseMiniThumb(long) is undefined for the type MiniThumbFile
+---------------------------
+# 第一种方法： 按他说的，注释掉调用 https://bbs.mokeedev.com/t/topic/17256
+
+# 第一种方法： 搜索 eraseMiniThumb 然后查看新提交 https://github.com/MoKee/android_frameworks_base/commit/6d2096f3889d38da60099b1b5678347de4f042bf
+pushd frameworks/base/
+curl -O https://github.com/MoKee/android_frameworks_base/commit/6d2096f3889d38da60099b1b5678347de4f042bf.patch
+git apply 6d2096f3889d38da60099b1b5678347de4f042bf.patch
+# 发现在 patch 文件 media/java/android/media/MediaScanner.java 的修改对应不上
+# 没事，改动不多，手动改吧，在 media/java/android/media/MediaScanner.java 注释掉commit里减去的代码 
+# 其实也就是在 MediaScanner.java 里 注释掉 实例私有变量 mThumbsUri 及其调用，注释掉 实例私有方法 pruneDeadThumbnailFiles 及其实调用 
+# 然后删除 patch 文件中关于 MediaScanner.java 的修改重新 git apply
+popd
+# 重编后最终编译成功
+
+
+
+-------------------- 不要设置 false, 这里只是参考 --------------------
+# https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
+# make ANDROID_COMPILE_WITH_JACK:=false
+
+vim build/core/combo/javac.mk
+ANDROID_COMPILE_WITH_JACK := false
+
+---------------------------
+frameworks/base/packages/StatementService/src/com/android/statementservice/DirectStatementService.java:149: error: cannot access OkCacheContainer
+            mHttpResponseCache = HttpResponseCache.install(httpCacheDir, HTTP_CACHE_SIZE_IN_BYTES);
+                                                  ^
+  class file for com.android.okhttp.OkCacheContainer not found
+1 error
+---------------------------
+# https://surepy.github.io/My-ArchLinux-and-LineageOS-13-0-building-Experience/
+
+---------------------------
+packages/providers/MediaProvider/src/com/android/providers/media/MediaProvider.java:4145: error: cannot find symbol
+                                        imageMicroThumbs.eraseMiniThumb(id);
+---------------------------
+# 重新把上面 ANDROID_COMPILE_WITH_JACK := false 改为 true
+# 把上面 curl 命令解决了就没这些事了
+--------------------
+-------------------- 不要设置 false, 这里只是参考 --------------------
+
+
+
+export LC_ALL=C && . build/envsetup.sh && breakfast cancro && brunch cancro
+export LC_ALL=C && . build/envsetup.sh && breakfast gemini && brunch gemini
+export LC_ALL=C && . build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
+
+
+
+
+
+
+
+__________________________________ 重新 mkn-mr1 __________________________________
+
+## 这个也是很多缺失些库，不拉了。
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 mko-mr1 __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mko-mr1 --depth=1
+
+repo sync 
+
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 mkp __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mkp --depth=1
+
+repo sync
+
+--------------------------
+java -version: java version "1.8.0_172"
+python --version: Python 2.7.18
+--------------------------
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: 
+. build/envsetup.sh && breakfast cancro && brunch cancro
+. build/envsetup.sh && breakfast gemini && brunch gemini
+. build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 mkq-mr1 __________________________________
+
+repo init -u https://github.com/MoKee/android.git -b mkq-mr1 --depth=1
+
+repo sync
+
+. build/envsetup.sh
+
+lunch cancro
+
+brunch cancro
+
+一次性成功
+
+以后就: . build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------
+Checking out:  9% (61/630) device/google/atverror: Cannot checkout LineageOS/android_external_okhttp: ManifestInvalidRevisionError: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
+Checking out: 25% (160/630) platform/external/liboggerror: in `sync --force-sync --current-branch -j 4`: revision refs/heads/mko-mr1 in LineageOS/android_external_okhttp not found
+----------------------------
+## 它用了　LineageOS/android_external_okhttp　的git库，但人家没有 refs/heads/mko-mr1 分支，改一下
+.repo/manifests/default.xml
+## 搜索 LineageOS, 加上　revision="lineage-15.1" : 
+<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" />
+<project path="external/okhttp" name="LineageOS/android_external_okhttp" groups="pdk" revision="lineage-15.1" />
+## 重新 repo sync
+
+
+
+
+
+. build/envsetup.sh 
+lunch gemini
+brunch gemini
+
+-----------------------------------------------------
+e/ubuntu/Workspaces/AOSP/MoKee/mkp/out/target/common/obj/APPS/ConfigPanel_intermediates/src/R.stamp )"
+device/xiaomi/msm8996-common/configpanel/res/values/styles.xml:30: error: resource layout/preference_category_material_settings (aka org.mokee.settings.device:layout/preference_category_material_settings) not found.
+device/xiaomi/msm8996-common/configpanel/res/values/styles.xml:41: error: resource layout/preference_material_settings (aka org.mokee.settings.device:layout/preference_material_settings) not found.
+error: failed linking references
+-----------------------------------------------------
+# 发现是 MoKee/android_packages_resources_devicesettings 没 sync 成功
+# 删掉 .repo/projects/, .repo/project-objects/ 下对应的 .git 及 .repo/local_manifests/roomservice.xml 中的 itme.
+# 重新 breakfast gemini 拉一下，拉完后看看 packages/resources/devicesettings/ 存不存在 
+
+
+
+
+
+
+-----------------------------------------------------
+[  0% 178/20545] RenderScript: Snap <= packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs
+FAILED: /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp 
+/bin/bash -c "(rm -rf /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript )
+...
+(touch /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp )"
+/bin/bash: line 1: 18598 Bus error               (core dumped) ( ASAN_OPTIONS=detect_leaks=0:detect_container_overflow=0 /AOSP/MoKee/mko-mr1/out/host/linux-x86/bin/llvm-rs-cc -o /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/res/raw -p /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript/src -d /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/renderscript -a /AOSP/MoKee/mko-mr1/out/target/common/obj/APPS/Snap_intermediates/src/RenderScript.stamp -MD -target-api 23 -Wall -Werror -I external/clang/lib/Headers -I frameworks/rs/script_api/include packages/apps/Snap/rs/YuvToRgb.rs packages/apps/Snap/rs/rotator.rs )
+-----------------------------------------------------
+
+ulimit -c unlimited
+export LC_ALL=C
+echo $USE_CCACHE
+echo $CCACHE_DIR
+
+export CCACHE_SIZE=50G
+du -h -d 1 /home/ubuntu/.ccache/
+prebuilts/misc/linux-x86/ccache/ccache --help
+prebuilts/misc/linux-x86/ccache/ccache -s
+rm -rf /home/ubuntu/.ccache/*
+prebuilts/misc/linux-x86/ccache/ccache -M 50G
+prebuilts/misc/linux-x86/ccache/ccache -s
+
+
+
+
+
+
+-----------------------------------------------------
+[ 87% 81769/92955] //frameworks/rs:libRS header-abi-linker libRS.so.lsdump
+Couldn't find end of symbol
+[ 88% 82098/92955] //frameworks/compile/libbcc/bcinfo:libbcinfo header-abi-linker libbcinfo.so.lsdump
+FAILED: /AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump 
+prebuilts/build-tools/linux-x86/bin/header-abi-linker -o /AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump -v frameworks/compile/libbcc/bcinfo/libbcinfo.map -arch arm64 -api current -Iframeworks/compile/libbcc/bcinfo/include @/AOSP/MoKee/mko-mr1/out/soong/.intermediates/frameworks/compile/libbcc/bcinfo/libbcinfo/android_arm64_armv8-a_kryo_shared_core/libbcinfo.so.lsdump.rsp 
+[libprotobuf ERROR external/protobuf/src/google/protobuf/text_format.cc:274] Error parsing text-format abi_dump.TranslationUnit: 189563:327: Unexpected end of string.
+[libprotobuf ERROR external/protobuf/src/google/protobuf/text_format.cc:274] Error parsing text-format abi_dump.TranslationUnit: 189563:327: Expected identifier.
+Failed to link elements
+[ 88% 82106/92955] Docs droiddoc: /AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
+DroidDoc took 25 sec. to write docs to /AOSP/MoKee/mko-mr1/out/target/common/docs/system-api-stubs
+[ 88% 82107/92955] Docs droiddoc: /AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
+DroidDoc took 25 sec. to write docs to /AOSP/MoKee/mko-mr1/out/target/common/docs/api-stubs
+ninja: build stopped: subcommand failed.
+11:57:03 ninja failed with: exit status 1
+-----------------------------------------------------
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------
+The boot animation could not be generated as
+ImageMagick is not installed in your system.
+ 
+Please install ImageMagick from this website:
+https://imagemagick.org/script/binary-releases.php
+**********************************************
+./vendor/mk/bootanimation/Android.mk:49: error: stop.
+21:17:47 ckati failed with: exit status 1
+
+#### failed to build some targets (50 seconds) ####
+-----------------------------------------------------
+sudo apt-get install imagemagick
+
+
+
+
+
+-----------------------------------------------------
+FAILED: /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/constants/src/gen/cpp/generate_constants.o 
+/bin/bash -c "PWD=/proc/self/cwd  prebuilts/clang/host/linux-x86/clang-4053586/bin/clang++  -I device/xiaomi/msm8996-common/include -I external/conscrypt -I /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates -I /AOSP/MoKee/mko-mr1/out/host/linux-x86/gen/EXECUTABLES/conscrypt_generate_constants_intermediates -I libnativehelper/include_deprecated \$(cat /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/import_includes)  -I system/core/include -I system/media/audio/include -I hardware/libhardware/include -I hardware/libhardware_legacy/include -I hardware/ril/include -I libnativehelper/include -I frameworks/native/include -I frameworks/native/opengl/include -I frameworks/av/include  -c  -fno-exceptions -Wno-multichar -Wa,--noexecstack -fPIC -no-canonical-prefixes -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -O2 -g -fno-strict-aliasing --gcc-toolchain=prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8 --sysroot prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/sysroot -fstack-protector-strong -m64 -DANDROID -fmessage-length=0 -W -Wall -Wno-unused -Winit-self -Wpointer-arith -DNDEBUG -UDEBUG -fdebug-prefix-map=/proc/self/cwd= -D__compiler_offsetof=__builtin_offsetof -Werror=int-conversion -Wno-reserved-id-macro -Wno-format-pedantic -Wno-unused-command-line-argument -fcolor-diagnostics -Wno-expansion-to-defined -fdebug-prefix-map=\$PWD/=   -target x86_64-linux-gnu -Bprebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin  -Wsign-promo -Wno-inconsistent-missing-override -Wno-null-dereference -D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS -Wno-thread-safety-negative -isystem prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/include/c++/4.8 -isystem prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/include/c++/4.8/backward -isystem prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/include/c++/4.8/x86_64-linux -std=gnu++14  -fPIE -D_USING_LIBCXX -nostdinc++  -Werror=int-to-pointer-cast -Werror=pointer-to-int-cast -Werror=address-of-temporary -Werror=return-type   -MD -MF /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/constants/src/gen/cpp/generate_constants.d -o /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/EXECUTABLES/conscrypt_generate_constants_intermediates/constants/src/gen/cpp/generate_constants.o external/conscrypt/constants/src/gen/cpp/generate_constants.cpp"
+prebuilts/clang/host/linux-x86/clang-4053586/bin/clang++.real: error while loading shared libraries: libncurses.so.5: cannot open shared object file: No such file or directory
+[  0% 147/92901] Notice file: external/conscrypt/NOTICE -- /AOSP/MoKee/mko-mr1/out/host/linux-x86/obj/NOTICE_FILES/src/bin/conscrypt_generate_constants.txt
+ninja: build stopped: subcommand failed.
+-----------------------------------------------------
+sudo apt-get install -y libncurses5 libncurses5-dev lib32ncurses5-dev
+## sudo apt-get install -y build-essential maven gnupg pngcrush schedtool g++-multilib gcc-multilib ## 多装了 T_T
+
+
+
+
+-----------------------------------------------------
+FAILED: /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/imx298_semco_chromatix.xml 
+/bin/bash -c "(xmllint vendor/xiaomi/gemini/proprietary/etc/camera/imx298_semco_chromatix.xml >/dev/null ) && (mkdir -p /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/ ) && (rm -f /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/imx298_semco_chromatix.xml ) && (cp vendor/xiaomi/gemini/proprietary/etc/camera/imx298_semco_chromatix.xml /AOSP/MoKee/mko-mr1/out/target/product/gemini/system/etc/camera/imx298_semco_chromatix.xml )"
+/bin/bash: xmllint: command not found
+-----------------------------------------------------
+sudo apt-get install libxml2 libxml2-utils
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 这是编 mkm 的这些比较低的版本出现的问题:
+-----------------------------------------------------
+flex-2.5.39: loadlocale.c:130: _nl_intern_locale_data: Assertion `cnt < (sizeof (_nl_value_type_LC_TIME) / sizeof (_nl_value_type_LC_TIME[0]))' failed.
+flex-2.5.39: loadlocale.c:130: _nl_intern_locale_data: Assertion `cnt < (sizeof (_nl_value_type_LC_TIME) / sizeof (_nl_value_type_LC_TIME[0]))' failed.
+-----------------------------------------------------
+export LC_ALL=C
+
+
+-----------------------------------------------------
+[ERROR] Plugin org.apache.maven.plugins:maven-dependency-plugin:2.10 or one of its dependencies could not be resolved: Failed to read artifact descriptor for org.apache.maven.plugins:maven-dependency-plugin:jImport includes file: /AOSP/MoKee/mkm/out/target/product/gemini/obj/EXECUTABLES/btsnoop_intermediates/import_includes
+ar:2.10: Could not transfer artifact org.apache.maven.plugins:maven-dependency-plugin:pom:2.10 from/to central (https://repo.maven.apache.org/maven2): Transfer failed for https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-dependency-plugin/2.10/maven-dependency-plugin-2.10.pom: java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty -> [Help 1]
+[ERROR] 
+Export includes file: system/bt/tools/btsnoop_dump/Android.mk -- /AOSP/MoKee/mkm/out/target/product/gemini/obj/EXECUTABLES/btsnoop_intermediates/export_includes
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginResolutionException
+-----------------------------------------------------
+# 按此描述: https://stackoverflow.com/q/4764611
+# 现在用着是 openjdk8，把 PATH 换成 sun/oracle jdk8 就行了
+JAVA_HOME=$O_HOME/Workspaces/JDK/jdk-8u172-linux-x64
+JRE_HOME=$JAVA_HOME/jre
+JAVA_BIN=$JAVA_HOME/bin
+CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME JAVA_BIN CLASSPATH
+PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+which java
+
+
+-----------------------------------------------------
+ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v20_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
+make: *** [build/core/prebuilt_internal.mk:324: /AOSP/CyanogenMod/cm-13.0/out/target/common/obj/JAVA_LIBRARIES/sdk_v14_intermediates/classes.jack] Error 255
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+curl: option --no-proxy: used '--no-' for option that isn't a boolean
+curl: try 'curl --help' or 'curl --manual' for more information
+ERROR: Communication error with Jack server (2)
+-----------------------------------------------------
+# 是 curl 的问题，因为 curl 的版本比较高，低版本时才有 --no-proxy， curl --help 发现只有 --noproxy
+# 把文件：
+AOSP/CyanogenMod/cm-13.0/prebuilts/sdk/tools/jack
+AOSP/CyanogenMod/cm-13.0/prebuilts/sdk/tools/jack-admin
+# 的 --no-proxy 改成 --noproxy
+
+
+export JACK_JAR=./out/host/linux-x86/framework/jack.jar
+./out/host/linux-x86/bin/jack-admin stop-server
+./out/host/linux-x86/bin/jack-admin start-server
+
+export JACK_JAR=./prebuilts/sdk/tools/jack.jar
+prebuilts/sdk/tools/jack-admin kill-server
+prebuilts/sdk/tools/jack-admin start-server
+
+prebuilts/sdk/tools/jack-admin server-log
+# 然后 tail -f -n 500 打开输出的 log 文件，发现在 brunch gemini 不久之后就 Shutdowning admin connection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ mkr-mr1 __________________________________
+
+mkdir mkr-mr1 && cd mkr-mr1
+
+repo init -u https://github.com/MoKee/android.git -b mkr-mr1 --depth=1
+
+./ReRepoSync.sh
+
+
+
+
+
+
+
+

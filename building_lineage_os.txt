@@ -1,0 +1,2755 @@
+
+
+----------------------------------------- LineageOS -----------------------------------------
+
+
+
+
+mkdir LineageOS && cd LineageOS/
+
+
+
+
+
+------------------------> lineage-15.0 <------------------------
+
+
+mkdir lineage-15.0 && cd lineage-15.0/
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
+
+
+
+
+
+
+
+
+breakfast oneplus3
+------------------------------
+including vendor/lineage/vendorsetup.sh
+build/core/product_config.mk:248: *** Can not locate config makefile for product "lineage_oneplus3".  Stop.
+Device oneplus3 not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Found repository: android_device_oneplus_oneplus3
+Traceback (most recent call last):
+  File "vendor/lineage/build/tools/roomservice.py", line 258, in <module>
+    default_revision = get_default_revision()
+  File "vendor/lineage/build/tools/roomservice.py", line 115, in get_default_revision
+    d = m.findall('default')[0]
+IndexError: list index out of range
+build/core/product_config.mk:248: *** Can not locate config makefile for product "lineage_oneplus3".  Stop.
+build/core/product_config.mk:248: *** Can not locate config makefile for product "lineage_oneplus3".  Stop.
+
+** Don't have a product spec for: 'lineage_oneplus3'
+** Do you have the right repo manifest?
+------------------------------
+# 看一下 cat .repo/manifest.xml , 然后
+# 把 roomservice.py 脚本的 .repo/manifest.xml 全部改成 .repo/manifests/default.xml
+vim vendor/lineage/build/tools/roomservice.py
+:%s/\.repo\/manifest\.xml/\.repo\/manifests\/default\.xml/
+# wq 退出
+
+
+
+
+
+
+
+
+
+
+
+------------------------> lineage-15.1 <------------------------
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.1
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync -j8
+
+. build/envsetup.sh
+
+breakfast oneplus3
+
+// https://wiki.lineageos.org/devices/oneplus3/build
+// 把 ./extract-files.sh 的步骤用以下操作代替
+vim .repo/local_manifests/roomservice.xml
+## TheMuppets 的但这会下载许多无关的机型， 用 MinimalAndroidVendor 的吧
+----- vim -----
+<!-- <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-15.1" /> -->
+<project name="MinimalAndroidVendor/proprietary_vendor_oneplus3" path="vendor/oneplus/oneplus3" remote="github" revision="lineage-15.1" />
+----- vim -----
+## 推荐用 svn
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-15.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+
+or gemini
+----- vim -----
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
+----- vim -----
+
+repo sync --force-sync
+
+
+brunch oneplus3
+
+
+
+# 先刷底包，再刷Rom
+https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
+https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable5.0.8_Firmware_Modem_OnePlus3.zip
+
+# 完全root, 把zip包push到sdcard上，进入Recovery Installn刷入。重启后，可以adb root 和 开发者选项->root->应用与ADB
+https://download.lineageos.org/extras
+https://iso.mirrors.ustc.edu.cn/lineageos/su/20190709/addonsu-15.1-arm64-signed.zip
+
+
+————————————————————————————————— 一加3刷机步骤 —————————————————————————————————
+A.进入Recovery正确步骤:
+
+进入原生系统　-> 点击６次版本号 -> 打开开发者模式 -> 开发者选项　-> 勾上　OEM解锁　及　允许ADB调试　-> 等待驱动安装完毕
+-> 进入　bootloader: adb reboot bootloader
+-> sh fastboot_oem_unlock.sh (fastboot oem unlock)
+-> 按音量键选择YES，按开机键来确定　解锁bootloader -> 按音量键进入Options menu -> 选择　fastboot, 按开机键来确定进入 bootloader
+-> sh fastboot_flash_rec.sh (fastboot flash recovery twrp-3.3.1-0-oneplus3.img && fastboot boot twrp-3.3.1-0-oneplus3.img)
+-> 自动重启进入TWRP Recovery -> 此时自动进入的有mount错误，手动进入一遍Recovery, 点击Reboot-Recovery -> 
+-> 按音量键进入Options menu -> Recovery, 按开机键来确定进入 Recovery
+
+B.在Recovery刷机步骤:
+
+1. 
+Wipe -> Format Data -> yes
+
+2. 
+sh adb_push_in_rec.sh 
+(adb push Stable9.0.3_Firmware_Modem_OnePlus3.zip /sdcard/ && adb push addonsu-16.0-arm64-signed.zip /sdcard/ && adb push lineage-16.0-20191012-UNOFFICIAL-oneplus3.zip /sdcard/)
+
+3.
+Install -> StableXXX.zip (先刷底包)
+Install -> lineageXXX.zip (再刷Rom包)
+Install -> addonsuXXX.zip (最后刷SU包)
+
+4. 
+刷完后　-> Wipe Cache/Dalvik -> Reboot System (Do Not Install TWRP APP)
+————————————————————————————————— 一加3刷机步骤 —————————————————————————————————
+
+
+
+
+
+
+
+
+make
+make all
+
+
+# 单独编译
+hmm
+make clean-framework
+mmm frameworks/base/:framework
+[100% 2/2] Install: xxx/out/target/product/oneplus3/system/framework/framework.jar
+
+
+// Than push all modified/complied to device
+export OUT=__path_to_your_aosp_dir__/out/target/product/oneplus3
+__modify_time_string__="Nov 12"
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/
+
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/
+
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+
+i.e.
+__modify_time_string__="May 31"
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+
+
+adb shell sync
+adb shell sync system
+
+
+
+# 编译(system/framework/)所有，包括 .art, .oat, .vdex 
+make update-api
+pushd frameworks/base/ && mma && popd
+mmma frameworks/base/
+
+
+
+
+
+# 单独编译 libandroid_runtime.so
+make clean-libandroid_runtime
+mmm frameworks/base/core/jni/
+
+
+
+
+----------------------------------------- Error -----------------------------------------
+javadoc: error - In doclet class com.google.doclava.Doclava,  method start has thrown an exception java.lang.reflect.InvocationTargetException
+com.sun.tools.javac.code.Symbol$CompletionFailure: class file for com.android.okhttp.ConnectionPool not found
+1 error
+----------------------------------------- Error -----------------------------------------
+因为里面sh执行导致PATH不一样JAVA版本不一样。为系统下载openjdk8, 并且用上这个openjdk8，参考:
+// https://forum.xda-developers.com/oneplus-3/how-to/guide-complete-guide-building-t3477198/post70646310#post70646310
+
+sudo add-apt-repository ppa:openjdk-r/ppa
+sudo apt-get update
+sudo apt-get install openjdk-7-jdk
+sudo apt-get install openjdk-8-jdk
+sudo update-alternatives --config java
+
+ls -al /usr/lib/jvm/
+
+vim ~/.bash_aliases
+JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+
+
+
+----------------------------------------- Error -----------------------------------------
+.....
+/bin/bash -c "(build/core/tasks/check_boot_jars/check_boot_jars.py build/core/tasks/check_boot_jars/package_whitelist.txt  lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/core-oj_intermediates/classes.jar
+.....
+Error: lineage-15.1/out/target/common/obj/JAVA_LIBRARIES/telephony-ext_intermediates/classes.jar contains class file org/codeaurora/internal/IDepersoResCallback.class, which is not in the whitelist
+----------------------------------------- Error -----------------------------------------
+
+----------------------------------------- Error -----------------------------------------
+.....
+build/core/tasks/check_boot_jars/check_boot_jars.py build/core/tasks/check_boot_jars/package_whitelist.txt
+.....
+Error: out/target/common/obj/JAVA_LIBRARIES/org.ifaa.android.manager_intermediates/classes.jar contains class file org/ifaa/android/manager/IFAAManagerFactory$1.class, which is not in the whitelist
+----------------------------------------- Error -----------------------------------------
+
+# 往 build/make/core/tasks/check_boot_jars/package_whitelist.txt 追加:
+org\.codeaurora\.internal
+org\.ifaa\.android\.manager
+# 但后面也有，干脆改 check_boot_jars.py 不让它检查算了: 
+build/core/tasks/boot_jars_package_check.mk : ifneq ($(SKIP_BOOT_JARS_CHECK),true) -> ifneq ($(SKIP_BOOT_JARS_CHECK),)
+
+
+
+
+
+boot.img: make bootimage
+system.img: make snod (snod: System NO Dependent)
+
+
+adb reboot bootloader
+fastboot boot boot.img          # 暂时
+fastboot flash boot boot.img    # 永久替换了
+fastboot reboot
+
+
+
+
+
+
+## Android Studio To View Sources
+
+source build/envsetup.sh && breakfast oneplus3 && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+## 不設置 Project SDK 了，會導致 indexing 很久並且佔據大量內存．或者把　android.ipr　内容的　project-jdk-name="" project-jdk-type=""　设置为空．
+
+
+
+
+
+
+_________________________________________________________________________
+
+模块 	make命令 	mmm命令
+init 	make init 	mmm system/core/init
+zygote 	make app_process 	mmm frameworks/base/cmds/app_process
+system_server 	make services 	mmm frameworks/base/services
+java framework 	make framework 	mmm frameworks/base
+framework资源 	make framework-res 	mmm frameworks/base/core/res
+jni framework 	make libandroid_runtime 	mmm frameworks/base/core/jni
+binder 	make libbinder 	mmm frameworks/native/libs/binder
+_________________________________________________________________________
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 16.0 -----------------------------------------
+
+
+mkdir lineage-16.0 && cd lineage-16.0/
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-16.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync --force-sync
+
+
+---------------------- 专有文件 ----------------------
+// https://wiki.lineageos.org/devices/oneplus3/build
+// 把 ./extract-files.sh 的步骤用以下操作代替
+mkdir .repo/local_manifests
+vim .repo/local_manifests/roomservice.xml
+----- vim -----
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-16.0" />
+</manifest>
+----- vim -----
+repo sync --force-sync
+
+## 但推荐用 svn， 因为上面的下载的包太大，有各种不需要的机型
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-16.0/oneplus3/ ./vendor/oneplus/oneplus3
+
+---------------------- 专有文件 ----------------------
+
+
+. build/envsetup.sh
+
+breakfast oneplus3
+
+export WITH_SU=true 	## 可选, 编译时带上 su 就不需要再刷 addonsu 了
+
+## 一次性方便复制的: . build/envsetup.sh && breakfast oneplus3 && export WITH_SU=true
+
+brunch oneplus3
+
+
+
+## 最终一次性编译成功!!!
+## 其实 JDK 版本也不用换, 已经在 prebuilts/jdk/jdk9/linux-x86 了
+
+## 修改源码后: make update-api
+
+## 1. 底包
+https://www.celsoazevedo.com/files/android/
+https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
+https://www.celsoazevedo.com/files/android/oneplus3t-modem-firmware/
+
+https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/
+一加3: https://f.celsoazevedo.com/file/cfiles/oneplus3-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus3.zip
+一加3T: https://f.celsoazevedo.com/file/cfiles/oneplus3t-modem-firmware/Stable9.0.3_Firmware_Modem_OnePlus_3T.zip
+## 2. addonsu
+https://download.lineageos.org/extras
+https://mirrorbits.lineageos.org/su/20190709/addonsu-16.0-arm64-signed.zip
+## 3. recovery image
+https://twrp.me/oneplus/oneplusthree.html
+https://dl.twrp.me/oneplus3/twrp-3.3.1-0-oneplus3.img.html
+
+# 刷TWRP后自动重启进入TWRP Recovery有Mount问题，手动重启再进入一遍: 先刷底包 -> 再刷Rom包 -> 最后刷SU包
+
+
+
+
+
+
+
+## Android Studio To View Sources
+
+source build/envsetup.sh && breakfast oneplus3 && make idegen && development/tools/idegen/idegen.sh
+
+
+--------------------------------------------------------------------------------------------------
+## 执行命令出现错误: development/tools/idegen/idegen.sh 
+find: ‘out/target/product/oneplus3/obj/PACKAGING/target_files_intermediates/lineage_oneplus3-target_files-eng.ubuntu/RECOVERY/RAMDISK/d’: Permission denied
+find: ‘out/target/product/oneplus3/obj/PACKAGING/target_files_intermediates/lineage_oneplus3-target_files-eng.ubuntu/BOOT/RAMDISK/d’: Permission denied
+find: ‘out/target/product/oneplus3/root/d’: Permission denied
+find: ‘out/target/product/oneplus3/recovery/root/d’: Permission denied
+Read excludes: 43ms
+Traversed tree: 148649ms
+
+## 发现这几个路径是软链，都指向　/sys/kernel/debug
+## 进入　su 后，发现　chmod a+r -R /sys/kernel/debug　还是不能完全解决, 可能要给到x/w权限, 于是不管它了, 毕竟修改到系统级的东西．
+--------------------------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------------------------
+## ERROR: Users are strongly recommended to migrate to the new APIs.
+
+## 原因是 Ubuntu 18.04 一些环境及开发包没装好: 
+sudo apt install -y build-essential ccache gnupg flex bison gperf zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc 
+--------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+### 往 libc 里添加 export 函数的时候:
+
+## 1. 先往 bionic/libc/libc.map.txt 加入你的 [your_export_function_name]
+## 2. 然后 python bionic/libc/tools/genversion-scripts.py 会自动生成各 arch 的 map 文件
+
+
+mmm showcommands bionic/libc/
+--------------------------------------------------------------------------------------------------
+******************************************************
+error: VNDK library: libc's ABI has EXTENDING CHANGES Please check compatiblity report at : out/soong/.intermediates/bionic/libc/libc/android_arm64_armv8-a_kryo_core_shared/libc.so.abidiff
+******************************************************
+ ---- Please update abi references by running platform/development/vndk/tools/header-checker/utils/create_reference_dumps.py -l libc ----
+--------------------------------------------------------------------------------------------------
+
+
+development/vndk/tools/header-checker/utils/create_reference_dumps.py -l libc
+--------------------------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "development/vndk/tools/header-checker/utils/create_reference_dumps.py", line 224, in <module>
+    main()
+  File "development/vndk/tools/header-checker/utils/create_reference_dumps.py", line 210, in main
+    targets = [Target(True, product), Target(False, product)]
+  File "development/vndk/tools/header-checker/utils/create_reference_dumps.py", line 29, in __init__
+    self.arch = build_vars[1]
+IndexError: list index out of range
+--------------------------------------------------------------------------------------------------
+
+
+## 修改编译工具源码 development/vndk/tools/header-checker/utils/utils.py 的方法 get_build_vars_for_product, 注释掉拼接 lunch 的命令:
+    # if product is not None:
+    #     cmd += 'source build/envsetup.sh>/dev/null && lunch>/dev/null ' + product + '&&'
+
+## 重新执行上面，成功后，重新编译 mmm showcommands bionic/libc/
+nm -D [path_to_libc.so] | grep [your_export_function_name]
+objdump -T [path_to_libc.so] | grep [your_export_function_name]
+
+i.e. 
+nm -D out/target/product/oneplus3/system/lib64/libc.so | grep kt
+objdump -T out/target/product/oneplus3/system/lib64/libc.so | grep kt
+
+## 参考: 
+// 1. https://blog.csdn.net/m0_37340681/article/details/98734047
+// 2. https://www.jianshu.com/p/ff31f3e693bb
+// 3. https://blog.csdn.net/u013082948/article/details/106060443
+
+
+
+## 另，查看当前文件夹下 elf so 的 .rodata 包含 "MnXVOViiLL" 字符常量的 so
+## https://stackoverflow.com/questions/1685483/how-can-i-examine-contents-of-a-data-section-of-an-elf-file-on-linux
+for f in *.so; do echo $f; readelf -x .rodata $f | grep MnXVOViiLL; done;
+for f in *.so; do echo $f; objdump -s -j .rodata $f | grep MnXVOViiLL; done;
+
+
+
+
+
+
+
+
+
+##### 编译 libandroid_runtime.so #####
+
+mmm frameworks/base/core/jni/
+
+# 新机制不允许 系统 lib 被 普通 APP 加载:
+# https://www.jianshu.com/p/4be3d1dafbec
+# https://jackwish.net/2017/namespace-based-dynamic-linking-chn.html
+
+# 需要把 libandroid_runtime.so 如 liblog.so、libc.so、libm.so 一样加入白名单中 /system/etc/public.libraries.txt
+mount -o remount,rw /system
+echo "libandroid_runtime.so\n" >> /etc/public.libraries.txt
+reboot
+
+
+
+
+
+##### 编译 framework #####
+
+mmm frameworks/base/:framework
+[100% 10/10] Install: ***/lineage-16.0/out/target/product/oneplus3/system/framework/arm64/boot.art
+#### build completed successfully (02:49 (mm:ss)) ####
+
+adb root && adb remount 
+
+// Than push all modified/complied (jar,vdex,oat,art ...) to device as mentioned by 15.1 aboved
+
+export OUT=__path_to_your_aosp_dir__/out/target/product/oneplus3
+
+export __modify_time_string__="Jun 15 02"
+
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/ && ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm/ && ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' | xargs -I{} adb push {} /system/framework/arm64/
+
+adb shell sync && adb shell sync system
+
+
+// Just print out
+ls -al $OUT/system/framework/*.{jar,vdex} | grep "$__modify_time_string__" | awk -F " " '{print $9}'
+ls -al $OUT/system/framework/arm/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' 
+ls -al $OUT/system/framework/arm64/*.{oat,art} | grep "$__modify_time_string__" | awk -F " " '{print $9}' 
+
+i.e.
+mkdir -p system/framework/arm64/
+xargs -I{} cp {} system/framework/arm64/
+
+
+
+
+
+##### /system/bin/service 命令 #####
+
+mmm showcommands frameworks/native/cmds/service
+
+
+mmm showcommands bionic/libc/
+mmm showcommands external/json-c/
+mmm showcommands frameworks/base/media/jni
+
+adb root && adb shell mount -o remount,rw /system
+
+
+
+
+##### 编译 内核kernel boot.img #####
+
+. build/envsetup.sh && breakfast oneplus3
+make bootimage
+adb reboot bootloader
+fastboot boot ${OUT}/boot.img 			# 下次启动会恢复原来的 boot.img
+
+fastboot flash boot ${OUT}/boot.img  	# 永久替换了
+fastboot reboot
+
+
+
+# 查看 kernel log:
+dmesg -w
+cat proc/kmsg
+# https://www.cnblogs.com/ZanyRain/p/10076645.html
+cat /proc/last_kmsg 
+cat /sys/fs/pstore/console-ramoops
+
+
+
+. build/envsetup.sh && breakfast gemini && make bootimage
+adb reboot bootloader && fastboot flash boot ${OUT}/boot.img && fastboot boot ${OUT}/boot.img 
+
+
+
+
+# 查看 dwc3-msm.c 所有 dev_dbg 的输出
+# https://wiki.stmicroelectronics.cn/stm32mpu/wiki/How_to_use_the_kernel_dynamic_debug
+# https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/Documentation/admin-guide/dynamic-debug-howto.rst?h=v5.5.3
+
+mount | grep debugfs
+echo "file dwc3-msm.c +p" > /sys/kernel/debug/dynamic_debug/control
+
+
+
+
+##### 常用的 kernel 命令
+insmod、lsmod、rmmod
+
+
+
+
+
+
+
+##### 编译 libart.so #####
+
+mmm art/
+--------------------------------------------------------------------------------------------------
+ninja: no work to do.
+[1/1] out/soong/.bootstrap/bi...g_build out/soong/build.ninja
+out/build-lineage_oneplus3-_art_Android.mk-cleanspec.ninja is missing, regenerating...
+out/build-lineage_oneplus3-_art_Android.mk.ninja is missing, regenerating...
+[ 75% 3/4] glob frameworks/base/core/java/**/*.java
+ninja: error: 'out/host/linux-x86/framework/apache-xml-hostdex.jar', needed by 'out/host/linux-x86/framework/x86_64/core.art', missing and no known rule to make it
+--------------------------------------------------------------------------------------------------
+
+# 原因是没有构建依赖: 
+# mmm 构建模块指定路径，不构建依赖
+# mmma 构建模块指定路径，并构建依赖
+
+mmma art/
+
+
+# 当构件过依赖后，以后若想再编译，则可以直接 mmm art/ 了
+
+# 又或者仅单独编译 libart.so，省些编译了其他so的时间:
+
+pushd ./art/runtime && mm -j8 && popd
+
+
+
+
+##### 编译 libc.so #####
+
+pushd bionic/libc && mm && popd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export WITH_SU=true 
+
+. build/envsetup.sh
+
+breakfast gemini
+
+----------------------------------------------------------------------------
+including vendor/lineage/vendorsetup.sh
+build/make/core/product_config.mk:234: error: Can not locate config makefile for product "lineage_gemini".
+18:52:34 dumpvars failed with: exit status 1
+Device gemini not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Failed to search GitHub
+----------------------------------------------------------------------------
+
+# 打开 vendor/lineage/build/tools/roomservice.py 搜索 ‘Failed to search GitHub’ 发现是开了代理，请求不了GitHub。
+
+# 1. 直接把浏览器打开 url 把那段json保存成文件，暂时让 roomservice.py 读取吧:
+
+``````
+with open("/home/ubuntu/Downloads/repositories.json") as f:
+    content = f.read()
+    # print(content)
+    result = json.loads(content)
+    # print(result)
+``````
+
+# 2. 但发现 roomservice.py 下面还有一句 result = json.loads(urllib.request.urlopen(githubreq).read().decode()) ，看来还是得解决在 python 设置 socks5 proxy 请求问题
+# 参考:
+https://www.cnblogs.com/kainhuck/p/12421700.html
+https://blog.csdn.net/huangkangying/article/details/78858446
+
+## export ALL_PROXY=socks://127.0.0.1:1090/ && export all_proxy=socks://127.0.0.1:1090/
+## unset ALL_PROXY && unset all_proxy
+set | grep proxy
+set | grep PROXY
+
+# ALL_PROXY=socks://127.0.0.1:1090/
+# NO_PROXY=localhost,127.0.0.0/8,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,localhost
+# all_proxy=socks://127.0.0.1:1090/
+# no_proxy=localhost,127.0.0.0/8,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,localhost
+
+
+git config --global http.proxy 'socks5://127.0.0.1:1090'
+git config --global https.proxy 'socks5://127.0.0.1:1090'
+cat ~/.gitconfig
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+
+
+export http_proxy=http://127.0.0.1:41091
+export https_proxy=https://127.0.0.1:41091
+unset http_proxy
+
+
+
+``````
+import socks
+import socket
+import requests
+
+def get_result_by_socks5(githubreq):
+    url = githubreq.get_full_url()
+    socks.set_default_proxy(socks.SOCKS5, "127.0.0.1", 1090)
+    socket.socket = socks.socksocket
+    r = requests.get(url)
+    result = r.content.decode('utf-8')
+    return result
+``````
+
+# 把 roomservice.py 的所有代码是
+json.loads(urllib.request.urlopen(githubreq).read().decode()) 
+# 换成
+json.loads(get_result_by_socks5(githubreq))
+
+# 把下面文件中包含 xiaomi 或 gemini 的行删掉:
+lineage-16.0/.repo/local_manifests/roomservice.xml
+lineage-16.0/.repo/project.list
+lineage-16.0/.repo/.repo_fetchtimes.json
+
+# 同时把对应的文件夹删除掉:
+lineage-16.0/.repo/projects/device/xiaomi/
+lineage-16.0/.repo/projects/kernel/xiaomi/
+lineage-16.0/.repo/project-objects/LineageOS/android_device_xiaomi_gemini.git
+lineage-16.0/.repo/project-objects/LineageOS/android_device_xiaomi_msm8996-common.git
+lineage-16.0/.repo/project-objects/LineageOS/android_kernel_xiaomi_msm8996.git
+
+# 然后再次
+
+breakfast gemini
+
+
+
+
+Error:
+--------------------------------------------------------------------------------------------------
+TypeError: a bytes-like object is required, not 'str'
+--------------------------------------------------------------------------------------------------
+python --version
+repo --version
+## 看看是不是相同大版本的 python 
+sudo update-alternatives --list python
+sudo update-alternatives --config python
+
+
+Error:
+--------------------------------------------------------------------------------------------------
+build/target/product/product_launched_with_m.mk:2: error: _nic.PRODUCTS.[[device/xiaomi/gemini/lineage_gemini.mk]]: "vendor/xiaomi/msm8996-common/msm8996-common-vendor.mk" does not exist.
+23:22:25 dumpvars failed with: exit status 1
+--------------------------------------------------------------------------------------------------
+# 参考
+https://blog.csdn.net/yusakul/article/details/103270156
+https://blog.csdn.net/fftt516/article/details/78160488
+
+# 拉取 vendor 需要Mi5手机连 adb 并且 root，我们还是从 github 下载吧 [小米开源 https://github.com/MiCode]
+# 类似
+https://github.com/mi3-dev
+# 请去
+https://github.com/mi5-dev 
+# 把两个 vendor 库写进 lineage-16.0/.repo/local_manifests/roomservice.xml 去:
+
+``````
+  <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+``````
+
+------------------------------------------------- 參考的roomservice.xml -------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-16.0" />
+  <project name="LineageOS/android_device_oneplus_oneplus3" path="device/oneplus/oneplus3" remote="github" />
+  <project name="LineageOS/android_device_oppo_common" path="device/oppo/common" remote="github" />
+  <project name="LineageOS/android_kernel_oneplus_msm8996" path="kernel/oneplus/msm8996" remote="github" />
+  <project name="LineageOS/android_packages_resources_devicesettings" path="packages/resources/devicesettings" remote="github" />
+   
+  <project name="LineageOS/android_device_xiaomi_gemini" path="device/xiaomi/gemini" remote="github" />
+  <project name="LineageOS/android_device_xiaomi_msm8996-common" path="device/xiaomi/msm8996-common" remote="github" />
+  <project name="LineageOS/android_kernel_xiaomi_msm8996" path="kernel/xiaomi/msm8996" remote="github" /> 
+
+<!--
+  <project name="mi5-dev/device_xiaomi_gemini" path="device/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/device_xiaomi_msm8996-common" path="device/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/kernel_xiaomi_msm8996" path="kernel/xiaomi/msm8996" remote="github" revision="lineage-16.0" />
+-->
+
+  <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+
+</manifest>
+------------------------------------------------- 參考的roomservice.xml -------------------------------------------------
+
+
+# 然后
+
+repo sync --force-sync 
+
+
+
+# 如果需要提交你的修改才能 sync ，那么请切换个新分支来提交，sync 完毕后 rebase 一下最新的，别 merge ，方便管理。
+
+
+
+# 最后
+
+brunch gemini
+
+
+
+# 下载 Recovery 和 固件
+https://twrp.me/Devices/Xiaomi/
+https://xiaomifirmwareupdater.com/
+
+# 1. 出现 ERROR: This package requires firmware from MIUI 8.8.30 ...
+# 1.1 可以到 Rom zip 包的 META-INF/com/google/updater-script 文件，找到此处的 assert 所在行，然后删掉此行，保存回zip。
+# 1.2 又或者下载 [https://xiaomifirmwareupdater.com/archive/firmware/gemini/] fw_gemini_miui_MI5Global_8.8.30.zip 固件包，升级了此 firmware 先。
+
+# 2. 出现ERROR 7: TWRP 要用 twrp-3.2.1-0-gemini.img 这个 3.2.1 版本的。尝试了 3.4.0 的会出现 ERROR: 7 错误, mkdir /cache/xxx 的错误。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 17.0 -----------------------------------------
+
+
+
+## 为 repo 设置代理，把 repo 拖 sublime text 里看 repo 源码，发现可设置环境变量'http_proxy':export http_proxy="127.0.0.1:41091"
+
+
+
+
+cd ~/Disk/Workspaces/AOSP/LineageOS
+
+mkdir lineage-17.0 && cd lineage-17.0
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync --force-sync
+
+
+---------------------- oneplus3 专有文件 ----------------------
+// https://wiki.lineageos.org/devices/oneplus3/build
+// 把 ./extract-files.sh 的步骤用以下操作代替
+mkdir .repo/local_manifests
+vim .repo/local_manifests/roomservice.xml
+----- vim -----
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+	<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-17.0" />
+</manifest>
+----- vim -----
+repo sync --force-sync
+---------------------- oneplus3 专有文件 ----------------------
+
+
+
+---------------------- gemini 专有文件 ----------------------
+
+# 从这个网站 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi 可以找到所有小米的驱动相关: 
+
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.0/gemini 得 proprietary_vendor_xiaomi-lineage-17.0-gemini.zip
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.0/msm8996-common 得 proprietary_vendor_xiaomi-lineage-17.0-msm8996-common.zip
+
+mkdir -p ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.0/vendor/xiaomi/
+
+unzip proprietary_vendor_xiaomi-lineage-17.0-gemini.zip  && unzip proprietary_vendor_xiaomi-lineage-17.0-msm8996-common.zip
+mv proprietary_vendor_xiaomi-lineage-17.0-gemini/gemini ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.0/vendor/xiaomi/gemini
+mv proprietary_vendor_xiaomi-lineage-17.0-msm8996-common/msm8996-common ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.0/vendor/xiaomi/msm8996-common
+
+---------------------- gemini 专有文件 ----------------------
+
+
+. build/envsetup.sh
+
+export WITH_SU=true
+
+
+
+# 把 vendor/lineage/build/tools/roomservice.py 里所有的 repo sync --force-sync 改成 repo sync --current-branch --force-sync 。从而只拉当前分支的代码，加快下载速度。
+
+breakfast oneplus3 / breakfast gemini
+
+
+
+brunch oneplus3 / brunch gemini
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------
+FAILED: out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.sorted.tmp
+/bin/bash -c "(out/host/linux-x86/bin/checkfc -e out/target/product/gemini/obj/ETC/sepolicy_intermediates/sepolicy out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device
+.tmp ) && (out/host/linux-x86/bin/fc_sort out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.tmp out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/fi
+le_contexts.device.sorted.tmp )"
+out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.tmp: Multiple same specifications for /data/vendor/misc/audio(/.*)?.
+Error: could not load context file from out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.tmp
+[ 79% 79557/100088] build out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts
+FAILED: out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts
+/bin/bash -c "(m4 --fatal-warnings -s     system/sepolicy/vendor/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/qcom/sepolicy-legacy-um/vendor/common
+/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/qcom/sepolicy-legacy-um/vendor/msm8996/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_
+intermediates/sectxfile_nl    device/qcom/sepolicy-legacy-um/vendor/test/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/lineage/sepolicy/qcom/vendor/
+file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl    device/xiaomi/msm8996-common/sepolicy/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermedi
+ates/sectxfile_nl    device/lineage/sepolicy/common/vendor/file_contexts  out/target/product/gemini/obj/ETC/sectxfile_nl_intermediates/sectxfile_nl > out/target/product/gemini/obj/ETC/vendor_file_conte
+xts_intermediates/vendor_file_contexts.tmp ) && (out/host/linux-x86/bin/checkfc out/target/product/gemini/obj/ETC/sepolicy_intermediates/sepolicy out/target/product/gemini/obj/ETC/vendor_file_contexts_
+intermediates/vendor_file_contexts.tmp ) && (out/host/linux-x86/bin/fc_sort out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts.tmp out/target/product/gemini/obj/E
+TC/vendor_file_contexts_intermediates/vendor_file_contexts )"
+out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts.tmp: Multiple same specifications for /data/vendor/misc/audio(/.*)?.
+Error: could not load context file from out/target/product/gemini/obj/ETC/vendor_file_contexts_intermediates/vendor_file_contexts.tmp
+13:39:28 ninja failed with: exit status 1
+------------------------------
+# 打开文件 out/target/product/gemini/obj/ETC/file_contexts.bin_intermediates/file_contexts.device.sorted.tmp
+# 搜索 "/data/vendor/misc/audio" 发现确实定义多个规则了 
+# 初次定义是在 #line 1 "system/sepolicy/vendor/file_contexts"
+# 看最后个定义，往上看发现 #line 1 "device/xiaomi/msm8996-common/sepolicy/file_contexts" 这个文件定义有
+# 打开 device/xiaomi/msm8996-common/sepolicy/file_contexts 搜索 "/data/vendor/misc/audio" 在前面加个 "#" 注释掉
+
+vim device/xiaomi/msm8996-common/sepolicy/file_contexts:
+-------
+# Data vendor files
+# /data/vendor/misc/audio(/.*)?         u:object_r:vendor_audio_data_file:s0
+-------
+
+
+
+
+------------------------------
+ExternalError: Failed to run command '['mkuserimg_mke2fs', '-s', 'lineage-17.0/out/soong/.temp/tmp693BSW', 'l
+ineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.img', 'ext4', '/', '5368709120', '-j', '0', '-T', '1230768000', '-C',
+ 'lineage-17.0/out/soong/.temp/merged_fs_configHjIeou.txt', '-B', 'lineage-17.0/out/target/product/gemini/obj
+/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map', '-L', '/', '-M', '0', '-U', '66aff1d5-dee6-5976-adfb-7c3f39c8c8aa', '-S', '4b1f3b28-8b07-5d53-96df-3c15f
+96aa83c', '--inode_size', '256', 'lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/ME
+TA/file_contexts.bin']' (exit code 4):
+15:08:56 mkuserimg_mke2fs.py INFO: Env: {'E2FSPROGS_FAKE_TIME': '1230768000', 'MKE2FS_CONFIG': './system/extras/ext4_utils/mke2fs.conf'}
+15:08:56 mkuserimg_mke2fs.py INFO: Running: mke2fs -O ^has_journal -L / -I 256 -M / -m 0 -U 66aff1d5-dee6-5976-adfb-7c3f39c8c8aa -E android_sparse,hash_seed=4b1f3b28-8b07-5d53-96df-3c15f96aa83c -t ext4
+ -b 4096 lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.img 1310720
+15:08:57 mkuserimg_mke2fs.py INFO: Env: {'E2FSPROGS_FAKE_TIME': '1230768000'}
+15:08:57 mkuserimg_mke2fs.py INFO: Running: e2fsdroid -T 1230768000 -C lineage-17.0/out/soong/.temp/merged_fs_configHjIeou.txt -B /home/ubuntu/Disk6T/Works
+paces/AOSP/LineageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/IMAGES/system.map -S /AOSP/Line
+ageOS/lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubuntu/META/file_contexts.bin -f line
+age-17.0/out/soong/.temp/tmp693BSW -a / lineage-17.0/out/target/product/gemini/obj/PACKAGING/target_files_intermediates/lineage_gemini-target_files-eng.ubu
+ntu/IMAGES/system.img
+
+15:08:58 mkuserimg_mke2fs.py ERROR: Failed to run e2fsdroid_cmd: set_selinux_xattr: No such file or directory searching for label "/bt_firmware"
+19:10:41 mkuserimg_mke2fs.py ERROR: Failed to run e2fsdroid_cmd: set_selinux_xattr: No such file or directory searching for label "/firmware"
+
+
+set_selinux_xattr: No such file or directory searching for label "/bt_firmware"
+set_selinux_xattr: No such file or directory searching for label "/firmware"
+e2fsdroid: No such file or directory while configuring the file system
+loaded 3558 fs_config entries
+
+
+Out of space? Out of inodes? The tree size of lineage-17.0/out/soong/.temp/tmp693BSW is 1249435648 bytes (1191 MB), with reserved space of 0 bytes (0 MB).
+The max image size for filesystem files is 5368709120 bytes (5120 MB), out of a total partition size of 5368709120 bytes (5120 MB).
+15:08:59 ninja failed with: exit status 1
+
+------------------------------
+# 参考 https://blog.csdn.net/zhangpengfei991023/article/details/109241215
+# 发现 lineage-17.0/device/xiaomi/msm8996-common/BoardConfigCommon.mk 有定义 BOARD_SYSTEMIMAGE_PARTITION_SIZE，刚好也是 3221225472 (3072 MB)
+# 给够 5G 试试吧
+# BOARD_SYSTEMIMAGE_PARTITION_SIZE := 5368709120
+# 但发现不是这个原因
+
+# 搜索关键字，对比 lineage-17.1 发现, file_contexts 少了些东西，于是添加上 bt_firmware 和 firmware:
+
+vim device/xiaomi/msm8996-common/sepolicy/file_contexts
+-------
+# Data vendor files
+# /data/vendor/misc/audio(/.*)?         u:object_r:vendor_audio_data_file:s0
+
+# Root files
+/bt_firmware(/.*)?    u:object_r:bt_firmware_file:s0
+/firmware(/.*)?       u:object_r:firmware_file:s0
+-------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 17.1 -----------------------------------------
+
+
+# sudo apt install python2
+# sudo apt install python3
+# python2 与 python3　的自由切换:
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 100
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
+sudo update-alternatives --list python
+sudo update-alternatives --config python
+
+
+
+cd ~/Disk/Workspaces/AOSP/LineageOS
+
+mkdir lineage-17.1 && cd lineage-17.1
+
+# 只要当前 branch，加快下载速度
+
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
+
+repo sync --force-sync --current-branch -j 4
+
+## repo sync -c -n -j 4 && repo sync -c -l -j 16 ## for faster syncing
+## https://superuser.com/q/603547
+
+
+# 用下面重试 sync 脚本来 sync 吧：
+vim ReRepoSync.sh
+------------------------- ReRepoSync.sh -------------------------
+#!/bin/sh
+
+count=0
+
+repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    repo sync --force-sync --current-branch -j 4
+
+done
+------------------------- ReRepoSync.sh -------------------------
+chmod 777 ReRepoSync.sh
+
+
+
+
+
+
+---------------------- 专有文件 ----------------------
+
+oneplus: 
+mkdir -p ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/
+
+# 用 svn 下载 https://github.com/TheMuppets/proprietary_vendor_oneplus/tree/lineage-17.1/oneplus3，因为只想拉我们需要的部分，多余的我们不要，要不会耗太长时间了
+cd ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/
+# 链接 https://github.com/TheMuppets/proprietary_vendor_oneplus/tree/lineage-17.1/oneplus3 中的 tree 改成 branches
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/oneplus3/ ./oneplus3
+
+# 若 svn 太慢了，或者 git 吧: git clone --single-branch -b lineage-17.1 https://github.com/TheMuppets/proprietary_vendor_oneplus.git，然后:
+mv proprietary_vendor_oneplus/oneplus3 ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/oneplus3
+
+# 若 svn 和 git 都太慢了，直接下载zip包吧:
+unzip proprietary_vendor_oneplus-lineage-17.1.zip
+mv proprietary_vendor_oneplus-lineage-17.1/oneplus3 ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/oneplus/oneplus3
+
+
+
+gemini:
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.1/gemini 
+# 下载 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-17.1/msm8996-common 
+
+mkdir -p ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/xiaomi/
+
+unzip proprietary_vendor_xiaomi-lineage-17.1-gemini.zip  && unzip proprietary_vendor_xiaomi-lineage-17.1-msm8996-common.zip
+mv proprietary_vendor_xiaomi-lineage-17.1-gemini/gemini ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/xiaomi/gemini
+mv proprietary_vendor_xiaomi-lineage-17.1-msm8996-common/msm8996-common ~/Disk/Workspaces/AOSP/LineageOS/lineage-17.1/vendor/xiaomi/msm8996-common
+
+---------------------- 专有文件 ----------------------
+
+
+
+. build/envsetup.sh && export WITH_SU=true
+
+
+# 把 vendor/lineage/build/tools/roomservice.py 里所有的 repo sync --force-sync 改成 repo sync --current-branch --force-sync 。从而只拉当前分支的代码，加快下载速度。
+
+
+breakfast oneplus3  /  breakfast gemini
+
+brunch oneplus3  /  brunch gemini
+
+
+
+
+
+
+## Android Studio To View Sources
+
+source build/envsetup.sh && breakfast oneplus3 && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+
+
+
+
+
+## system 的 mount 由 /system 改为 /，可用命令 tune2fs -l /dev/block/by-name/system 查看!
+mount -o remount,rw /
+
+
+## Android 10 编译完全root版本 https://www.jianshu.com/p/b7b0361aca34
+
+## ----------------------------- 但发现不行 -----------------------------
+1.修改 system/extras/su/su.cpp
+// 注释掉第83-84行
+// uid_t current_uid = getuid();
+// if (current_uid != AID_ROOT && current_uid != AID_SHELL) error(1, 0, "not allowed");
+
+mmm system/extras/su/
+adb root && adb remount && adb push out/target/product/oneplus3/system/xbin/su /system/xbin/su 
+## ----------------------------- 但发现不行 -----------------------------
+
+
+1.修改 system/core/libcutils/fs_config.cpp
+// 把 system/xbin/su 的 04750 改成 00755
+{ 00755, AID_ROOT,      AID_SHELL,     0, "system/xbin/su" },
+
+
+2.把 LineageOS 16.0 的 system/extras/su/ 全部复制过来
+
+3.改一下 superuser.rc 的前8行:
+# su daemon
+service su_daemon /system/xbin/su --daemon
+	class main 			## 插入此行
+    user root
+    group root
+    disabled
+    seclabel u:r:sudaemon:s0 	## 改成这样
+
+4.往 frameworks/native/libs/binder/include/binder/AppOpsManager.h 的 Line 112 加入:
+      OP_SU = 79,
+
+# 比如 79 这个值，会有个所有APP都能获取su权限了的问题。首先要看 frameworks/base/core/java/android/app/AppOpsManager.java 里定义的最大值: 
+  public static final int OP_ACTIVITY_RECOGNITION = 79;
+  ...
+  ...
+  public static final int _NUM_OP = 91;
+  ...
+  ...
+  private static int[] sOpDefaultMode = new int[] {...}; # 这里会发现 79 这个是默认允许，所以会发现所有APP都能 su 了
+
+  ## 所以我们追加一个值，并对 _NUM_OP 增 1
+  ## 再查看本类中 _NUM_OP 的调用 static {...} 块中，发现许多sOp为前缀的数组变量的长度要跟着 _NUM_OP 变，所以要一并改埋
+
+
+5.手动 push 编出来的上去
+
+  adb root && adb remount
+  adb push out/target/product/oneplus3/system/xbin/su /system/xbin/su
+  adb push out/target/product/oneplus3/system/etc/init/superuser.rc /etc/init/superuser.rc
+  adb reboot
+
+
+6. 没关SELinux下，1加5上没有自启 su daemono, superuser.rc 也没有问题，在adb root下手动启动一下: /system/xbin/su --daemon &
+   这个问题要解决一下
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 专有文件网站:
+https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/
+
+
+
+
+
+## 用的 repo 还是 https://github.com/MoKee/git-repo 
+
+export USE_CCACHE=1
+export CCACHE_SIZE=200G
+export WITH_SU=true
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
+
+export SOONG_GEN_CMAKEFILES=1
+export SOONG_GEN_CMAKEFILES_DEBUG=1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 lineage-18.0 __________________________________
+
+mkdir lineage-18.0 && cd lineage-18.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-18.0 --depth=1
+# repo init -u https://github.com/LineageOS/android.git -b lineage-18.0   # 换在https，不用为git设置代理，代理软件设置全局的http代理就OK了
+
+./ReRepoSync.sh
+
+# https://download.mokeedev.com/
+# https://github.com/TheMuppets/proprietary_vendor_oneplus, 发现对应的只有一加5/5T可又刷
+# https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/tree/lineage-18.0, 支持的小米机就很多
+
+
+========================
+breakfast sagit
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-lineage-18.0_sagit.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-18.0/proprietary_vendor_xiaomi-lineage-18.0.zip?path=sagit
+curl -o proprietary_vendor_xiaomi-lineage-18.0_msm8998-common.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-18.0/proprietary_vendor_xiaomi-lineage-18.0.zip?path=msm8998-common
+
+unzip proprietary_vendor_xiaomi-lineage-18.0_msm8998-common.zip -d ./
+unzip proprietary_vendor_xiaomi-lineage-18.0_sagit.zip -d ./
+mv proprietary_vendor_xiaomi-lineage-18.0-msm8998-common/msm8998-common ./
+mv proprietary_vendor_xiaomi-lineage-18.0-sagit/sagit ./
+
+rmdir proprietary_vendor_xiaomi-lineage-18.0-msm8998-common && rmdir proprietary_vendor_xiaomi-lineage-18.0-sagit
+popd
+brunch sagit
+========================
+
+
+========================
+breakfast cheeseburger/dumpling
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/cheeseburger/ ./vendor/oneplus/cheeseburger
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/dumpling/ ./vendor/oneplus/dumpling
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-18.0/msm8998-common/ ./vendor/oneplus/msm8998-common
+
+brunch cheeseburger/dumpling
+========================
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 lineage-17.1 __________________________________
+
+mkdir lineage-17.1 && cd lineage-17.1
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.1 --depth=1
+./ReRepoSync.sh
+
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+gemini:
+vim .repo/local_manifests/roomservice.xml
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mkq-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mkq-mr1" />
+
+# 重新 ./ReRepoSync.sh && . build/envsetup.sh && breakfast oneplus3/gemini && brunch oneplus3/gemini
+
+
+cp -r ../lineage-16.0/system/extras/su/* ../lineage-17.1/system/extras/su/
+# 在参照上面改一下 superuser.rc 的前8行:
+# su daemon
+service su_daemon /system/xbin/su --daemon
+  class main            ## 插入此行
+    user root
+    group root
+    disabled
+    seclabel u:r:sudaemon:s0  ## 改成这样
+
+
+
+. build/envsetup.sh && breakfast gemini && brunch gemini
+
+sleep 2h && . build/envsetup.sh && breakfast oneplus3 && brunch oneplus3
+
+
+
+-------------------------
+FAILED: out/soong/build.ninja
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -globFile out/soong/.bootstrap/build-globs.ninja -o out/soong/build
+.ninja Android.bp
+error: bionic/libc/system_properties/Android.bp:1:1: dependency "libjson_static" of "libsystemproperties" missing variant:
+  arch:android_arm64_armv8-a, image:recovery, link:static
+available variants:
+  arch:android_arm64_armv8-a, image:core, link:static, version:
+  arch:android_arm_armv8-a, image:core, link:static, version:
+14:10:45 soong bootstrap failed with: exit status 1
+-------------------------
+# 查找同样被 "libsystemproperties" 引用的 "libpropertyinfoparser" 发现在编译的 Android.bp 加上:
+# vendor: true,   ## vendor_available: doesn't make sense at the same time as `vendor: true`, `proprietary: true`, or `device_specific:true`
+# host_supported: true,   ## 有些 函数symbol 没有
+    vendor_available: true,
+    recovery_available: true,
+
+readelf -d out/target/product/gemini/obj_arm/SHARED_LIBRARIES/libjson_intermediates/libjson.so  # 查看依赖库
+
+
+
+-------------------------
+error: bionic/libc/Android.bp:1527:1: encountered dependency cycle:
+error: bionic/libc/Android.bp:1527:1:     "libc" depends on "libc"
+error: bionic/libc/Android.bp:1527:1:     "libc" depends on "libc_common_static"
+error: bionic/libc/Android.bp:1404:1:     "libc_common_static" depends on "libc_common"
+error: bionic/libc/Android.bp:1391:1:     "libc_common" depends on "libc_nopthread"
+error: bionic/libc/Android.bp:1351:1:     "libc_nopthread" depends on "libc_bionic_ndk"
+error: bionic/libc/Android.bp:1001:1:     "libc_bionic_ndk" depends on "libsystemproperties"
+error: bionic/libc/system_properties/Android.bp:1:1:     "libsystemproperties" depends on "libjson_static"
+error: external/json-c/Android.bp:13:1:     "libjson_static" depends on "libm"
+-------------------------
+# 把 "libpropertyinfoparser" 的 Android.bp 拷过来，改 name 改 cpp_flags 改 src 去掉一些不必要的，重新删除 out 再编就OK通过了。
+# 是以前旧的 “libjson” 的 Android.bp 不适用了，依照 "libpropertyinfoparser" 的 Android.bp 写一份就好。
+# 估计是要多加下面两个配置:
+    stl: "none",
+    system_shared_libs: [],
+
+
+
+-------------------------
+******************************************************
+error: VNDK library: libc's ABI has EXTENDING CHANGES Please check compatibility report at: out/soong/.intermediates/bionic/libc/libc/android_arm64_armv8-a_recovery_shared/libc.so.abidiff
+******************************************************
+error: Please update ABI references with: $ANDROID_BUILD_TOP/development/vndk/tools/header-checker/utils/create_reference_dumps.py --llndk -l libc
+15:48:44 ninja failed with: exit status 1
+-------------------------
+## 1 第一种方式，直接执行:  
+  $ANDROID_BUILD_TOP/development/vndk/tools/header-checker/utils/create_reference_dumps.py --llndk -l libc
+# 这会导致 prebuilts/abi-dumps/ndk/ 出现很多修改~~~
+
+## 2 第二种方式:
+# https://blog.csdn.net/tkwxty/article/details/105834911
+# 注释掉 development/vndk/tools/header-checker/src/diff/header_abi_diff.cpp 的:
+  /*
+    bool should_emit_warning_message = ShouldEmitWarningMessage(status);
+
+    if (should_emit_warning_message) {
+      llvm::errs() << "******************************************************\n"
+                   << error_or_warning_str
+                   << "VNDK library: "
+                   << lib_name
+                   << "'s ABI has "
+                   << status_str
+                   << unreferenced_change_str
+                   << " Please check compatibility report at: "
+                   << compatibility_report << "\n"
+                   << "******************************************************\n";
+    }
+
+    if (!advice_only && should_emit_warning_message) {
+      return status;
+    }
+  */
+# 单独编译 mmm development/vndk/tools/header-checker/
+# 但是遇到错误: FAILED: ninja: unknown target 'MODULES-IN-development-vndk-tools-header-checker'
+
+
+
+
+
+
+
+
+####### cheeseburger
+
+## LineageOS github上没有放 vendor 的东西，从 MoKee 或 TheMuppets 那里下(下面方法二选一):
+
+
+# 1.
+vim .repo/local_manifests/roomservice.xml:
+
+  <project name="MoKee/android_vendor_oneplus_msm8998-common" path="vendor/oneplus/msm8998-common" remote="github" revision="mkq-mr1" />
+  <project name="MoKee/android_vendor_oneplus_cheeseburger" path="vendor/oneplus/cheeseburger" remote="github" revision="mkq-mr1" />
+
+#  就不用这种了，下载太多别的机型了, 用 svn checkout 会好点
+#  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-17.1" />
+
+./ReRepoSync.sh
+
+
+# 2.
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/msm8998-common/ ./vendor/oneplus/msm8998-common
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/cheeseburger/ ./vendor/oneplus/cheeseburger
+
+# 可选，设置svn代理:
+cp ~/.subversion/servers ~/.subversion/servers.default
+vim ~/.subversion/servers
+------------
+http-proxy-host=127.0.0.1
+http-proxy-port=41091
+------------
+
+
+
+
+. build/envsetup.sh && breakfast cheeseburger && brunch cheeseburger
+
+
+
+
+
+
+. build/envsetup.sh ; breakfast dumpling ;
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/msm8998-common/ ./vendor/oneplus/msm8998-common #注:如上面1加5拉过就不用了哦
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/dumpling/ ./vendor/oneplus/dumpling
+
+
+. build/envsetup.sh && breakfast dumpling && brunch dumpling
+
+
+
+
+
+
+
+. build/envsetup.sh ; breakfast fajita ;  
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.1/sdm845-common/ ./vendor/oneplus/sdm845-common
+
+
+. build/envsetup.sh && breakfast fajita && brunch fajita
+
+
+
+
+
+
+
+
+
+
+##### ------------- brunch fajita 时出错(但在 brunch cheeseburger 时没有出现这个错) ------------- #####
+----------------------------------------------------------------------------------------------------
+FAILED: out/soong/build.ninja
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -globFile out/soong/.bootstrap/build-g
+lobs.ninja -o out/soong/build.ninja Android.bp
+error: frameworks/base/core/jni/Android.bp:11:1: dependency "sandhook" of "libandroid_runtime" missing variant:
+  arch:android_arm64_armv8-a, image:core, link:static, version:
+available variants:
+  arch:android_arm64_armv8-a, image:vendor, link:static, version:
+  arch:android_arm_armv8-a, image:vendor, link:static, version:
+22:10:45 soong bootstrap failed with: exit status 1
+----------------------------------------------------------------------------------------------------
+# 把
+vendor: true,
+# 改成
+vendor_available: true,
+
+# 不要同时留两个，不然会出现:
+error: external/sandhook/Android.bp:56:21: module "sandhook" variant "android_arm64_armv8-a": vendor_available: doesn't make sense at the same time as `vendor: true`, `proprietary: true`, or `device_specific:true`
+
+
+
+
+
+
+
+## 9008 模式刷机
+https://www.oneplusbbs.com/thread-5824264-1.html
+https://www.oneplusbbs.com/thread-4446250-1.html
+https://onepluscommunityserver.com/list/Unbrick_Tools/
+https://forum.xda-developers.com/t/tool-6t-msmdownloadtool-v4-0-59-oos-v9-0-13.3867448/
+https://forum.xda-developers.com/t/tool-t-mobile-oneplus-6t-msmdownloadtool-firmware-9-0-13-8-9.3868916/
+https://forum.xda-developers.com/t/6t-is-hard-bricked-param-preload-device-not-match-image.4329821/
+
+https://forum.xda-developers.com/t/guide-unlocked-flashing-t-mobile-oneplus-6t-to-international-oos-rom.3865966/
+https://forum.xda-developers.com/t/t-mobile-6t-to-international-conversion-without-unlocked-bootloader-sim-unlock.3888307/
+
+
+# 完全关机，拔掉数据线。之后 同时按着 音量加减 键，然后再插上数据线。待 Device Manager 的 Ports 那里显示 9008 则为进入了 9008 模式。
+# 用 ANDROID+9+OOS+9.0.13+fajitat_34_O.13_190725_repack.zip 这个来刷 T-Mobile 品牌的机子, 否则会出现 '镜像与手机不匹配' 问题
+
+1. Open up your working folder and run MsmDownloadTool V4.0.exe
+2. Power off the device, unplugged from the working pc.
+3. Holding Volume up and down together, plug the device into the working pc (device should now show up in the tool, if it doesn't you may need the qualcomm usb drivers)
+4. Once your device shows up, hit start and sit tight, device will reboot upon completion.
+    MSMDownloadTool 9.0v2: DOWNLOAD LINK[https://androidfilehost.com/?fid=11410963190603861856]
+    MSMDownloadTool 9.0v1: DOWNLOAD LINK[https://androidfilehost.com/?fid=11410963190603853541]
+    MSMDownloadTool 9.0.13: DOWNLOAD LINK[https://www.androidfilehost.com/?fid=6006931924117933380]
+    USB Drivers can be found here: https://androidfilehost.com/?fid=11410963190603879743
+# 但此时不能正常解锁BL，需要发 https://www.oneplus.com/unlock_token 获取 token 才行， 而且要等7天。
+##################################### [所以应该下载:] ############################################
+# 1. https://forum.xda-developers.com/t/tool-6t-msmdownloadtool-v4-0-59-oos-v9-0-13.3867448/ 的: 6T MsmDownloadTool v4.0.58 (OOS v9.0.11)
+# 2. https://forum.xda-developers.com/t/t-mobile-6t-to-international-conversion-without-unlocked-bootloader-sim-unlock.3888307/ 的Patched: 6T_MsmDownloadTool_v4.0.58_patched.zip
+(https://drive.google.com/file/d/1dYuVxnf_J97KPrRt6KEBOjau1BRvtnJQ/view)
+# 然后解压到同一个文件夹下，然后打开 MsmDownloadTool V4.0_factory_patched.exe 来 9008 刷机。
+# 其实就是要把 T-Mobile 版刷成 International或Global 版的 OOS
+
+
+
+## 正常 TWRP 刷机
+https://twrp.me/oneplus/oneplus6t.html
+
+    adb reboot bootloader && fastboot oem unlock && fastboot boot twrp-3.2.1-0-fajita.img && adb push twrp-installer-fajita-3.2.3-0.zip /sdcard/
+
+    adb shell getprop | grep imei
+    # Get IMEI by dialing *#06#
+    adb reboot bootloader
+    fastboot oem unlock
+    # Please flash unlock token first
+    # https://www.oneplus.com/unlock_token
+    fastboot oem get_unlock_code
+    # https://www.oneplus.com/cn/support/answer/detail/op588
+    # 看回 ######## [所以应该下载:] ##### 一节，重刷
+
+
+# https://wiki.lineageos.org/devices/fajita/upgrade
+adb push lineage-17.1-20211208-UNOFFICIAL-fajita.zip /sdcard/
+# 双清，安装 zip 后重新进入了 bootloader, 在 bootloader 中选择进么 Recovery，此时进入了紫色的 REC，点击 Apply update 
+adb sideload lineage-17.1-20211208-UNOFFICIAL-fajita.zip
+adb sideload twrp-installer-fajita-3.2.3-0.zip
+# 但还是不断的进入了 bootloader ...
+
+
+
+
+
+
+
+
+--------------------- 17.1 不关SELinux模式下开启 su_daemon 允许 su ---------------------
+
+
+---------- superuser.rc ----------
+
+# su daemon
+service su_daemon /system/xbin/su --daemon
+    class main
+    user root
+    group root
+    disabled
+    seclabel u:r:sudaemon:s0
+
+on property:persist.sys.root_access=0
+    stop su_daemon
+
+on property:persist.sys.root_access=2
+    stop su_daemon
+
+on property:persist.sys.root_access=1
+    start su_daemon
+
+on property:persist.sys.root_access=3
+    start su_daemon
+
+---------- superuser.rc ----------
+
+
+1. cp -r ../lineage-16.0/system/extras/su/ system/extras/
+
+2. cp ../lineage-16.0/device/lineage/sepolicy/common/private/su.te device/lineage/sepolicy/common/private/su.te
+
+3. 对齐一下 lineage-16.0 和 lineage-17.1 两边带有 sudaemon 字符的:
+system/sepolicy/private/compat/26.0/26.0.ignore.cil
+system/sepolicy/private/compat/27.0/27.0.ignore.cil
+system/sepolicy/private/compat/28.0/28.0.ignore.cil     # 这个是添加 sudaemon 作一行
+
+meld ../lineage-16.0/system/sepolicy/private/compat/26.0/26.0.ignore.cil system/sepolicy/private/compat/26.0/26.0.ignore.cil && meld ../lineage-16.0/system/sepolicy/private/compat/27.0/27.0.ignore.cil system/sepolicy/private/compat/27.0/27.0.ignore.cil && meld system/sepolicy/private/compat/27.0/27.0.ignore.cil system/sepolicy/private/compat/28.0/28.0.ignore.cil
+# meld then search 'sudaemon'
+
+
+4. 两边这两个文件也对齐一下带有 sudaemon 字符的: system/sepolicy/public/domain.te (有3处, 有处要加多-system_app) 和 system/sepolicy/public/su.te (只有1处)
+meld ../lineage-16.0/system/sepolicy/public/domain.te system/sepolicy/public/domain.te && meld ../lineage-16.0/system/sepolicy/public/su.te system/sepolicy/public/su.te
+
+
+5. 注释掉 lineage-17.1 的 system/sepolicy/public/domain.te 的这一行，因为与 第2步新加的一些规则冲突了
+# neverallow { domain userdebug_or_eng(`-dumpstate -shell -su -sudaemon') } su_exec:file no_x_file_perms;
+
+
+6. 再对齐一下本身的
+meld system/sepolicy/prebuilts/api/29.0/public/domain.te system/sepolicy/public/domain.te
+meld system/sepolicy/prebuilts/api/29.0/public/su.te system/sepolicy/public/su.te
+
+meld system/sepolicy/prebuilts/api/29.0/private/compat/26.0/26.0.ignore.cil  system/sepolicy/private/compat/26.0/26.0.ignore.cil
+meld system/sepolicy/prebuilts/api/29.0/private/compat/27.0/27.0.ignore.cil  system/sepolicy/private/compat/27.0/27.0.ignore.cil
+meld system/sepolicy/prebuilts/api/29.0/private/compat/28.0/28.0.ignore.cil  system/sepolicy/private/compat/28.0/28.0.ignore.cil
+
+
+
+
+6. 再按上面修改一下这两个文件就可以了:
+system/core/libcutils/fs_config.cpp
+frameworks/native/libs/binder/include/binder/AppOpsManager.h
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 lineage-17.0 __________________________________
+
+mkdir lineage-17.0 && cd lineage-17.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-17.0 --depth=1
+./ReRepoSync.sh
+
+. build/envsetup.sh && breakfast oneplus3/gemini
+
+
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-17.0/oneplus3/ ./vendor/oneplus/oneplus3
+
+## 参考 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/
+
+gemini:
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-lineage-17.0_gemini.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-17.0/proprietary_vendor_xiaomi-lineage-17.0.zip?path=gemini
+curl -o proprietary_vendor_xiaomi-lineage-17.0_msm8996-common.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/lineage-17.0/proprietary_vendor_xiaomi-lineage-17.0.zip?path=msm8996-common
+unzip proprietary_vendor_xiaomi-lineage-17.0_gemini.zip -d ./
+unzip proprietary_vendor_xiaomi-lineage-17.0_msm8996-common.zip -d ./
+mv proprietary_vendor_xiaomi-lineage-17.0-gemini/gemini ./
+mv proprietary_vendor_xiaomi-lineage-17.0-msm8996-common/msm8996-common ./
+popd
+
+
+brunch oneplus3/gemini
+
+
+
+
+
+
+__________________________________ 重新 lineage-16.0 __________________________________
+
+mkdir lineage-16.0 && cd lineage-16.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-16.0 --depth=1
+./ReRepoSync.sh
+
+-----------------------
+java -version: openjdk version "1.8.0_40"  ## openjdk version "9.0.4"
+## java 版本不管，后面它会自动用回自己内置的 prebuilts/jdk/jdk9/linux-x86/bin/java[openjdk version "9"]
+python --version: Python 2.7.18
+-----------------------
+
+
+. build/envsetup.sh
+
+## 一次性搞掂:
+breakfast oneplus3
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-16.0/oneplus3/ ./vendor/oneplus/oneplus3
+brunch oneplus3
+
+breakfast gemini
+vim .repo/local_manifests/roomservice.xml
+  <project name="mi5-dev/vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="lineage-16.0" />
+  <project name="mi5-dev/vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="lineage-16.0" />
+brunch gemini
+
+
+
+
+******************************************************
+prebuilts/clang/host/linux-x86/clang-4691093/bin/clang++.real: error while loading shared libraries: libtinfo.so.5: cannot open shared object file: No such file or directory
+******************************************************
+find /usr/lib -name libtinfo*
+sudo apt install libncurses5
+find /usr/lib -name libtinfo*
+
+
+******************************************************
+FAILED: out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/classes.dex 
+/bin/bash -c "(rm -rf out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ ) && (mkdir -p out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ ) && (find out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex/ -maxdepth 1 -name \"classes*.dex\" | sort | xargs -I{} cp -f {} out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ ) && (find out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex-hiddenapi/ -name \"classes*.dex\" | sort | sed 's/^/--dex=/' | xargs out/host/linux-x86/bin/hiddenapi --light-greylist=out/target/common/obj/PACKAGING/hiddenapi-light-greylist.txt --dark-greylist=out/target/common/obj/PACKAGING/hiddenapi-dark-greylist.txt --blacklist=out/target/common/obj/PACKAGING/hiddenapi-blacklist.txt )"
+hiddenapi E 07-03 22:40:51 642260 642260 hiddenapi.cc:47] No DEX files specified
+hiddenapi E 07-03 22:40:51 642260 642260 hiddenapi.cc:47] Command: out/host/linux-x86/bin/hiddenapi --light-greylist=out/target/common/obj/PACKAGING/hiddenapi-light-greylist.txt --dark-greylist=out/target/common/obj/PACKAGING/hiddenapi-dark-greylist.txt --blacklist=out/target/common/obj/PACKAGING/hiddenapi-blacklist.txt
+******************************************************
+# apache-xml 模块编译出错，导致 hiddenapi 命令出错
+# https://stackoverflow.com/a/66055065
+ls -al out/target/common/obj/JAVA_LIBRARIES/apache-xml_intermediates/dex/  ## 发现确实是空的
+
+$ make clean-apache-xml
+$ make clean-ims-common
+$ make ims-common
+$ make apache-xml
+
+
+
+******************************************************
+vendor/codeaurora/telephony/ims/src/org/codeaurora/ims/QtiImsExtManager.java:41: error: cannot find symbol
+import com.android.ims.ImsManager;
+                      ^
+  symbol:   class ImsManager
+  location: package com.android.ims
+vendor/codeaurora/telephony/ims/src/org/codeaurora/ims/QtiImsExtManager.java:283: error: cannot find symbol
+            if (ImsManager.getInstance(mContext, phoneId).getImsServiceState() !=
+                ^
+  symbol:   variable ImsManager
+  location: class QtiImsExtManager
+2 errors
+******************************************************
+# rm -rf out/ 重新来试试，最终编译成功完成
+
+
+
+
+
+
+
+
+make bootimage
+______________________________________________________
+
+Target buildinfo from: device/oneplus/oneplus3/system.prop
+Traceback (most recent call last):
+  File "build/make/tools/post_process_props.py", line 144, in <module>
+    main(sys.argv)
+  File "build/make/tools/post_process_props.py", line 132, in main
+    if not validate(properties):
+  File "build/make/tools/post_process_props.py", line 65, in validate
+    for key, value in buildprops.iteritems():
+AttributeError: 'dict' object has no attribute 'iteritems'
+[ 33% 3/9] Building Kernel Config
+______________________________________________________
+python --version
+Python 3.8.10
+# 切换到 python 2 试试
+sudo update-alternatives --config python
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________ 重新 lineage-15.1 __________________________________
+
+mkdir lineage-15.1 && cd lineage-15.1
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.1 --depth=1
+./ReRepoSync.sh
+
+
+## 一次性搞掂:
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-15.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+gemini:
+vim .repo/local_manifests/roomservice.xml
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
+
+
+
+
+__________________________________ 重新 lineage-15.0 __________________________________
+
+mkdir lineage-15.0 && cd lineage-15.0
+repo init -u git://github.com/LineageOS/android.git -b lineage-15.0 --depth=1
+./ReRepoSync.sh
+
+
+## 一次性搞掂:
+oneplus3:
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-15.0/oneplus3/ ./vendor/oneplus/oneplus3
+
+gemini:
+vim .repo/local_manifests/roomservice.xml
+  <project name="MoKee/android_vendor_xiaomi_gemini" path="vendor/xiaomi/gemini" remote="github" revision="mko-mr1" />
+  <project name="MoKee/android_vendor_xiaomi_msm8996-common" path="vendor/xiaomi/msm8996-common" remote="github" revision="mko-mr1" />
+
+===================
+field "arch.arm64.kryo" does not exist
+
+https://forum.xda-developers.com/t/rom-kernel-unofficial-unified-lineageos-15-1-8-1-0.3668952/page-47#post-73920910
+===================
+
+
+
+
+
+
+__________________________________ 重新 cm-14.1 __________________________________
+
+mkdir cm-14.1 && cd cm-14.1
+repo init -u git://github.com/LineageOS/android.git -b cm-14.1 --depth=1
+./ReRepoSync.sh
+
+
+## 用 sun/oracle jdk 1.8.x , 不要用 openjdk 
+
+export LC_ALL=C
+
+. build/envsetup.sh
+
+
+
+breakfast cancro
+
+
+vim .repo/local_manifests/roomservice.xml:
+## 添加:
+  <project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+## 再 ./ReRepoSync.sh 一下, 如果觉得下载慢，可以去 cd .repo/project-objects/TheMuppets ，然后不断 du -h -d 1 ./ 看看大小有没有在增加~~~
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.1_cancro.zip -d ./ > /dev/null 2>&1
+mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
+popd
+
+
+brunch cancro
+
+
+-------------------------
+frameworks/av/camera/cameraserver/Android.mk:18: Target has integrated cameraserver into mediaserver. This is weakening security measures introduced in 7.0
+find: '/AOSP/LineageOS/cm-14.1/out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates': No such file or directory
+./vendor/qcom/binaries/Android.mk:1: *** This repo is now deprecated. Move your blobs to your device's vendor repo..
+make: *** [build/core/ninja.mk:167: /AOSP/LineageOS/cm-14.1/out/build-lineage_cancro.ninja] Error 1
+make: Leaving directory '/AOSP/LineageOS/cm-14.1'
+-------------------------
+# 错误是 This repo is now deprecated. Move your blobs to your device's vendor repo
+vim ./vendor/qcom/binaries/Android.mk  ## 注释掉第1行抛出的 error 就可以了
+
+
+
+breakfast oneplus3
+
+vim ~/.subversion/servers
+------------
+http-proxy-host=127.0.0.1
+http-proxy-port=41091
+------------
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/cm-14.1/oneplus3/ ./vendor/oneplus/oneplus3
+
+brunch oneplus3
+
+
+-------------------------
+build/core/base_rules.mk:183: *** vendor/qcom/binaries/msm8996/graphics: MODULE.TARGET.SHARED_LIBRARIES.libsdm-disp-apis already defined by vendor/oneplus/oneplus3.
+-------------------------
+# 重复定义了 LOCAL_MODULE := libsdm-disp-apis 了， 注释掉 
+# vendor/qcom/binaries/msm8996/graphics/Android.mk 或 vendor/oneplus/oneplus3/Android.mk 中的
+# LOCAL_MODULE := libsdm-disp-apis 的相关行
+# 这里我注释掉了 vendor/oneplus/oneplus3/Android.mk 的 Line 44-54 行:
+
+
+
+breakfast gemini
+
+gemini:
+mkdir vendor/xiaomi/ ; pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_gemini.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=gemini
+curl -o proprietary_vendor_xiaomi-cm-14.1_msm8996-common.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=msm8996-common
+unzip proprietary_vendor_xiaomi-cm-14.1_gemini.zip -d ./
+unzip proprietary_vendor_xiaomi-cm-14.1_msm8996-common.zip -d ./
+mv proprietary_vendor_xiaomi-cm-14.1-gemini/gemini ./
+mv proprietary_vendor_xiaomi-cm-14.1-msm8996-common/msm8996-common ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-gemini
+rmdir proprietary_vendor_xiaomi-cm-14.1-msm8996-common
+popd
+
+brunch gemini
+
+
+-------------------------
+build/core/base_rules.mk:183: *** vendor/xiaomi/msm8996-common: MODULE.TARGET.SHARED_LIBRARIES.libsdm-disp-apis already defined by vendor/qcom/binaries/msm8996/graphics.
+-------------------------
+# 同上处理把 vendor/xiaomi/msm8996-common/Android.mk 中的 libsdm-disp-apis 模块定义行都注释掉
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CyanogenMod:
+
+
+## 因为repo 版本变了，都要改一下 roomservice.py, 都要把里面的 .repo/manifest.xml 全部改成 .repo/manifests/default.xml
+
+
+export LC_ALL=C
+
+
+export USE_CCACHE=1
+export CCACHE_SIZE=200G
+export WITH_SU=true
+export PATH=$HOME/Disk6T/Workspaces/GitHub/git_v2.25.1:$PATH
+
+
+
+
+__________________________________ 重新 cm-11.0 __________________________________
+
+mkdir cm-11.0 && cd cm-11.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-11.0 --depth=1
+./ReRepoSync.sh
+
+
+
+## 用 sun/oracle jdk: java version "1.6.0_45"
+
+
+
+
+svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm-11.0 device/xiaomi/cancro
+
+# 因为这个库有 cm.dependencies 了，读懂 build/envsetup.sh 和 build/tools/roomservice.py 源码, 
+-------------------------
+vim .repo/local_manifests/roomservice.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <!-- <project name="mi3-dev/android_kernel_xiaomi_msm8x74pro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" /> -->
+  <project name="rud0lf/android_kernel_xiaomi_cancro" path="kernel/xiaomi/cancro" remote="github" revision="cancro-kk-oss" />
+  <project name="mi3-dev/android_device_xiaomi_cancro" path="device/xiaomi/cancro" remote="github" />
+</manifest>
+-------------------------
+./ReRepoSync.sh
+
+# 当 checkout 完，修改 build/envsetup.sh，在调用 build/tools/roomservice.py 那里传多个 true 参数过去
+# Line 858: build/tools/roomservice.py $product true
+# 修改后，重新 . build/envsetup.sh 一下
+
+breakfast cancro  # 拉 roomservice.xml 及 cm.dependencies 里的依赖库，好像不需要 svn checkout 这一步也行, xml里有就会帮你拉了
+
+
+
+svn checkout https://github.com/mi3-dev/proprietary_vendor_xiaomi/branches/cm-11.0/cancro vendor/xiaomi/cancro/
+# OR: 
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-11.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-11.0/proprietary_vendor_xiaomi-cm-11.0.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-11.0_cancro.zip -d ./
+mv proprietary_vendor_xiaomi-cm-11.0-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-11.0-cancro/
+popd
+
+
+##  mi3-dev 的 kernel 也是 fork MiCode/Xiaomi_Kernel_OpenSource 的，我们点击它所有的 fork, Ctrl-F 搜 cancro
+##  发现 rud0lf/android_kernel_xiaomi_cancro 的对应 branch 的 arch/arm/configs 里有 cyanogenmod_cancro_defconfig，那么就用它了
+## 重新 ReRepoSync.sh 之后 cd .repo/project-objects/rud0lf 不断 du -h -d 1 ./ 发现会在下载，只是下载慢，别 Ctrl-C 就行
+
+vim device/xiaomi/cancro/BoardConfig.mk
+在第 Line 40 行插入（40gg）:
+TARGET_KERNEL_SOURCE               := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH                 := arm
+TARGET_KERNEL_CONFIG               := cyanogenmod_cancro_defconfig
+
+
+
+brunch cancro
+
+
+# 有个编 Kernel 的错误:
+--------------------
+Can't use 'defined(@array)' (Maybe you should just omit the defined()?) at /AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/kernel/timeconst.pl line 373.
+make[3]: *** [/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/kernel/Makefile:129: kernel/timeconst.h] Error 255
+make[2]: *** [/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro/Makefile:950: kernel] Error 2
+make[3]: *** Waiting for unfinished jobs....
+make[1]: Leaving directory '/AOSP/CyanogenMod/cm-11.0/kernel/xiaomi/cancro'
+make: *** [build/core/tasks/kernel.mk:188: TARGET_KERNEL_BINARIES] Error 2
+--------------------
+# 把 kernel/xiaomi/cancro/kernel/timeconst.pl 文件中 373行的：
+if (!defined(@val)) { 
+# 改为 
+if (!@val) {
+
+
+
+错误1:
+--------------
+build/core/config.mk:374: *** Error: could not find jdk tools.jar, please install JDK6, which you can download from java.sun.com.  Stop.
+--------------
+# 下载 jdk6: https://www.oracle.com/java/technologies/javase-java-archive-javase6-downloads.html
+# 网上找个为了下载的 oracle 账号 2696671285@qq.com:Oracle123
+# 下载好解压:
+chmod a+x jdk-6u45-linux-x64.bin
+./jdk-6u45-linux-x64.bin
+# 然后加入 PATH 变量
+java -version 
+# java version "1.6.0_45"
+
+
+错误2:
+--------------
+/bin/bash: flex: command not found
+--------------
+sudo apt install flex
+
+
+
+
+错误3:
+-----------------
+No rule to make target 'vendor/cm/proprietary/Term.apk'
+-----------------
+# 查看 cat vendor/cm/get-prebuilts, 其实就是下载 https://jackpal.github.com/Android-Terminal-Emulator/downloads/Term.apk 并 unzip 解压它里面的 lib
+./vendor/cm/get-prebuilts
+# 发现 curl 下载不了 curl: (7) Failed to connect to jackpal.github.io port 80: Connection refused， 手动下载并手动 unzip 解压吧
+BASEDIR=vendor/cm/
+unzip -o -d $BASEDIR/proprietary $BASEDIR/proprietary/Term.apk lib/*
+
+
+
+
+
+
+__________________________________ 重新 cm-12.0 __________________________________
+
+## 这个也是很多缺失些库，不拉了。
+
+
+
+
+
+__________________________________ 重新 cm-12.1 __________________________________
+
+mkdir cm-12.1 && cd cm-12.1
+repo init -u git://github.com/CyanogenMod/android.git -b cm-12.1 --depth=1
+./ReRepoSync.sh
+
+. build/envsetup.sh
+
+breakfast cancro
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-12.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-12.1/proprietary_vendor_xiaomi-cm-12.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-12.1_cancro.zip -d ./
+mv proprietary_vendor_xiaomi-cm-12.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-12.1-cancro/
+popd
+
+## The required version is: "1.7.x"
+## vim build/core/main.mk, 把文件里面的 ^java 改成 ^openjdk
+
+
+brunch cancro
+
+
+__________________________________ 重新 cm-13.0 __________________________________
+
+
+环境: sun/oracle jdk8 (not java 7) && python 2 && export LC_ALL=C
+
+
+mkdir cm-13.0 && cd cm-13.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-13.0 --depth=1
+./ReRepoSync.sh
+
+. build/envsetup.sh
+
+breakfast cancro
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-13.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-13.0/proprietary_vendor_xiaomi-cm-13.0.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-13.0_cancro.zip -d ./
+mv proprietary_vendor_xiaomi-cm-13.0-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-13.0-cancro/
+popd
+
+
+export LC_ALL=C
+brunch cancro
+
+
+
+__________________________________ 重新 cm-14.0 __________________________________
+
+mkdir cm-14.0 && cd cm-14.0
+repo init -u git://github.com/CyanogenMod/android.git -b cm-14.0 --depth=1
+./ReRepoSync.sh
+
+. build/envsetup.sh
+
+breakfast cancro
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.0_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.0/proprietary_vendor_xiaomi-cm-14.0.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.0_cancro.zip -d ./ > /dev/null 2>&1  # 将标准输出重定向到空设备, 2>&1将标准错误输出重定向到标准输出
+mv proprietary_vendor_xiaomi-cm-14.0-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.0-cancro/
+popd
+
+-------
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/qcom/binaries/msm8974/graphics/graphics-vendor.mk" does not exist.  Stop.
+-------
+svn checkout https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/branches/cm-14.0/msm8974 vendor/qcom/binaries/msm8974 
+or:
+svn checkout https://github.com/MoKee/android_vendor_qcom_binaries/branches/mkn/msm8974 vendor/qcom/binaries/msm8974
+
+
+curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk
+
+
+brunch cancro
+
+
+
+错误1: 
+----------------------
+ninja: error: 'cm-14.0/out/target/product/cancro/obj/lib/libtime_genoff.so.toc', needed by 'cm-14.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libandroid_servers_intermediates/LINKED/libandroid_servers.so', missing and no known rule to make it
+----------------------
+# https://forum.xda-developers.com/t/ninja-error-missing-out-target-product-cancro-obj-lib-libtime_genoff-so-toc.3488154/
+# put this below in vendor/xiaomi/cancro/Android.mk can solve the problem:
+----------------------
+include $(CLEAR_VARS)
+LOCAL_MODULE := libtime_genoff
+LOCAL_MODULE_OWNER := xiaomi
+LOCAL_SRC_FILES := proprietary/vendor/lib/libtime_genoff.so
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_SUFFIX := .so
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+include $(BUILD_PREBUILT)
+----------------------
+# https://forum.xda-developers.com/t/q-no-rule-to-make-target-libtime_genoff-so.2647435/
+
+
+
+错误2: 
+----------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact com.cyngn.ambient:ambientsdk:aar:1.5.11 from/to central (https://repo.maven.apache.org/maven2): Transfer failed for https://repo.maven.apache.org/maven2/com/cyngn/ambient/ambientsdk/1.5.11/ambientsdk-1.5.11.aar
+[ERROR]   com.cyngn.ambient:ambientsdk:aar:1.5.11
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR]   central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR]   central (https://repo1.maven.org/maven2, releases=true, snapshots=true)
+[ERROR] : java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+----------------------
+## the trustAnchors parameter must be non-empty 关键是这个错误
+## 用回 sun/oracle 的 java 8 就行了，之前一直用 openjdk 8 来编， 这跟 mkq-mr1 出现的"the trustAnchors parameter must be non-empty"问题是一样的。
+
+
+
+## 最终成功编译ROM成功通过
+
+
+
+
+__________________________________ 重新 cm-14.1 __________________________________
+
+mkdir cm-14.1 && cd cm-14.1
+repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1 --depth=1
+./ReRepoSync.sh
+
+. build/envsetup.sh
+
+
+## 用 sun/oracle jdk 1.8.x , 不要用 openjdk  ## 原因看下面的 错误1
+
+
+
+breakfast cancro
+
+
+mkdir vendor/xiaomi/ && pushd vendor/xiaomi/
+curl -o proprietary_vendor_xiaomi-cm-14.1_cancro.zip https://gitlab.com/the-muppets/proprietary_vendor_xiaomi/-/archive/cm-14.1/proprietary_vendor_xiaomi-cm-14.1.zip?path=cancro
+unzip proprietary_vendor_xiaomi-cm-14.1_cancro.zip -d ./ > /dev/null 2>&1
+mv proprietary_vendor_xiaomi-cm-14.1-cancro/cancro ./
+rmdir proprietary_vendor_xiaomi-cm-14.1-cancro/
+popd
+
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/branches/cm-14.1/msm8974 vendor/qcom/binaries/msm8974 
+
+curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk
+
+
+brunch cancro
+
+
+错误1: 
+----------------------
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:19: error: package android.support.v14.preference does not exist
+import android.support.v14.preference.SwitchPreference;
+                                     ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:20: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceViewHolder;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingSwitchPreference.java:27: error: cannot find symbol
+public class SelfRemovingSwitchPreference extends SwitchPreference {
+                                                  ^
+  symbol: class SwitchPreference
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:27: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.Preference;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:28: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceGroup;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:29: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceManager;
+                                    ^
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/ConstraintsHelper.java:30: error: package android.support.v7.preference does not exist
+import android.support.v7.preference.PreferenceViewHolder;                                ^
+....
+      symbol: class Preference
+vendor/cmsdk/sdk/src/java/cyanogenmod/preference/SelfRemovingPreference.java:52: error: cannot find symbol
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+                                 ^
+  symbol:   class PreferenceViewHolder
+  location: class SelfRemovingPreference
+javadoc: error - In doclet class com.google.doclava.Doclava,  method start has thrown an exception java.lang.reflect.InvocationTargetException
+com.sun.tools.javac.code.Symbol$CompletionFailure: class file for com.android.okhttp.ConnectionPool not found
+1 error
+----------------------
+# 解决方法: 切回 sun/oracle jdk 8 来编译
+# https://blog.csdn.net/ztguang/article/details/80435314
+# 真实错误是这个 javadoc: error - In doclet class com.google.doclava.Doclava
+# 确实是 openjdk 的问题。无论是 openjdk 7 还是 openjdk 8 都不对，用回 sun/oracle jdk 8 。
+
+
+
+
+
+错误2: 
+----------------------
+javac: invalid source release: 1.8
+Usage: javac <options> <source files>
+[  0% 47/5812] Ensure Jack server is installed and started
+Jack server already installed in "/home/ubuntu/.jack-server"
+Server is already running
+Bad request, see Jack server log
+----------------------
+# 这是因为上个错误把 session 的java版本改成 1.7 导致的, 用 sun/oracle jdk 8 不会出现这种问题
+
+
+## 最终成功编译ROM成功通过
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 18.1 -----------------------------------------
+
+mkdir lineage-18.1 && cd lineage-18.1
+
+# repo init -u git://github.com/LineageOS/android.git -b lineage-18.1 --depth=1
+
+# 换成 https 的方式了，不用老是设置 git 代理
+./repo init -u https://github.com/LineageOS/android.git -b lineage-18.1 --git-lfs
+
+# 如果出现 error: main.py: error: no such option: --git-lfs, 升级 repo 命令就好，且更新 cd .repo/repo/ ; git remote -v ; git pull , 然后再重试
+# 千万不要 rm -rf ./repo, 容量这么大要不又要重新拉了， 得新 repo init 就好，然后重新同步就好 ./repo sync --force-sync，记得有这个 force
+
+
+./ReRepoSync.sh
+
+
+
+
+# 编译 1加7T , 复制 hotdogb & sm8150-common 一加7T的专有文件
+TheMuppets=~/Disk6T/Workspaces/GitHub/TheMuppets
+pushd $TheMuppets/
+# git clone https://github.com/TheMuppets/proprietary_vendor_oneplus.git
+pushd proprietary_vendor_oneplus
+git checkout lineage-18.1
+popd
+popd
+
+mkdir -p vendor/oneplus/
+cp -r $TheMuppets/proprietary_vendor_oneplus/hotdogb vendor/oneplus/
+cp -r $TheMuppets/proprietary_vendor_oneplus/sm8150-common vendor/oneplus/
+
+
+
+# 开始编译
+. build/envsetup.sh && breakfast hotdogb && brunch hotdogb
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 19.0 -----------------------------------------
+
+mkdir lineage-19.0 && cd lineage-19.0
+
+
+# repo init -u git://github.com/LineageOS/android.git -b lineage-19.0 --depth=1
+
+# 换成 https 的方式了，不用老是设置 git 代理
+./repo init -u https://github.com/LineageOS/android.git -b lineage-19.0 --git-lfs
+
+# 如果出现 error: main.py: error: no such option: --git-lfs, 升级 repo 命令就好，且更新 cd .repo/repo/ ; git remote -v ; git pull , 然后再重试
+# 千万不要 rm -rf ./repo, 容量这么大要不又要重新拉了， 得新 repo init 就好，然后重新同步就好 ./repo sync --force-sync，记得有这个 force
+
+
+./ReRepoSync.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 19.1 -----------------------------------------
+
+mkdir lineage-19.1 && cd lineage-19.1
+
+# sudo apt install git-lfs
+
+curl --proxy "http://192.168.1.6:8084" -O https://storage.googleapis.com/git-repo-downloads/repo
+
+chmod a+x ./repo
+
+./repo init -u https://github.com/LineageOS/android.git -b lineage-19.1 --git-lfs
+
+
+./ReRepoSync.sh  # becareful use `./repo`
+
+
+
+
+
+一加7T(代号: hotdogb [https://download.lineageos.org/devices/]):
+# svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-19.1/hotdogb/ ./vendor/oneplus/hotdogb
+# vim ~/.subversion/servers, 注意看看设置的代理有没有变了。不行了，这种方式，用 git clone 吧，以后共用
+
+pushd ~/Disk6T/Workspaces/GitHub/TheMuppets/
+git clone https://github.com/TheMuppets/proprietary_vendor_oneplus.git
+pushd proprietary_vendor_oneplus
+git checkout lineage-19.1
+popd
+popd
+
+
+mkdir -p vendor/oneplus/
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/hotdogb vendor/oneplus/
+ls -al vendor/oneplus/
+
+
+. build/envsetup.sh
+
+breakfast hotdogb
+
+# 继续等待下载完毕 
+
+
+
+-------------------------
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+hardware/oplus/overlay/qssi/qssi.mk:14: error: _nic.PRODUCTS.[[device/oneplus/hotdogb/lineage_hotdogb.mk]]: "vendor/oneplus/sm8150-common/sm8150-common-vendor.mk" does not exist.
+01:13:39 dumpvars failed with: exit status 1
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+hardware/oplus/overlay/qssi/qssi.mk:14: error: _nic.PRODUCTS.[[device/oneplus/hotdogb/lineage_hotdogb.mk]]: "vendor/oneplus/sm8150-common/sm8150-common-vendor.mk" does not exist.
+01:13:40 dumpvars failed with: exit status 1
+
+** Don't have a product spec for: 'lineage_hotdogb'
+** Do you have the right repo manifest?
+-------------------------
+# 找了一下，https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8150-common 是只有 lineage-20 的
+其实可以一步到位的，从 TheMuppets 拉完 vendor 的所有下来:
+vim .repo/local_manifests/roomservice.xml
+<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="mkq-mr1" />
+
+但不推荐这种方式，因为上面我们已经 clone TheMuppets 的下来了，复制过来就好:
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/sm8150-common vendor/oneplus/
+
+
+# OK, 重新来
+
+breakfast hotdogb
+
+# Good, 成功输出可以编译前的各个信息
+
+brunch hotdogb
+
+
+
+-------------------------
+FAILED: ninja: 'external/chromium-webview/prebuilt/arm64/webview.apk', needed by 'out/target/product/hotdogb/obj/APPS/webview_intermediates/package.apk
+', missing and no known rule to make it
+17:54:59 ninja failed with: exit status 1
+-------------------------
+cd external/chromium-webview/prebuilt/arm64 ; git status 
+发现状态有变，有许多东西被 deleted，那就 `git reset --hard HEAD` 恢复吧。但有点不对劲，会不会别的也这样，赶紧去根目录看一下
+repo status 
+发现 external/chromium-webview/prebuilt/ 下的各个架构的都被本地修改了，奇怪，没动哦，为什么会 deleted 了呢 ...，把它们都 `git reset --hard HEAD` 后再
+repo status
+确保 "nothing to commit (working directory clean)"
+
+
+# OK, 重新来
+
+brunch hotdogb
+
+
+----> 顺利编译成功 :)
+
+
+# 后面的一键: . build/envsetup.sh && breakfast hotdogb && brunch hotdogb
+
+# 或者重编整个zip包的话就不用早餐: source build/envsetup.sh && brunch hotdogb
+
+# 或者仅是编某个模块的话就仅用早餐: source build/envsetup.sh && breakfast hotdogb ; mmm system/extras/su/
+
+
+
+
+
+
+
+
+
+===================##### 刷机 #####===================
+
+adb reboot bootloader && fastboot oem unlock 
+# 手机重新进入已 OEM 解锁的系统 
+adb reboot bootloader
+
+echo $ANDROID_PRODUCT_OUT
+cd $ANDROID_PRODUCT_OUT
+fastboot flash dtbo dtbo.img
+fastboot flash recovery recovery.img
+# 此时 按向下音量键 选择进入 Recovery Mode 
+# 进入 Recovery Mode -> 清除数据 Factory Reset -> Format data/factory reset 
+# 返回 Apply update -> Apply from adb , 此时用 adb sideload 命令来刷:
+adb sideload lineage-19.1-20230923-UNOFFICIAL-hotdogb.zip
+# 刷完后返回 -> Reboot system now, 之后会进入到这个编译好的系统
+# 详细可以看看这个印度小哥的视频: https://www.youtube.com/watch?v=daQ6KAalToc
+
+
+
+--->> 后面再刷就直接进入 recovery 模式就好: adb reboot recovery
+
+
+
+
+
+
+===================##### Android Studio #####===================
+
+source build/envsetup.sh && breakfast hotdogb && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+
+
+
+
+
+
+
+
+# 编译工程版本
+. build/envsetup.sh ; breakfast hotdogb eng ; brunch hotdogb eng
+
+
+# 编译 su & libc
+. build/envsetup.sh ; breakfast hotdogb; mmm system/extras/su/ ; mmm bionic/libc/
+
+
+
+
+
+##### 一些其他错误 #####
+# mmm frameworks/base/ 的错:
+--------------------------------------------------
+FAILED: out/target/common/obj/APPS/MultiDexLegacyAndException_intermediates/maindex.list
+/bin/bash -c "(PROGUARD_HOME=external/proguard out/host/linux-x86/bin/mainDexClasses out/target/common/obj/APPS/Mult
+iDexLegacyAndException_intermediates/classes.jar 1>out/target/common/obj/APPS/MultiDexLegacyAndException_intermediat
+es/maindex.list ) && (echo \"com/android/multidexlegacyandexception/Test.class\" >> out/target/common/obj/APPS/Multi
+DexLegacyAndException_intermediates/maindex.list )"
+
+Error: Can't read [/home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/common/obj/APPS/MultiDexLeg
+acyAndException_intermediates/classes.jar] (Can't process class [javax/annotation/CheckForNull.class] (Unsupported c
+lass version number [53.0] (maximum 52.0, Java 1.8)))
+--------------------------------------------------
+# 直接重新编译就好, 或许只删模块的产物就好，懒得折腾了，直接删整个 out 吧:
+rm -rf out/; brunch hotdogb
+
+# 后面尝试了一下下面清除命令，再加上 :framework ，编译是通过了，但 oat 文件并没有重新构建生成出来，还是旧的 
+make clean-framework ; mmma frameworks/base:framework
+
+
+
+
+
+
+===================##### framework.jar framework.jar #####===================
+
+# 后来发现 编译 framework.jar 只需要 `make framework-minus-apex`就好:
+make framework-minus-apex
+# [100% 384/384] Install: out/target/product/hotdogb/system/framework/framework.jar
+
+# 推到手机上:
+adb root; adb remount; adb shell; adb shell "cd /system/framework/ ; rm -rf oat/ arm/ arm64/"
+adb push out/target/product/hotdogb/system/framework/framework.jar /system/framework/
+adb shell ls -al /system/framework/framework.jar
+
+# 然后重启 zygote:
+adb shell stop ; adb shell start
+
+
+
+
+
+
+
+
+# remount 分区
+adb root
+adb remount # adb shell mount -o rw,remount /
+
+
+
+# lldb 源码调试(不需要工程版本也行)
+# https://werat.dev/blog/debugging-lldb-with-source-stepping/
+# [Why lldb remote debug can't locate the libflutter.so's symbol file]: 
+# https://github.com/flutter/flutter/issues/45971
+# https://github.com/vadimcn/codelldb/issues/190
+find -name libc.so
+file ./symbols/apex/com.android.runtime/lib64/bionic/libc.so
+readelf --debug-dump=info ./symbols/apex/com.android.runtime/lib64/bionic/libc.so | grep DW_AT_name | grep cpp
+
+This one finds debug symbols:
+(lldb) image lookup -r -n <FUNC_REGEX>
+
+This one finds non-debug symbols:
+(lldb) image lookup -r -s <FUNC_REGEX>
+
+(lldb) br set -r "SystemProperties::*"
+
+(lldb) br list 
+
+(lldb) image lookup -vn SystemProperties::Find
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/bootstrap/libc.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/liblog.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/libandroid_runtime.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/libutils.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/apex/com.android.art/lib64/libart.so
+
+(lldb) settings set target.source-map . /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/
+
+(lldb) br set -name SystemProperties::Find
+
+(lldb) br set -name SystemProperties::AreaSerial
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- LineageOS 20.0 -----------------------------------------
+
+mkdir lineage-20.0 && cd lineage-20.0
+
+cp ../lineage-19.1/repo ./ ; cp ../lineage-19.1/ReRepoSync.sh ./
+
+./repo init -u https://github.com/LineageOS/android.git -b lineage-20.0 --git-lfs
+
+./ReRepoSync.sh
+
+# 开另外一个 Terminal Tab 来观看下载情况: 
+for i in `seq 1 1000`; do echo -e "\n################$(date +%Y/%m/%d-%H:%M)################"; du -h -d 1; sleep 60; done;
+
+
+----> 顺利拉完 :)
+
+
+# 对于 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件，TheMuppets github 就已经提供了， breakfast 之后我们写入 .repo/local_manifests/roomservice.xml 再 repo sync 就好
+# https://github.com/TheMuppets/proprietary_vendor_oneplus_hotdogb
+# https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8150-common
+
+
+. build/envsetup.sh
+
+breakfast hotdogb
+
+
+# 编辑 .repo/local_manifests/roomservice.xml ， 加入 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件
+vim .repo/local_manifests/roomservice.xml:
+  <project name="TheMuppets/proprietary_vendor_oneplus_hotdogb" path="vendor/oneplus/hotdogb" remote="github" revision="lineage-20" />
+  <project name="TheMuppets/proprietary_vendor_oneplus_sm8150-common" path="vendor/oneplus/sm8150-common" remote="github" revision="lineage-20" />
+
+
+# OK, repo sync 一下，这个会同步及只会拉新加入的
+./ReRepoSync.sh
+
+# 再来 breakfast 一次，这时就完全 OK 了
+breakfast hotdogb
+
+＃ 编译
+brunch hotdogb
+
+
+
+===================##### Android Studio #####===================
+
+source build/envsetup.sh && breakfast hotdogb && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+

@@ -1,0 +1,42 @@
+
+git clone https://github.com/ios-control/ios-deploy.git
+cd ios-deploy/ 
+git checkout 1.12.1
+
+## build it. -workspace <workspacename> or -project <projectname>
+xcodebuild -project ios-deploy.xcodeproj -list
+xcodebuild -project ios-deploy.xcodeproj -scheme ios-deploy
+
+## get the built output path
+xcodebuild -project ios-deploy.xcodeproj -scheme ios-deploy -showBuildSettings | grep BUILD_DIR
+
+
+## ios-deploy --verbose --id 00008020-001B048A0EF0402E --debug --justlaunch --noinstall --bundle ~/Workspaces/FlutterProject/build/ios/iphoneos/Runner.app
+
+
+
+
+
+
+
+
+
+##### 如何调试 Podfile
+
+https://stackoverflow.com/a/52773670/1749293
+https://medium.com/@GalvinLi/tinysolution-cocoapods%E7%B1%BB%E9%87%8D%E5%A4%8D%E5%AE%9E%E7%8E%B0%E8%AD%A6%E5%91%8A%E5%A4%84%E7%90%86-ba88bb3deaf6
+
+
+IDE 用 RubyMine
+
+1. 用 RubyMine 打开一个 支持了 Cocoaspod XCode 工程的目录，如拿 Github TinySolution [https://github.com/bestwnh/TinySolution.git] 为例子
+
+	Edit Configuration -> Add + -> Ruby -> Ruby script: /usr/local/bin/pod, Script arguments: install -> Working directory: /__path_to__/TinySolution -> Ruby SDK: set it as in [Ruby script]
+
+2. ln -s Podfile Podfile.rb
+
+3. 双击打开 Podfile.rb , 设置断点
+
+4. 点击 Debug
+
+

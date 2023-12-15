@@ -1,0 +1,1064 @@
+The Most Popular Custom ROMs on XDA:
+###### https://www.xda-developers.com/the-most-popular-custom-roms-on-xda/
+
+13 Best Android Custom ROMs For 2021 That You Must Try
+###### https://fossbytes.com/android-custom-roms/#2-2-paranoid-android-pa-rom
+
+###### https://www.zhihu.com/question/355012971/answer/888070583
+###### https://github.com/Evolution-X/manifest
+
+
+###### https://www.zhihu.com/question/355012971
+
+
+###### 无需科学上网！访问所有 https://source.android.com 的链接请把 com 改成 google.cn 即: https://source.android.google.cn ######
+
+##### 谷歌源码镜像:
+https://source.codeaurora.org/
+##### 如 chromium/src 的 https://source.codeaurora.org/quic/lc/chromium/src/
+
+repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest 	# 是清华提供的镜像源
+repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest  		# 是中国科学技术大学的镜像源
+
+
+
+
+
+
+
+
+______________________________ 下载 com.android.webview 源码 ______________________________________
+
+WebViewFactory: Loading com.android.webview version 89.0.4389.105 (code 438910503)
+
+# https://source.codeaurora.org/quic/lc/chromium/src/  这个还不知到怎么下载
+https://chromium.googlesource.com/chromium/src.git
+
+# 点开 tag ，搜索 89.0.4389.105 ，点进去 然后点击 android_webview，然后点击 [tgz] 下载压缩包
+# 注意，我们只需要 android_webview 这个源码
+
+
+
+
+
+
+
+______________________________ 下载开发软件  ______________________________________
+
+# 1. Android Studio: android-studio-ide-181.5056338-linux.zip
+# 2. Visual Studio Code: code_1.34.0-1557957934_amd64.deb
+
+
+
+
+
+______________________________ Build Google Android Source ______________________________________
+
+mkdir -p ~/Workspaces/AOSP/Google/android/
+cd ~/Workspaces/AOSP/Google/android/
+
+repo init -u https://aosp.tuna.tsinghua.edu.cn/platform/manifest -b android-6.0.1_r42
+
+
+
+
+
+
+
+______________________________ Build HookZz ______________________________________
+
+
+## 1. Check cmake version 
+cmake --version
+
+## 2. Dwonload new version of cmake source from: https://github.com/Kitware/CMake/releases
+
+pushd ~/Workspaces/Softwares
+
+curl -L -O https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2.tar.gz
+
+# wget https://github.com/Kitware/CMake/releases/download/v3.13.2/cmake-3.13.2.tar.gz
+# you will see 302 code and Location redirect, so we need the -L option)
+
+pushd cmake-3.13.2/
+
+tar -xzvf cmake-3.13.2.tar.gz
+./configure
+make
+
+which cmake
+export PATH=$HOME/Workspaces/Softwares/cmake-3.13.2/bin:$PATH
+# export PATH=$HOME/Workspaces/Softwares/cmake-3.13.4/bin:$PATH
+# export PATH=$HOME/Workspaces/Github/CMake/bin:$PATH
+which cmake
+
+cmake --version
+
+popd
+popd
+
+
+# HookZz
+
+pushd ~/Workspaces/Github/
+git clone https://github.com/jmpews/HookZz.git
+pushd HookZz/
+
+# 检查有没有配置了 ANDROID_NDK 变量, 没有的话下载或者指向 ANDROID_SDK/ndk-bundle/ 
+
+
+# 1. 编译出: shared library libhookzz.so
+cmake . \
+-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DANDROID_ABI="armeabi-v7a" \
+-DANDROID_STL=c++_static \
+-DANDROID_NATIVE_API_LEVEL=android-23 \
+-DDEBUG=OFF \
+-DSHARED=ON
+
+make -j4
+
+
+# 2. 编译出: static library libhookzz.a
+cmake . \
+-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DANDROID_ABI="armeabi-v7a" \
+-DANDROID_STL=c++_static \
+-DANDROID_NATIVE_API_LEVEL=android-23 \
+-DSHARED=OFF \
+-DHOOKZZ_DEBUG=OFF
+
+make -j4
+
+
+# 2. 编译 arm64 的:
+cmake . \
+-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+-DCMAKE_BUILD_TYPE=Release \
+-DANDROID_ABI="arm64-v8a" \
+-DANDROID_STL=c++_static \
+-DANDROID_NATIVE_API_LEVEL=android-23 \
+-DDEBUG=OFF \
+-DSHARED=ON
+
+make -j4 -n
+
+
+
+
+# 切换编译别的架构时，有错，都是因为缓存问题的，清掉一些缓存: 
+find ./ -name CMakeFiles | xargs rm -rf
+find ./ -name Makefile | xargs rm 
+find ./ -name *.a | xargs rm
+# 如果还有错,新开terminal重新编。还是有错的话，重新clone到别的目录去, 分别make:
+git clone https://github.com/jmpews/HookZz.git HookZz-arm/
+git clone https://github.com/jmpews/HookZz.git HookZz-arm64/
+
+# 根据Readme.md的make时输出，看看对应架构的编了哪些文凭，分别写进Android.mk/Android.bp去。编译进libandroid_runtime.so时，需要把.cc文件后缀改为.cpp
+# 写Android.mk/Android.bp时，可以找一个有编译汇编的模版来对照着定，比如 frameworks/rs/cpu_ref/Android.bp(.mk)
+# 也可指定多个后缀 LOCAL_CPP_EXTENSION := .cc .cpp .cxx
+
+# mmm showcommands mmm frameworks/base/core/jni
+
+
+
+______________________________ Android Qualcomm cancro Kernel Source ______________________________________
+
+1.
+make bootimage -j4
+build/core/main.mk:45: ********************************************************************************
+build/core/main.mk:46: *  You are using version 4.1 of make.
+build/core/main.mk:47: *  Android can only be built by versions 3.81 and 3.82.
+build/core/main.mk:48: *  see https://source.android.com/source/download.html
+build/core/main.mk:49: ********************************************************************************
+build/core/main.mk:50: *** stopping.  Stop
+
+
+
+mkdir -p ~/Workspaces/Softwares/
+pushd ~/Workspaces/Softwares/
+
+wget http://ftp.gnu.org/gnu/make/make-3.81.tar.gz
+
+tar xzvf make-3.81.tar.gz
+cd make-3.81/
+
+./configure
+make
+./make --version
+
+popd
+export PATH=~/Workspaces/Softwares/make-3.81:$PATH
+which make
+make --version
+
+
+
+2.
+make bootimage -j4
+Checking build tools versions...
+************************************************************
+You are attempting to build with the incorrect version
+of java.
+ 
+Your version is: java version "1.7.0_80".
+The correct version is: Java SE 1.6.
+ 
+Please follow the machine setup instructions at
+    https://source.android.com/source/download.html
+************************************************************
+
+# 在oracle官网下载 jdk-6:
+cd ~/Downloads/
+chmod a+x jdk-6u45-linux-x64.bin
+./jdk-6u45-linux-x64.bin
+sudo mv jdk1.6.0_45/ /usr/local/java/
+
+export JAVA_HOME=/usr/local/java/jdk1.6.0_45
+export JRE_HOME=$JAVA_HOME/jre
+export JAVA_BIN=$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
+export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+java -version
+
+
+
+3.
+/bin/bash: m4: command not found
+/bin/bash: flex: command not found
+sudo apt install -y m4 flex
+
+
+
+4.
+Can't use 'defined(@array)' (Maybe you should just omit the defined()?) at /AndroidKernel/Qualcomm_Android/kernel/kernel/timeconst.pl line 373.
+
+把 kernel/timeconst.pl 文件中 373行的：
+if (!defined(@val)) {
+改为if (!@val) {
+
+
+
+
+adb reboot bootloader
+fastboot flash boot out/target/product/msm8974/boot.img
+fastboot reboot
+
+
+
+
+
+
+
+----------------------------------------- cm-14.1 -----------------------------------------
+
+Difference from cm-13.0, use openjdk-8 instead:
+
+sudo apt-get install git-core gnupg flex bison gperf libsdl1.2-dev libesd0-dev libwxgtk3.0-dev squashfs-tools build-essential zip curl libncurses5-dev zlib1g-dev openjdk-8-jre openjdk-8-jdk pngcrush schedtool libxml2 libxml2-utils xsltproc lzop libc6-dev schedtool g++-multilib lib32z1-dev lib32ncurses5-dev gcc-multilib maven liblz4-tool tmux screen w3m ncftp 
+
+
+# 因为已经装有 jdk7 和 jdk8，我就不装 openjdk7 和 openjdk8 了，下面换变量PATH来切换版本
+
+
+cd ~/Workspaces/AOSP/CyanogenMod/
+
+mkdir android_cm-14.1
+cd android_cm-14.1/
+
+
+
+repo init -u git://github.com/CyanogenMod/android.git -b cm-14.1
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
+
+
+ 
+
+source build/envsetup.sh 		# 初始化环境变量
+
+breakfast cancro				# 等待下载依赖完成
+
+
+
+1.
+--------------------------------- 
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/qcom/binaries/msm8974/graphics/graphics-vendor.mk" does not exist.  Stop.
+
+** Don't have a product spec for: 'cm_cancro'
+** Do you have the right repo manifest?
+---------------------------------
+
+# 而发现在 .repo/local_manifests/roomservice.xml 确实有定义 device/qcom/common, 确没有 vendor/qcom/binaries
+# 根据 https://forum.xda-developers.com/oneplus-3/how-to/guide-complete-guide-building-t3477198/page7, 在 roomservice.xml 添加
+<project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+
+# 下载文件夹 https://github.com/TheMuppets/proprietary_vendor_qcom_binaries/tree/cm-14.1/msm8974
+# 不想整个git clone，就用 http://kinolien.github.io/gitzip/ 吧，svn checkout 不了。
+
+mkdir -p vendor/qcom/binaries/msm8974/
+# 然后把下载内容复制过去
+# 另 roomservice.py 已经被移到 vendor/cm/build/tools/ 下面
+
+
+2.
+--------------------------------- 
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/xiaomi/cancro/cancro-vendor.mk" does not exist.  Stop.
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/xiaomi/cancro/cm.mk]]: "vendor/xiaomi/cancro/cancro-vendor.mk" does not exist.  Stop.
+
+** Don't have a product spec for: 'cm_cancro'
+** Do you have the right repo manifest?
+---------------------------------
+
+pushd ~/Downloads
+svn checkout https://github.com/TheMuppets/proprietary_vendor_xiaomi/branches/cm-14.1/cancro/ ./proprietary_cancro_cm-14.1
+popd
+
+mkdir -p vendor/xiaomi/cancro
+cp -r ~/Downloads/proprietary_cancro_cm-14.1/* vendor/xiaomi/cancro/
+
+
+
+继续:
+
+breakfast cancro
+
+
+切换一下 java 版本:
+
+which java 
+PATH=/usr/local/java/jdk1.8.0_172/bin:$PATH
+java -version
+
+
+改 .bash_alias 吧，改 $PATH 会不认：
+
+vim ~/.bash_aliases
+
+// ----- vim content begin -----
+# JAVA_HOME=/usr/local/java/jdk1.7.0_80
+JAVA_HOME=/usr/local/java/jdk1.8.0_172
+// ----- vim content end -----
+
+source ~/.bash_aliases
+
+
+
+编译:
+
+brunch cancro
+
+
+
+
+
+
+
+
+
+
+3.
+--------------------------------- 
+[ 54% 18881/34643] Download: /AOSP/Cyanogen...t/common/obj/APPS/Gello_intermediates/org.cyanogenmod.gello-40.apk
+FAILED: /bin/bash -c "(mvn -q org.apache.maven.plugins:maven-dependency-plugin:2.10:get 				   org.apache.maven.plugins:maven-dependency-plugin:2.10:copy 		-DremoteRepositories=central::::https://maven.cyanogenmod.org/artifactory/gello_prebuilds 		-Dartifact=org.cyanogenmod:gello:40:apk 		-Dmdep.prependGroupId=true 		-Dmdep.overWriteSnapshots=true 		-Dmdep.overWriteReleases=true 		-Dtransitive=false 		-DoutputDirectory=/AOSP/CyanogenMod/android_cm-14.1/out/target/common/obj/APPS/Gello_intermediates/ )"
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact org.cyanogenmod:gello:apk:40 from/to central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds): Connect to maven.cyanogenmod.org:443 [maven.cyanogenmod.org/216.168.38.166] failed: Connection timed out (Connection timed out)
+[ERROR] org.cyanogenmod:gello:apk:40
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR] central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR] central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds, releases=true, snapshots=true)
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+[ 54% 18881/34643] target thumb C++: libv8 <= external/v8/src/crankshaft/hydrogen.cc
+ninja: build stopped: subcommand failed.
+build/core/ninja.mk:151: recipe for target 'ninja_wrapper' failed
+make: *** [ninja_wrapper] Error 1
+make: Leaving directory '/AOSP/CyanogenMod/android_cm-14.1'
+
+#### make failed to build some targets (41:45 (mm:ss)) ####
+--------------------------------- 
+
+mv vendor/cm/gello/Android.mk vendor/cm/gello/Android.mk.bak
+curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-14.1_old/gello/Android.mk -o vendor/cm/gello/Android.mk 
+
+
+
+继续编译:
+
+brunch cancro
+
+
+
+4.
+--------------------------------- 
+ninja: build stopped: subcommand failed.
+build/core/ninja.mk:151: recipe for target 'ninja_wrapper' failed
+make: *** [ninja_wrapper] Error 1
+make: Leaving directory '/AOSP/CyanogenMod/android_cm-14.1
+---------------------------------
+
+make update-api
+
+export LC_ALL=C
+
+prebuilts/sdk/tools/jack-admin stop-server
+prebuilts/sdk/tools/jack-admin start-server
+
+## 若出现 Jack server installation not found, 则: 
+cd prebuilts/sdk/tools/ && ./jack-admin install-server jack-launcher.jar jack-server-4.8.ALPHA.jar && cd -
+prebuilts/sdk/tools/jack-admin start-server
+
+
+
+还有这个错误因为改源码出错了，所以请仔细检查代码!
+
+
+
+
+1. 刷机：
+
+https://eu.dl.twrp.me/cancro/
+
+adb reboot bootloader
+fastboot devices
+
+fastboot flash recovery [image_name.img]
+fastboot boot [image_name.img]
+
+推荐用 TWRP 3.1.0 来刷cm-14.1, 因为其它版本会出现以下错误:
+
+3.2.3.0  TWRP : recv error on uevent
+3.0.2.0  TWRP : unknown command [log]
+
+
+
+
+2. 关掉 selinux 的正确做法:
+# 启示来源: http://www.miui.com/thread-9137678-1-1.html
+
+device/xiaomi/cancro/BoardConfig.mk : 在 BOARD_KERNEL_CMDLINE 追加 androidboot.selinux=permissive (注意前面空格)
+
+# Kernel
+BOARD_KERNEL_CMDLINE               := console=none vmalloc=340M androidboot.hardware=qcom msm_rtb.filter=0x3b7 ehci-hcd.park=3 androidboot.bootdevice=msm_sdcc.1 androidboot.selinux=permissive
+
+
+
+
+3. 记得一定要 清掉 Davilk Cache 目录， 要不会以为 system_server 一直访问不了/sdcard。其实关掉了 selinux 后是能访问的了，只是 dalvik cache 在搞鬼。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+______________________________ View and Debug AOSP Using Android Studio ______________________________________
+
+
+1. Debug Java
+
+source build/envsetup.sh && make idegen && development/tools/idegen/idegen.sh
+
+
+vim ~/.AndroidStudio3.2/config/studio64.vmoptions
+vim ~/.AndroidStudio[version_number]/config/studio64.vmoptions
+
+-Xms1g
+-Xmx4g
+
+
+File - open - android.ipr
+
+打开 Project Structure Settings -> Modules -> Dependencies 把底下的 <Module source> 移到最上面，优先跳转到它的API
+
+
+
+Scanning file to index ... or Indexing ... or Update index ... issue:
+
+# 选择好 Project SDK!!!!!!!! Project Structure Settings -> Project -> Project SDK
+
+# https://stackoverflow.com/a/30927850
+# https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit
+
+sudo vim /etc/sysctl.conf or cd /etc/sysctl.d/ && vim idea.conf
+# Increase the limit for Android Studio
+fs.inotify.max_user_watches = 8388608
+
+sudo sysctl -p --system
+cat /proc/sys/fs/inotify/max_user_watches
+
+# https://stackoverflow.com/a/37627121
+cd [~/Workspaces/Softwares/]android-studio/bin/
+cp idea.properties idea.properties.defaulf
+vim idea.properties
+
+
+
+
+2. LLDB Debug C++
+
+# https://zhuanlan.zhihu.com/p/24867284
+
+lldb-server 端:
+adb push /home/ubuntu/Android/Sdk/lldb/3.1/android/armeabi/lldb-server /data/local/tmp/
+cancro:/ # adb shell
+cancro:/ # whoami
+cancro:/ # su
+cancro:/ # cd /data/local/tmp
+cancro:/ # chmod 777 ./lldb-server
+cancro:/ # ./lldb-server platform --server --listen unix-abstract:///data/local/tmp/debug.sock
+
+lldb 端:
+sudo apt install lldb 
+(lldb) platform select remote-android
+(lldb) platform connect unix-abstract-connect:///data/local/tmp/debug.sock
+(lldb) process attach -p 1439
+(lldb) c
+(lldb) br s -n Java_java_io_UnixFileSystem_createFileExclusively0
+(lldb) br list
+
+(lldb) source info
+(lldb) add-dsym '/AOSP/CyanogenMod/android_cm-14.1/out/target/product/cancro/symbols/system/lib/libopenjdk.so'
+(lldb) br list
+(lldb) source info 
+(lldb) settings set target.source-map /proc/self/cwd/ /AOSP/CyanogenMod/android_cm-14.1/
+(lldb) source info
+(lldb) n
+
+
+
+
+# xcrun simctl list devices booted
+# ~/Library/Developer/CoreSimulator/Devices/[__Device_ID__]/data/Containers/Data/Application/[__APPLICATION_ID__]/.com.apple.mobile_container_manager.metadata.plist
+# Find out the matching BundleId, then can build up mapping of __APPLICATION_ID__ & BundleId
+
+
+ps -ef | grep XDragon.app/XDragon
+lldb or XCode attach
+(lldb) process attach -p 56305
+(lldb) c
+(lldb) process interrupt
+(lldb) po [TeeSecurityStore secretKeys]
+(lldb) process detach   # should detach for hot-reload/restart dart
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------> cm-12.0 <------------------------
+
+mkdir cm-12.0 && cd cm-12.0
+
+repo init -u git://github.com/LineageOS/android.git -b cm-12.0
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+repo sync
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- OnePlusOSS -----------------------------------------
+
+cd Disk && mkdir -p Workspaces/AOSP/OnePlusOSS/
+
+
+------------------------> oneplus3_6.0.1 (垃圾系统来的，滑动点单击了) <------------------------
+
+
+mkdir oneplus3_6.0.1 && cd oneplus3_6.0.1/
+
+repo init -u git://github.com/OnePlusOSS/android.git -b oneplus3/6.0.1
+
+repo sync
+
+
+# connect to device and make sure adb is connected & unauthorized.
+
+pushd .repo/manifests && ./pull_library.sh && popd
+
+# 因为没有 root 权限，有些文件 pull 不下来
+# pull_library.sh -> pull_library_without_root.sh: 把所有 adb pull 改成 cp, 并在之前加上 mkdir -p $(dirname ${[Below_File_Name]})
+# adb push pull_library_without_root.sh /sdcard/
+# adb shell &&  cd /sdcard/ && sh pull_library_without_root.sh
+# adb pull /sdcard/vendor ~/Downloads/
+
+# 但还是不全:
+https://github.com/mkey-mi/android_vendor_oneplus_oneplus3
+# 下载完后改名作 oneplus 文件夹名, merge 进 vendor/oneplus/ 中去
+# 因为放错位置，导致了错误: No rule to make target out/target/common/obj/JAVA_LIBRARIES/tcmiface_intermediates/classes.jar
+
+
+# then copy the .repo/manifests/vendor to project root directory, cause root directory also has vendor/ folder, but copy to will auto merge.
+
+. build/envsetup.sh
+
+
+# Download https://download.java.net/openjdk/jdk7u75/ri/openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz
+
+sudo mv openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz /usr/local/java/
+pushd /usr/local/java/
+sudo mkdir openjdk-7u75-ri
+sudo tar zxvf ./openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz -C ./openjdk-7u75-ri/
+
+# 改一下名字
+pushd openjdk-7u75-ri/ && sudo mv java-se-7u75-ri openjdk-7u75 && sudo mv openjdk-7u75 ../ && popd && sudo rm -rf openjdk-7u75-ri
+
+popd
+
+------------ vim ~/.bash_aliases ------------
+...
+JAVA_HOME=/usr/local/java/openjdk-7u75
+------------ vim ~/.bash_aliases ------------
+
+source ~/.bash_aliases && echo $JAVA_HOME && java -version
+
+lunch  # 而后选择 25
+
+make -j4
+
+# 已经是 openjdk 1.7.0_75, 但还是不行:
+Your version is: openjdk version "1.7.0_75" OpenJDK Runtime Environment (build 1.7.0_75-b13) OpenJDK 64-Bit Server VM (build 24.75-b04, mixed mode).
+The required version is: "1.7.x"
+
+# 不是 openjdk 问题:
+把 oneplus3_6.0.1/build/core/main.mk 里的 line 156: ^java -> ^openjdk
+java_version := $(shell echo '$(java_version_str)' | grep '^java .*[ "]1\.7[\. "$$]')
+改成
+java_version := $(shell echo '$(java_version_str)' | grep '^openjdk .*[ "]1\.7[\. "$$]')
+
+
+
+----------------------------------------- Error -----------------------------------------
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+build/core/host_shared_library_internal.mk:51: recipe for target 'out/host/linux-x86/obj/lib/libart.so' failed
+make: *** [out/host/linux-x86/obj/lib/libart.so] Error 1
+make: *** Waiting for unfinished jobs....
+----------------------------------------- Error -----------------------------------------
+
+// https://stackoverflow.com/questions/36048358/building-android-from-sources-unsupported-reloc-43
+// https://blog.csdn.net/fuchaosz/article/details/51487585
+// https://forum.xda-developers.com/chef-central/android/guide-how-to-setup-ubuntu-16-04-lts-t3363669/page2
+
+# 差不多都是 art/build/Android.common_build.mk： ifneq ($(WITHOUT_HOST_CLANG),true) -> 改成 ifeq ($(WITHOUT_HOST_CLANG),false)
+
+stat prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld
+stat prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld
+
+mv prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld_bak
+cp /usr/bin/ld.gold prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.11-4.8/x86_64-linux/bin/ld
+
+mv prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld_bak
+cp /usr/bin/ld.gold prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8/x86_64-linux/bin/ld
+
+# x86_64-linux-glibc2.15-4.8 这个目录下面 ld 才是主要的解决这个错误的。
+
+
+
+cd out/target/product/msm8996/
+adb reboot bootloader
+fastboot flash boot boot.img
+fastboot flash system system.img
+fastboot flash userdata userdata.img
+
+
+## 编译 OTA 包
+
+make otapackage -j8
+
+
+## 编译 Release 包
+
+make dist -j8
+
+
+## 生成了 Dist: out/dist/msm8996-ota-eng.ubuntu.zip
+
+
+# 去 TWRP 下载 Recovery 
+
+https://dl.twrp.me/oneplus3/
+adb reboot bootloader
+fastboot oem unlock
+fastboot flash recovery twrp-3.3.1-0-oneplus3.img
+fastboot boot twrp-3.3.1-0-oneplus3.img
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- cm-13.0 For oneplus3 -----------------------------------------
+
+
+cd ~/Workspaces/AOSP/CyanogenMod && mkdir android_cm-13.0-ZNH5Y/ && cd android_cm-13.0-ZNH5Y/
+
+
+repo init -u git://github.com/CyanogenMod/android.git -b stable/cm-13.0-ZNH5Y
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
+source build/envsetup.sh
+
+
+
+#########################################################################
+#
+# 直接使用 sultanxda 的，放在 .repo/local_manifest 下， 把 sultanxda/ 改为 kerneltoast/
+# https://github.com/kerneltoast/android/blob/master/oneplus3/cm-13.0-stable/local_manifest.xml
+# 直接 repo sync --force-sync -f -j8, 完事之后直接 brunch oneplus3 , 然后刷底包，然后刷机
+#
+#########################################################################
+
+
+breakfast oneplus3
+
+
+// 解决从github上拉取代码慢的问题: https://blog.csdn.net/yyou33459/article/details/84947819
+// 编辑hosts后，刷新DNS： https://askubuntu.com/a/414842
+// sudo /etc/init.d/dns-clean restart &&　sudo /etc/init.d/networking force-reload
+// 感觉确实有点效果
+
+
+# 中途下载有错/或想换branch "stable/cm-13.0-ZNH5Y" , vim .repo/local_manifests/roomservice.xml 删掉下载/检出出错的:
+  <project name="CyanogenMod/android_device_oneplus_oneplus3" path="device/oneplus/oneplus3" remote="github" revision="stable/cm-13.0-ZNH5Y" />
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="stable/cm-13.0-ZNH5Y" />
+
+  <project name="CyanogenMod/android_device_oppo_common" path="device/oppo/common" remote="github" />
+  <project name="CyanogenMod/android_kernel_oneplus_msm8996" path="kernel/oneplus/msm8996" remote="github" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_frameworks" path="vendor/nxp-nfc/opensource/frameworks" remote="github" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_libnfc-nci" path="vendor/nxp-nfc/opensource/libnfc-nci" remote="github" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_Nfc" path="vendor/nxp-nfc/opensource/Nfc" remote="github" />
+
+
+# 然后再 breakfast oneplus3 && repo sync --force-sync 一遍，让它重新下载
+
+
+#　 ！！！！！　实在下载太慢了　！！！！！
+#  把　https://github.com/CyanogenMod/android_kernel_oneplus_msm8996　fork 到码云上，然后再从码云上拉下来
+#  git clone --no-checkout [url_from_gitee.com]
+#   
+#  git remote -v
+#  改一下 .git/config 使其与　.repo/projects/kernel/oneplus/msm8996.git/config 及　.repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git　大致一致
+#  git fetch github 一下，然后移到 AOSP 源码去
+#  
+#  mv .repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git .repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git__
+#  mv ~/Downloads/android_kernel_oneplus_msm8996/.git .repo/project-objects/CyanogenMod/android_kernel_oneplus_msm8996.git
+#  
+#  然后再  breakfast oneplus3
+
+
+
+------------------------------------ 
+###### 如果不采用上面的 repo sync 来下载 proprietary_vendor_oneplus 
+adb root
+pushd device/oneplus/oneplus3/
+./extract-files.sh
+popd
+
+(extract-files.sh 会有好多没 pull 下来的，采用下面两种方法)
+
+1. 
+svn ls https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/stable/cm-13.0-ZNH5Y/oneplus3
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/stable/cm-13.0-ZNH5Y/oneplus3 ./cm-13.0-ZNH5Y_oneplus3/
+cp ./cm-13.0-ZNH5Y_oneplus3/* [path_to_aosp]/vendor/oneplus/oneplus3/
+
+
+2.
+# 同样的把 https://github.com/siankatabg/proprietary_vendor_oneplus3 弄到码云去，再下载zip，别clone了太大了，然后解压
+# 然后先把 vendor/oneplus/oneplus3 的 proprietary 复制Merge到刚刚下载解压文件去，然后再复制下载的 Merge 回 vendor/oneplus/oneplus3/下的 proprietary
+# 这样确保有的文件不变，没有的就复制过来了
+------------------------------------ 
+
+
+
+
+-----------------------------------------
+make: *** No rule to make target '/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y/out/target/common/obj/JAVA_LIBRARIES/sap-api-java-static_intermediates/classes.jack', needed by '/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y/out/target/common/obj/APPS/Bluetooth_intermediates/with-local/classes.dex'.  Stop.
+make: *** Waiting for unfinished jobs....
+Import includes file: /AOSP/CyanogenMod/android_cm-13.0-ZNH5Y/out/target/product/oneplus3/obj_arm/STATIC_LIBRARIES/libcutils_intermediates/import_includes
+make: Leaving directory '/AOSP/CyanogenMod/android_cm-13.0-ZNH5Y'
+-----------------------------------------
+device/oneplus/oneplus3/BoardConfig.mk:
+BOARD_HAVE_BLUETOOTH_QCOM := false -> BOARD_HAVE_BLUETOOTH_QCOM := false
+
+
+
+
+-----------------------------------------
+# 错误: make: *** No rule to make target 'vendor/oneplus/oneplus3/proprietary/framework/org.ifaa.android.manager.jar'
+-----------------------------------------
+# 这个 org.ifaa.android.manager.jar 错误其实在 extract-files.sh 那里也出现没adb pull到。
+# 氫OS 与 氧OS 都没有这个jar。2017年前是Android 6的。https://www.oneplusbbs.com/thread-3229065-1.html & http://pan.baidu.com/s/1eSutrz0 : hw5p
+# 下载个别人的Rom cm-13 for Sultan-oneplus3, 刷机后发现就有这个jar:
+// https://androidfilehost.com/?w=files&flid=98717&sort_by=date&sort_dir=DESC
+
+
+
+-----------------------------------------
+make: *** No rule to make target 'vendor/oneplus/oneplus3/proprietary/priv-app/xtra_t_app/xtra_t_app.apk', needed by '/AOSP/CyanogenMod/android_cm-13.0/out/target/product/oneplus3/obj/APPS/xtra_t_app_intermediates/package.apk'.  Stop.
+make: *** Waiting for unfinished jobs....
+-----------------------------------------
+# 几种解决方法, 
+# 一、删掉 vendor/oneplus/oneplus3/Android.mk 和 vendor/oneplus/oneplus3/oneplus3-vendor.mk 里面关于引用 xtra_t_app 的编译内容
+# 二、下载 https://github.com/TheMuppets/proprietary_vendor_oneplus/tree/cm-13.0/oneplus3 proprietary 并用上它的 Android.mk & oneplus3-vendor.mk
+# 三、单独下载 https://github.com/TheMuppets/proprietary_vendor_oneplus/blob/cm-13.0/oneplus3/proprietary/priv-app/xtra_t_app/xtra_t_app.apk 放到对应目录
+
+svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/cm-13.0/oneplus3/ ./TheMuppest_cm-13.0_oneplus3/
+# 如果中途停了，进到子目录去 svn checkout [url_to_dir] 来下载子目录，用 svn update [file_or_sudir] 来下载单个文件/子目录, 利用svn ls配合写个python脚本来下载
+// svn ls https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/cm-13.0/oneplus3/
+// https://stackoverflow.com/questions/122107/checkout-one-file-from-subversion
+// https://stackoverflow.com/questions/3196083/download-single-file
+
+brunch oneplus3
+
+
+
+
+# 刷 CM 前先刷底包
+// https://www.celsoazevedo.com/files/android/oneplus3-modem-firmware/    	(一加三的!!!!)
+// https://ciux.org/oneplus3-base-firmware.html
+// http://www.oneplusbbs.com/thread-594213-1-1.html 	(注意这是一加一的)
+// http://www.oneplusbbs.com/thread-2964248-1-2.html
+// https://forum.xda-developers.com/showpost.php?p=76943628&postcount=8
+# 所一加论坛说的： 刷了氧3.2.6底包再去刷CM14，才能正常。CM13的话，看第一条链接刷个底包看看。
+
+# 讨论1： https://www.oneplusbbs.com/thread-2972013-1.html
+# 讨论2： https://www.oneplusbbs.com/thread-2977319-1.html
+# 讨论3： https://www.oneplusbbs.com/thread-3000963-1.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- cm-14.1 For oneplus3 -----------------------------------------
+
+source build/envsetup.sh
+
+
+breakfast oneplus3
+
+
+# 下面两种选一种即可:
+
+
+-------- 1 --------
+// https://forum.xda-developers.com/oneplus-3/how-to/guide-complete-guide-building-t3477198/page7
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project name="CyanogenMod/android_device_oppo_common" path="device/oppo/common" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_device_qcom_common" path="device/qcom/common" remote="github" revision="cm-14.1" />
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_device_oneplus_oneplus3" path="device/oneplus/oneplus3" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_kernel_oneplus_msm8996" path="kernel/oneplus/msm8996" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_external_sony_boringssl-compat" path="external/sony/boringssl-compat" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_external_stlport" path="external/stlport" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_Nfc" path="vendor/nxp-nfc/opensource/Nfc" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_frameworks" path="vendor/nxp-nfc/opensource/frameworks" remote="github" revision="cm-14.1" />
+  <project name="CyanogenMod/android_vendor_nxp-nfc_opensource_libnfc-nci" path="vendor/nxp-nfc/opensource/libnfc-nci" remote="github" revision="cm-14.1" />
+  <project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+</manifest>
+
+# 如果不想从设备上 extract-files.sh, 毕竟老是有些 adb: error: remote object 'xxx' does not exist, 可以 roomservice.xml 加上:
+--- vim begin ----
+<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="cm-14.1" />
+--- vim end ---
+# 然后再 repo sync 一遍:
+repo sync --force-sync -j8
+
+
+-------- 2 --------
+adb root
+pushd device/oneplus/oneplus3/
+./extract-files.sh
+popd
+
+
+
+brunch oneplus3
+
+
+
+
+----------------------------------------- 错误 -----------------------------------------
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/oneplus/oneplus3/cm.mk]]: "vendor/qcom/binaries/msm8996/graphics/graphics-vendor.mk" does not exist.  Stop.
+Device oneplus3 not found. Attempting to retrieve device repository from CyanogenMod Github (http://github.com/CyanogenMod).
+...
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/oneplus/oneplus3/cm.mk]]: "vendor/qcom/binaries/msm8996/graphics/graphics-vendor.mk" does not exist.  Stop.
+build/core/product_config.mk:250: *** _nic.PRODUCTS.[[device/oneplus/oneplus3/cm.mk]]: "vendor/qcom/binaries/msm8996/graphics/graphics-vendor.mk" does not exist.  Stop.
+----------------------------------------- 错误 -----------------------------------------
+
+// https://github.com/TheMuppets/proprietary_vendor_qcom_binaries
+# vim .repo/local_manifests/roomservice.xml:
+--- vim begin ---
+<project name="TheMuppets/proprietary_vendor_qcom_binaries" path="vendor/qcom/binaries" remote="github" revision="cm-14.1" />
+--- vim end ---
+# 编辑完 roomservice.xml 后，需要重新 sync 一次: repo sync --force-sync -j8
+
+
+
+
+
+----------------------------------------- 错误 -----------------------------------------
+build/core/binary.mk:1253: external/pdfium/third_party/pdfiumbigint.mk: libpdfiumbigint: Unused source files: bigint/BigInteger.cc bigint/BigIntegerUtils.cc bigint/BigUnsigned.cc bigint/BigUnsignedInABase.cc
+./external/speex/Android.mk:56: TODOArm64: enable neon in libspeex
+frameworks/av/camera/cameraserver/Android.mk:18: Target has integrated cameraserver into mediaserver. This is weakening security measures introduced in 7.0
+build/core/package_internal.mk:143: Empty argument supplied to find-subdir-assets
+find: ‘/AOSP/CyanogenMod/android_cm-14.1/out/target/common/obj/SHARED_LIBRARIES/libwifi-hal-mock_intermediates’: No such file or directory
+build/core/package_internal.mk:143: Empty argument supplied to find-subdir-assets
+./vendor/qcom/binaries/Android.mk:1: *** This repo is now deprecated. Move your blobs to your device's vendor repo..
+build/core/ninja.mk:166: recipe for target '/AOSP/CyanogenMod/android_cm-14.1/out/build-cm_oneplus3.ninja' failed
+make: *** [/AOSP/CyanogenMod/android_cm-14.1/out/build-cm_oneplus3.ninja] Error 1
+----------------------------------------- 错误 -----------------------------------------
+# 错误是这一句: vendor/qcom/binaries/Android.mk:1: *** This repo is now deprecated. Move your blobs to your device's vendor repo..
+# 不是这一句： ... libwifi-hal-mock_intermediates’: No such file or directory
+// https://forum.xda-developers.com/moto-g-2014/general/guide-build-lineageos-titan-ubuntu-t3537396
+mv vendor/qcom/binaries/Android.mk vendor/qcom/binaries/Android.mk.bak
+# 或者注释掉第一句 $(error ....
+
+
+
+----------------------------------------- 错误 -----------------------------------------
+build/core/base_rules.mk:183: *** vendor/qcom/binaries/msm8996/graphics: MODULE.TARGET.SHARED_LIBRARIES.libsdm-disp-apis already defined by vendor/oneplus/oneplus3.
+build/core/ninja.mk:166: recipe for target '/AOSP/CyanogenMod/android_cm-14.1/out/build-cm_oneplus3.ninja' failed
+make: *** [/AOSP/CyanogenMod/android_cm-14.1/out/build-cm_oneplus3.ninja] Error 1
+make: Leaving directory '/AOSP/CyanogenMod/android_cm-14.1'
+----------------------------------------- 错误 -----------------------------------------
+# 重复定义了 LOCAL_MODULE 了， 注释掉 vendor/qcom/binaries/msm8996/graphics/Android.mk
+
+
+
+----------------------------------------- 错误 -----------------------------------------
+ninja: error: 'vendor/oneplus/oneplus3/proprietary/lib/qpd_dspcl_v2.bin', needed by '/AOSP/CyanogenMod/android_cm-14.1/out/target/product/oneplus3/system/lib/qpd_dspcl_v2.bin', missing and no known rule to make it
+build/core/ninja.mk:151: recipe for target 'ninja_wrapper' failed
+make: *** [ninja_wrapper] Error 1
+make: Leaving directory '/AOSP/CyanogenMod/android_cm-14.1
+----------------------------------------- 错误 -----------------------------------------
+# 少 svn 下载了 qpd_dspcl_v2.bin 这个文件, 下载后复制过去
+cd TheMuppest_cm-14.1_oneplus3/proprietary/lib && svn update qpd_dspcl_v2.bin
+
+# 还有别的缺少 .so 的错误，直接去 svn checkout 目录的对应子目录去， svn update [name.so] 然后复制到源码的 proprietary 对应子目录下
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

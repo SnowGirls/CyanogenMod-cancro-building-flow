@@ -1,0 +1,289 @@
+
+
+## Macosx 抓iOS模拟器的Http/Https包
+
+前期准备：
+1、打开 Charles；
+2、打开 模拟器； 后面步骤或许需要重启模拟器/Charles，先启动Charles，后启动模拟器；
+3、关闭电脑上的代理软件或代理服务；
+
+一、Charles -> 点击顶部菜单栏的 Proxy -> 勾选 macOS Proxy；
+二、Charles -> 点击顶部菜单栏的 Help -> SSL Proxying -> Install Charles Root Certificate in iOS Simulators；
+三、模拟器 -> 设置 App -> 通用 -> 关于本机 -> 滑到底部 -> 证书信任设置，点开后会看到 Charles Proxy CA（…），这时把证书开关打开；
+四、模拟器 -> Safari 浏览器，在地址栏输入 chls.pro/ssl，这时会弹出弹窗提示你安装描述文件，点允许安装；
+五、模拟器 -> 设置 App -> 通用 -> 滑到下面 -> 描述文件 -> 看到 Charles Proxy CA（…）-> 点击证书 -> 点击导航栏右上角安装 Charles 的描述文件；
+六、电脑 -> 系统偏好设置 App -> 网络 -> 记住你当前连接网络的 IP（如当前连接了 Wi-Fi）-> 点击右下角的高级 -> 弹出的窗口里 -> 点击代理 TAB；选中【网页代理(HTTP)】，在地址栏和端口填入刚刚记住的 IP 地址和端口8888（如果不是8888，请到 Charles -> Proxy 里查看具体的端口），同理，下方的【安全网页代理(HTTPS)】也一样输入 IP:Port，填好后点击“好”并应用；( 一般填 127.0.0.1:8888 就OK了)
+七、Charles -> 点击顶部菜单栏的 Proxy -> SSL Proxying setting -> 打勾 Enable SSL Proxying -> Include Location 里填写 *:* , 即所有IP所有Port；
+八、模拟器 -> 打开你的 App 或 网页(https://www.baidu.com) 抓包
+
+注意：抓包结束后，请按步骤六回到电脑系统设置页，把网页代理和安全网页代理去掉，否则关掉 Charles 后电脑上不了网。
+
+参考链接：
+https://www.jianshu.com/p/91efcaab989c
+https://www.jianshu.com/p/933d78091d90
+
+
+Android Studio Connect to 127.0.0.1:8888 [/127.0.0.1] failed: Connection refused
+
+因为之前连过代理Charles，即使关了也不行，Android Studio会认为你还连着代理，Mac电脑需要执行这个命令：
+
+pkill -f '.*GradleDaemon.*'
+
+Gradle Daemon是Gradle的守护进程，需要将其关闭。（若没有用，最后完全退出as，然后重新打开才有用。）
+
+
+
+
+## IntelliJ
+
+1. 删除掉 ${HOME}/Library/Application\ Support/JetBrains  来不断试用 IntelliJ 
+
+2. 用 IDE Eval Reset 不断试用 或者 ja-netfilter 来截获密钥License许可请求
+
+
+ja-netfilter 方式:
+
+1. 打开 https://3.jetbra.in  -> 选择一下地址进去[Page1] -> 下载它的 jetbra.zip 然后解压
+
+2. 打开解压出来的 readme.txt 读一遍, 设置好 IDE 的 vmoptions 的: 
+
+	--add-opens=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED
+	--add-opens=java.base/jdk.internal.org.objectweb.asm.tree=ALL-UNNAMED
+
+	-javaagent:/path_to_jetbra/ja-netfilter.jar=jetbrains
+
+
+	2.1 Macosx的话可以 运行 scripts/install.sh 自动写入
+
+3. 在 [Page1] 下点击 IntelliJ IDEA 框 就会 Copy 它的Key。
+
+4. Help -> Register... -> Add New License -> Activation Code -> Paste the Key you copied -> Activate
+
+	## Android Studio 不需要，去掉:
+		vim ${HOME}/Library/LaunchAgents/jetbrains.vmoptions.plist
+		delete STUDIO_VM_OPTIONS
+		env | grep VM_OPTIONS
+		unset STUDIO_VM_OPTIONS
+		launchctl unsetenv STUDIO_VM_OPTIONS
+
+5. 重启 IDE
+
+
+它的 readme.txt：
+
+		Operation guide: 
+		    1. add -javaagent:/path/to/ja-netfilter.jar=jetbrains to your vmoptions (manual or auto)
+		    2. log out of the jb account in the 'Licenses' window
+		    3. use key on page https://jetbra.in/5d84466e31722979266057664941a71893322460
+		    4. plugin 'mymap' has been deprecated since version 2022.1
+		    5. don't care about the activation time, it is a fallback license and will not expire
+
+		Enjoy it~
+
+		JBR17:
+		    add these 2 lines to your vmoptions file: (for manual, without any whitespace chars)
+		    --add-opens=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED
+		    --add-opens=java.base/jdk.internal.org.objectweb.asm.tree=ALL-UNNAMED
+
+		NEW: 
+		    Auto configure vmoptions:
+		        macOS or Linux: execute "scripts/install.sh"
+		        Windows: double click to execute "scripts\install-current-user.vbs" (For current user)
+		                                         "scripts\install-all-users.vbs" (For all users)
+
+
+
+
+________________________________________________ Macosx 查看端口被占用情况 ________________________________________________
+
+lsof -n -i:8081  
+
+netstat -anv | grep 8081
+
+
+________________________________________________ Android Studio Gradle sync 更快 ________________________________________________
+
+https://stackoverflow.com/a/35859572
+
+	View->Tool Windows->Gradle->Toggle button of online/offline
+
+https://stackoverflow.com/a/37475636
+
+	gradle.properties:
+
+		org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+		org.gradle.parallel=true
+
+
+________________________________________________ Macosx 常用快捷键 ________________________________________________
+
+
+$0 	当前脚本的文件名。
+$n （n≥1） 传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是 $1，第二个参数是 $2。
+$# 	传递给脚本或函数的参数个数。
+$* 	传递给脚本或函数的所有参数。
+$@ 	传递给脚本或函数的所有参数。当被双引号" "包含时，$@ 与 $* 稍有不同，我们将在《Shell $*和$@的区别》一节中详细讲解。
+$? 	上个命令的退出状态，或函数的返回值，我们将在《Shell $?》一节中详细讲解。
+$$ 	当前 Shell 进程 ID。对于 Shell 脚本，就是这些脚本所在的进程 ID。
+
+
+C-a, C-e   	行首 ahead, 行尾end          	 # 加上 shift 可选择至行首行尾，但有些编辑器可行如sublime/vscode, 不行的编辑器如android studio.
+
+C-f, C-b,   前进 forward, 后退 backward
+
+C-p, C-n,   上一行 previous, 下一行 next
+
+
+C-U: 		delete on line
+C-K: 		delete to the ene of the line 
+
+C-W: 		delete one word backward
+Option-D: 	delete one word forward (should enable 'Use Option as Meta key'[Optioin+Command+O])
+
+
+C-T: 		Transpose two characters
+
+// https://support.apple.com/en-us/HT201236
+// https://support.apple.com/en-hk/guide/terminal/trmlshtcts/mac
+
+Command-F: Find
+
+Command-G: Find next
+
+Command-Shift-G: Find previous
+
+Command-E: Find using the selected text
+
+Command-J: Jump to the selected text
+
+Command-A: Select all
+
+Control-Command-Space: Open the character viewer
+
+Command-K: Clear to start
+
+Control-R: Reverse search command history
+
+Command-Option-O: Toggle “Use Option as Meta Key” option
+
+
+
+
+
+
+
+________________________________________________ VSCode 常用快捷键 ________________________________________________
+
+
+Shift + F6    			# 切换焦点 Explorer -> Editor
+
+Command + .   			# 自动 import
+
+Command + K + S  		# 调出所有快捷键窗口
+
+Command + Control + E  	# 焦点定位到 Explorer 窗口
+
+Command + J 			# 显示/隐藏Console Panel
+
+Command + K, E  		# 焦点定位到 Explorer 的 OPEN EDITORS 窗口。 (这里逗号 , 指要松开 Command 再按 E)
+
+Command + K, R  		# 在 Finder 打开此刻活跃的编辑文件
+
+
+Command + Shift + { or } 	# 切换Tab，这个很通用的，在别的APP如 Terminal 等都通用
+
+Shift + Option + Up/Down 	# Copy on line up/down
+
+
+
+
+
+________________________________________________ XCode 常用快捷键 ________________________________________________
+
+1. Command + D
+
+将选中的代码复制一份，相当于复制 + 粘贴
+
+2. Command + Shift + Control + H
+
+鼠标放在函数名上，按这个组合键可以查找当前函数被调用的位置，以及层次结构
+
+3. Command + Option + [ or ]
+
+将选中的代码上移/下移一行
+
+4. Command + Control + E  or  Fn + Shift + F6
+
+Refactor 变量或者方法名
+
+
+5. Control + Command + R
+
+跳过编译，直接运行&调试
+
+6. Control + Option + Command + F 一键修复所有
+
+
+Command + ; 跳转到下一个有问题的单词
+
+Command + Shift + ; 打开拼写和语法窗口，快速处理
+
+
+Shift + Control + 向上/向下/单击 : 多光标编辑
+
+Control + Option + 鼠标上下拖拽  : 选中区域编辑
+
+
+
+
+________________________________________________ 生成二维码的几种方式 ________________________________________________
+
+1.
+
+URL=https://www.baidu.com
+curl "https://www.patrick-wied.at/static/qrgen/qrgen.php?r=14&a=0&content=$URL" -o QRCode.png
+
+TEXT=HELLO_WORLD
+curl "https://tool.oschina.net/action/qrcode/generate?data=$TEXT&output=image%2Fpng&error=Q&type=0&margin=8&size=4&1697683123240" -o b.png
+
+
+2.
+
+brew install qrencode
+
+URL_OR_TEXT="https://www.baidu.com"
+qrencode -m 2 -t utf8 <<< "$URL_OR_TEXT"
+
+
+alias qr='qrencode -m 2 -t utf8 <<< "$1"'
+qr https://www.baidu.com
+
+
+
+
+
+
+________________________________________________ pod install timeout 错误 ________________________________________________
+
+Mac ios % pod install 
+Analyzing dependencies
+[!] CDN: trunk Repo update failed - 191 error(s):
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.0/CloudIM.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.1/CloudIM.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.2/CloudIM.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.3/CloudIM.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.4/CloudIM.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.5/CloudIM.podspec.json Response: Couldn't resolve host name
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.6/CloudIM.podspec.json Response: Timeout was reached
+
+# 去源码 cocoapods-core-1.xx 里搜索 『URL couldn't be downloaded:』，可以发现设置 `COCOAPODS_CDN_MAX_NUMBER_OF_RETRIES` 环境变量可减少重试等待时间
+
+# 其实是链接是能访问的，只是超时时间短了。 可以 `download_typhoeus_impl_async` 方法发现超时时间为 10，可以设置成 120 秒 减少重试次数
+
+# 用浏览器&curl 打开一下 https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.0/CloudIM.podspec.json ，有正确响应回来后再 pod install 就 OK 了
+
+
+
+
+
+

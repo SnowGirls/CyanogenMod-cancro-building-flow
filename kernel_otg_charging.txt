@@ -1,0 +1,7 @@
+
+
+https://forum.xda-developers.com/t/usb-otg-cable-host-mode-while-charging-anyone-try-this-accessory.1839145/
+
+https://forum.xda-developers.com/t/otg-usb-using-otg-cable-and-charging-at-the-same-time-solved-29-08-12.1822653/
+
+https://github.com/artas182x/idleKernel-note3/commit/17c9a8cf85d16cb19faa3a4c7cd39c86efb46025

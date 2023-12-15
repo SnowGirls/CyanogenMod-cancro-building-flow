@@ -1,0 +1,22 @@
+
+## Complie resocks2
+
+redsocks:
+https://github.com/darkk/redsocks
+
+redsocks2:
+https://github.com/semigodking/redsocks
+
+
+Redsocks2 compile on Android platform:
+https://github.com/terry39/redsocks2-android-compile	## 推荐  (需要从下面的project复制config.h过来)
+https://github.com/fanmingyi/redsocks2Android 			## 不推荐，编了后运行不了 (需要把version.c移到上一层)
+
+## 先去Android开发网站下载 r14 版本的 ndk，加如 PATH 中
+## 然后到 project 的 android 目录下 ndk-build 一下
+
+
+参考:
+https://fh0.github.io/%E7%BC%96%E8%AF%91/2019/12/07/android-redsocks2.html
+
+

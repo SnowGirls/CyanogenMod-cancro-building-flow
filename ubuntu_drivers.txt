@@ -1,0 +1,275 @@
+
+ip a
+# only has lo, that means your new board new network device do not upported by Ubuntu 20.04 now
+
+# 1. Find your network device version, for example: Realtek RTL8125B
+# 2. Use Another PC, go to Realtek offical website, download r8125-9.005.06.tar.bz2 sources
+# 3. For compile the driver source, your need gcc & make command environment, so download the ubuntu-20.04.2.0-desktop-amd64.iso for apt source
+# 4. Copy r8125-9.005.06.tar.bz2 & ubuntu-20.04.2.0-desktop-amd64.iso to your ubuntu PC, then
+	
+	sudo mkdir /media/cdrom
+	sudo mount -o loop /home/ubuntu/Downloads/ubuntu-20.04.2.0-desktop-amd64.iso /media/cdrom
+	
+	sudo cp /etc/apt/sources.list /etc/apt/sources.list.default
+	sudo vi /etc/apt/sources.list
+	
+# 5. Insert line below into first (same as first comment line, you can just uncomment it):
+	deb cdrom:[Ubuntu 20.04.2.0 LTS _Focal Fossa_ - Release amd64 (20210209.1)]/ focal main restricted
+	# deb cdrom:[Ubuntu 20.04.2.0 LTS amd64]/ focal main restricted
+	
+# 6. Issue:
+
+	sudo apt-cdrom -m -d /media/cdrom add
+	sudo apt-get install build-essential	 # for install gcc & make env
+	gcc -v 				 # for check gcc & make 
+	which make 
+	
+	unzip r8125-9.005.06.tar.bz2
+	cd r8125-9.005.06/src/
+	sudo ls -al /lib/modules/5.8.0-43-generic/kernel/drivers/net/ethernet/realtek/
+	sudo make install
+	sudo ls -al /lib/modules/5.8.0-43-generic/kernel/drivers/net/ethernet/realtek/
+	
+	# then you will found new file r8125.ko was installed, and the r8169.ko was moved to r8169.bak
+	
+	cd ..
+	./autorun.sh
+	
+	# then wait for a minutes, you will found the network icon appeared on the right corner of Desktop
+	
+	ip a
+	
+	# you will see you network device appeared, not only lo now~~~
+	
+	sudo umount /media/cdrom
+	sudo rm /var/lib/apt/cdroms.list
+	sudo vi /etc/apt/sources.list	  # remove or comment the lines your inserted/uncomment aboved
+	
+	
+# 7. Run 'sudo ./autorun.sh' again after reboot if question resumed.
+
+
+Notice: Keep A Copy compiled sources r8125-9.005.06/ & ubuntu-20.04.2.0-desktop-amd64.iso into USB-DISK
+
+
+
+# 8. 过了几天后有重现吧, 执行一下 
+	
+	cd Sources/Drivers/r8125-9.005.06/
+	sudo ./autorun.sh
+
+	##### 就解决了 #####
+
+
+
+# 9. Reinstall Ubuntu 20.04 LTS OS
+
+	ls -al /dev/disk/by-uuid
+	
+	sudo vi /etc/fstab
+	# /dev/sda
+	UUID=ed85775e-9f4b-427d-9ccc-a22a86efe8a8 /home/ubuntu/Disk6T ext4 defaults 0 0
+
+	sudo mkdir /media/cdrom
+	sudo mount -o loop /home/ubuntu/Downloads/ubuntu-20.04.2.0-desktop-amd64.iso /media/cdrom
+	sudo cp /etc/apt/sources.list /etc/apt/sources.list.default
+
+	sudo vi /etc/apt/sources.list
+	# then uncomment the first line
+
+	sudo apt-cdrom -m -d /media/cdrom add
+	sudo apt-get install build-essential
+	gcc -v && which make
+	cd ~/Downloads/Sources/Drivers/r8125-9.005.06
+	sudo ./autorun.sh
+
+	sudo vi /etc/apt/sources.list
+	# then comment the first line
+	
+	##### OK解决了 #####
+	
+
+
+
+
+
+# 10. 重装后一键安装环境:
+
+# CPU https://zhuanlan.zhihu.com/p/143123436
+sudo apt install -y lm-sensors psensor hardinfo 
+
+sudo apt install -y build-essential ccache git vim curl wget autoconf bison gperf lib32z1 pngquant lldb libssl-dev libcapstone-dev rapidjson-dev imagemagick libncurses5 libncurses5-dev lib32ncurses5-dev maven gnupg pngcrush schedtool g++-multilib gcc-multilib libxml2 libxml2-utils m4 flex libz-dev gettext libcurl4-openssl-dev net-tools fcitx libaio1 libaio-dev python2 python3
+
+sudo apt install -y meld gimp subversion
+sudo apt install -y ibus-table-wubi ibus-pinyin   ## then restart PC 
+
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 100
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 150
+sudo update-alternatives --list python
+sudo update-alternatives --config python
+
+
+----------------- vim ~/.bash_aliases -----------------
+#!/bin/bash
+
+source ${HOME}/Disk6T/Workspaces/Bin/.bash_aliases
+----------------- vim ~/.bash_aliases -----------------
+
+
+sudo sh -c "echo 'SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0666\", GROUP=\"plugdev\"' >> /etc/udev/rules.d/51-android.rules"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 11. For Newly VM VirtualBox Ubuntu Without Disk6T:
+
+mkdir -p ~/Workspaces/Bin/
+mkdir -p ~/Workspaces/JDK/
+
+## https://jdk.java.net/archive/
+
+cd  ~/Workspaces/JDK/
+curl -O https://download.java.net/java/GA/jdk9/9.0.4/binaries/openjdk-9.0.4_linux-x64_bin.tar.gz
+curl -O https://download.java.net/java/GA/jdk10/10.0.2/19aef61b38124481863b1413dce1855f/13/openjdk-10.0.2_linux-x64_bin.tar.gz
+curl -O https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+curl -O https://download.java.net/java/GA/jdk12.0.2/e482c34c86bd4bf8b56c0b35558996b9/10/GPL/openjdk-12.0.2_linux-x64_bin.tar.gz
+curl -O https://download.java.net/java/GA/jdk13.0.2/d4173c853231432d94f001e99d882ca7/8/GPL/openjdk-13.0.2_linux-x64_bin.tar.gz
+
+
+tar -xvf openjdk-9.0.4_linux-x64_bin.tar.gz
+tar -xvf openjdk-10.0.2_linux-x64_bin.tar.gz
+tar -xvf openjdk-11.0.2_linux-x64_bin.tar.gz
+tar -xvf openjdk-12.0.2_linux-x64_bin.tar.gz
+tar -xvf openjdk-13.0.2_linux-x64_bin.tar.gz
+
+mv jdk-9.0.4 openjdk-9.0.4_linux-x64_bin
+mv jdk-10.0.2 openjdk-10.0.2_linux-x64_bin
+mv jdk-11.0.2 openjdk-11.0.2_linux-x64_bin
+mv jdk-12.0.2 openjdk-12.0.2_linux-x64_bin
+mv jdk-13.0.2 openjdk-13.0.2_linux-x64_bin
+
+
+----------------- vim ${HOME}/Workspaces/Bin/.bash_aliases -----------------
+
+O_PATH=$PATH
+
+W_PATH=$HOME/Workspaces
+S_PATH=$HOME/Workspaces/Softwares
+
+PATH=$PATH:$W_PATH/Bin
+
+## JDK
+JAVA_HOME=$W_PATH/JDK/openjdk-9.0.4_linux-x64_bin
+# JAVA_HOME=$W_PATH/JDK/openjdk-11.0.2_linux-x64_bin
+PATH=$JAVA_HOME/bin:$PATH
+
+----------------- vim ${HOME}/Workspaces/Bin/.bash_aliases -----------------
+
+
+curl https://raw.githubusercontent.com/MoKee/git-repo/stable/repo > $HOME/Workspaces/Bin/repo
+chmod 777 $HOME/Workspaces/Bin/repo
+
+mkdir -p ~/Workspaces/AOSP/Mokee/mkq-mr1 
+cd ~/Workspaces/AOSP/Mokee/mkq-mr1 
+repo init -u https://github.com/MoKee/android.git -b mkq-mr1 --depth=1
+vim ./repo_sync.sh && chmod 777 ./repo_sync.sh && ./repo_sync.sh
+
+
+export USE_CCACHE=1 && export CCACHE_SIZE=20G && export WITH_SU=true
+. build/envsetup.sh && breakfast cheeseburger && brunch cheeseburger
+
+
+---------- Error ----------
+FAILED: out/soong/.intermediates/frameworks/base/api-stubs-docs/android_common/api-stubs-docs-stubs.srcjar out/soong/.intermediates/frameworks
+......
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+	at java.base/java.nio.HeapCharBuffer.<init>(HeapCharBuffer.java:68)
+......
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+	at com.intellij.psi.impl.source.tree.JavaASTFactory.createLeaf(JavaASTFactory.java:36)
+......
+---------- Error ----------
+# https://stackoverflow.com/a/60474592
+# https://juejin.cn/post/6937992530331959326
+export _JAVA_OPTIONS="-Xmx7G" && export JAVA_OPTS="-Xmx4G"
+
+
+---------- Error ----------
+build/make/core/base_rules.mk:510: warning: ignoring old commands for target `out/target/product/cheeseburger/vendor/etc/gps.conf'
+[ 18% 519/2877] Building Kernel Config
+make: Entering directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/kernel/oneplus/msm8998'
+make[1]: Entering directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/out/target/product/cheeseburger/obj/KERNEL_OBJ'
+  GEN     ./Makefile
+#
+# configuration written to .config
+#
+make[1]: Leaving directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/out/target/product/cheeseburger/obj/KERNEL_OBJ'
+make: Leaving directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/kernel/oneplus/msm8998'
+make: Entering directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/kernel/oneplus/msm8998'
+make[1]: Entering directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/out/target/product/cheeseburger/obj/KERNEL_OBJ'
+  GEN     ./Makefile
+scripts/kconfig/conf  --savedefconfig=defconfig Kconfig
+make[1]: Leaving directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/out/target/product/cheeseburger/obj/KERNEL_OBJ'
+make: Leaving directory '/home/xpel/Workspaces/AOSP/Mokee/mkq-mr1/kernel/oneplus/msm8998'
+14:03:14 ninja failed with: exit status 137
+
+#### failed to build some targets (02:43 (mm:ss)) ####
+---------- Error ----------
+# https://blog.csdn.net/nei504293736/article/details/109628378
+# https://blog.csdn.net/u011426115/article/details/116279143
+1. vim build/soong/java/config/config.go : pctx.StaticVariable("JavacHeapSize", "2048M") -> pctx.StaticVariable("JavacHeapSize", "4096M") # 然后新开Terminal,不需要删除out/,继续编译
+2. export MAVEN_OPTS="-Xms4096m -Xmx4096m" # 需要删除out/,重新编译
+
+
+## exit status 137
+https://www.akr-developers.com/d/395/2
+https://www.reddit.com/r/LineageOS/comments/foe9zl/comment/fletj3u/?utm_source=share&utm_medium=web2x&context=3
+
+
+# increase /swapfile
+swapon -s
+free -h 
+sudo swapoff /swapfile
+sudo dd if=/dev/zero of=/swapfile bs=1M count=4096 oflag=append conv=notrunc
+sudo mkswap /swapfile
+sudo swapon /swapfile
+swapon -s
+free -h
+
+
+
+
+
+
+
+

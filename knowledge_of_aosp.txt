@@ -1,0 +1,17 @@
+
+拿系统调用 execve 来举例:
+
+SYS_EXECVE        = 59  // { int execve(char *fname, char **argv, char **envv); }
+
+
+1. 在 bionic/libc 源码的 .S 中会有 ENTRY(execve)
+
+2. 在 kernel 源码会有 SYSCALL_DEFINE3(execve ,其中 3 代表参数个数
+
+
+
+另，关于 execve 可参考:
+https://blog.csdn.net/tototuzuoquan/article/details/39336681
+https://www.q2zy.com/execve、execv、execvp、execle、execl、execlp小结/
+
+

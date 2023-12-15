@@ -1,0 +1,97 @@
+
+调试
+
+iOS 模拟器:
+
+ps -ef | grep Runner.app/Runner
+lldb
+(lldb) process attach -p 11880
+(lldb) c
+(lldb) process interrupt
+(lldb) po [SecurityStore secretKeys]
+(lldb) e [DecryptedModel decryptedModel]
+(DecryptedModel *) $1 = 0x0000600003bd8a00
+(lldb) po [$1 deviceId]
+E4DB4A34-AC33-42A5-891D-FCEF65D588A6
+
+
+
+
+
+
+Android:
+
+----------------------- Android Studio -----------------------
+sh /data/data/com.xpel.lldb.start/lldb/bin/start_lldb_server.sh /data/data/com.xpel.lldb.start/lldb unix-abstract /com.xpel.lldb.start-0 platform-1692845838052.sock lldb process:gdb-remote packets
+
+lldb-server platform --server --listen unix-abstract:///com.xpel.lldb.start-0/platform-1692845838052.sock --log-file /data/data/com.xpel.lldb.start/lldb/log/platform.log --log-channels lldb process:gdb-remote packets
+----------------------- Android Studio -----------------------
+
+
+/// remote
+
+# for root
+cd /data/local/tmp/ && ./lldb-server platform --listen "*:1234" --server
+# for user
+adb shell run-as com.xpel.lldb.start ./lldb/bin/lldb-server platform --server --listen unix-abstract:///com.xpel.lldb.start/debug.sock
+
+
+/// local
+export ANDROID_SERIAL="f977ac22"   # if you have multiple android divice connected USB
+
+(lldb) platform list
+remote-ios: Remote iOS platform plug-in.
+remote-android: Remote Android user platform plug-in.
+...
+(lldb) platform select remote-android
+
+# for root
+(lldb) platform connect connect://localhost:1234
+# for user
+(lldb) platform connect unix-abstract-connect:///com.xpel.lldb.start/debug.sock
+
+(lldb) process attach -p 14414    ## get pid using `adb shell pidof com.xpel.lldb.start`
+(lldb) c
+(lldb) process interrupt
+(lldb) bt
+(lldb) thread
+(lldb) thread list
+
+
+
+
+
+/// jdwp server help
+java -agentlib:jdwp=help
+
+
+/// android device
+adb jdwp                            # show supported pid, i.e. 23175
+adb forward tcp:<port> jdwp:<pid>   # adb forward tcp:50733 jdwp:23175
+jdb -connect com.sun.jdi.SocketAttach:hostname=localhost,port=<port>   # jdb -connect com.sun.jdi.SocketAttach:hostname=localhost,port=50733
+# jdb -attach IP:PORT               # remote device attach
+> classes
+> method com.xpel.XpelApplication
+> threads
+> suspend 0x64c0                    # suspend the main thread
+> where 0x64c0
+  [1] android.os.MessageQueue.nativePollOnce (native method)
+  [2] android.os.MessageQueue.next (MessageQueue.java:349)
+  [3] android.os.Looper.loopOnce (Looper.java:186)
+  [4] android.os.Looper.loop (Looper.java:351)
+  [5] android.app.ActivityThread.main (ActivityThread.java:8,399)
+  [6] java.lang.reflect.Method.invoke (native method)
+  [7] com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run (RuntimeInit.java:584)
+  [8] com.android.internal.os.ZygoteInit.main (ZygoteInit.java:1,013)
+main[1] resume 0x64c0
+> exit
+
+
+
+
+## About adb reverse
+adb reverse tcp:8088 tcp:8088
+# 如你的iMac（地址: 10.193.1.128）在端口 8081开了个http服务，那么你的手机上可以在浏览器输入地址 http://10.193.1.128:8088 就访问到，但若你想在手机上用 http://localhost:8088 就能访问到主机服务，就需要这个命令转发一下。
+
+
+

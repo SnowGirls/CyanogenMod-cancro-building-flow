@@ -1,0 +1,112 @@
+
+
+Reference: 
+https://www.52pojie.cn/thread-618515-1-1.html
+https://www.52pojie.cn/thread-978958-1-1.html
+https://github.com/imadr/Unity-game-hacking
+
+
+1. 如何识别u3d游戏？打开解压包，如果lib文件夹下有 libunity.so 就证明这是一个unity3d游戏。
+2. 要修改Unity3d游戏，首先就要对其游戏代码存放位置有一个基本的了解。Unity3d生成游戏的游戏主逻辑一般放在三个地方：libil2cpp.so、Assembly-CSharp.dll、lua脚本。
+
+【对于libil2cpp.so来说：我们知道，unity3d最大的一个特点是一次制作，多平台部署，而这一核心功能是靠Mono实现的。但是在2014年年中的时候，Unity3D引出了IL2CPP的概念，IL2CPP，英文意思即Intermediate Language to cpp，就是把IL中间语言转换成CPP文件。】
+
+
+
+
+一、修改代码：
+1. 利用 dnSpy[https://github.com/0xd4d/dnSpy/releases] 来反编/修改/导出 Assembly-CSharp.dll 等 CSharp 代码
+
+1.1 用dnSpy导出所有代码，在Sumblime Text里搜索到要改的点所在的类及方法
+1.2 在dnSpy里找到代码所在，右键 - 编辑方法 - 编译 - 保存模块/全部保存
+
+
+
+二、修改资源：
+
+# 先参考这两Link:
+# https://wiki.nexusmods.com/index.php/Unity_modding_tools
+# https://7daystodie.com/forums/showthread.php?22675-Unity-Assets-Bundle-Extractor
+
+1. 用 AssetStudio[https://github.com/Perfare/AssetStudio] 找到 Texture2D 及 PathID
+2. 然后用 Unity Assets Bundle Extractor[https://github.com/DerPopo/UABE] 替换资源图片，最后压缩保存资源包，并替换原资源包
+3. 对于 data.unity3d 压缩类文件，可以先用 UABE 打开后会自动 unpack 出到你指定保存的文件，然后用 AssetStudio -> File -> Extract 它输出到文件夹
+
+
+
+详细点：
+
+1. 先用 UABE 打开 data.unity3d 解压保存为 data.unity3d_unpack，然后用 AssetStudio 打开 data.unity3d_unpack 找到 名字 及 PathID，然后在 UABE 找到此资源
+2. 点击右侧 Plugin -> Edit -> Load -> 稍等一下 -> OK -> 默认选择 Normal(Multi Thread) -> OK -> OK -> 然后保存 File -> Save
+3. 一个注意的地方是 没有出现 Normal(Multi Thread)，那就要重试稍等一会。
+
+
+
+关于 public.xml 直接删除 public.xml 文件即可，回编过程会自动生成 public.xml 文件和 id
+
+
+三、关于 libil2cpp.so
+
+1. 先用 Il2CppDumper [https://github.com/Perfare/Il2CppDumper] 来 dump 出 dll 及 ida_with_struct.py 用到的 头文件(il2cpp.h) 及 Json(script.json)
+
+	命令: Il2CppDumper.exe <executable-file> <global-metadata> <output-directory>
+
+2. 打开 IDA 加载 libil2cpp.so，耐心等加载完毕，File -> Script file -> 选择 Il2CppDumper 解压安装目录下的 ida_with_struct.py 
+	-> 会提示依次选择<output-directory> 的 script.json 及其 il2cpp.h 头文件，耐心等待 IDA 分析完毕
+
+3. 最后用 dnSpy 导出所有 dump 出来的 dll 成 CSharp 代码用 Sublime Text 打开方便搜索
+
+说明: 
+a. ida_with_struct.py 在 Il2CppDumper 的安装目录，dump出来的 Json及头文件及dll 在 <output-directory>
+b. <executable-file> 指 Apk 包里 lib/[arm]/libil2cpp.so
+c. <global-metadata> 文件是指 Apk 包里的 assets\bin\Data\Managed\Metadata\global-metadata.dat
+
+
+
+
+
+
+## 密钥相关命令
+
+查看: keytool -list -v -keystore ~/.android/debug.keystore	## 直接回车了，也可以输入 android 这默认密码
+生成: keytool -genkey -alias key0 -keypass 123456 -keyalg RSA -keysize 2048 -validity 36500 -keystore ./key0_123456.keystore -storepass 123456	## 最后确认 Y/yes
+
+
+
+
+签名APK
+
+A 方式. 用 jarsigner ，但 jarsigner 太老了，只支持 v1 不建议使用了，验证时APK: jarsigner -verify [path_2_signed_apk] -verbose 		## -certs
+
+jarsigner -verbose -keystore ./key0_123456.keystore -signedjar [path_2_out_signed_apk] [path_2_in_apk] key0  
+
+
+
+B 方式. java -jar signapk.jar. 从 [https://github.com/appium-boneyard/sign] 下载 signapk.jar 
+
+java -jar 'path_2_signapk.jar' 'path_2_your_x509_pem' 'path_2_your_pk8' path_2_your_input.apk path_2_your_output_signed.apk
+
+
+
+C 方式. 推荐官方 apksigner。在 Android SDK 的 build-tools 目录下 [Sdk/build-tools/29.0.2/apksigner], 签名的包会被覆盖
+apksigner sign --ks-pass pass:123456 --ks release.jks app.apk
+apksigner verify --verbose --print-certs app.apk
+
+
+
+
+查看 APK 的签名:
+keytool -list -printcert -jarfile [path_2_your_signed_apk]
+apksigner verify --verbose --print-certs [path_2_your_signed_apk]
+
+
+
+
+## 一些问题：
+
+ABIs [armeabi] are not supported for platform. Supported ABIs are [arm64-v8a, armeabi-v7a, x86, x86_64].
+## 看看是否是用了比较高版本的 ndk 去编译了，下载个 v16.xx 的版本来编译就 OK 了: 
+## File - Project Structure - NDK Location 这里，把 bundle 的 ${Android_SDK}/ndk-bundle/ 换成具体版本的 ${Android_SDK}/ndk/16.1.4479499/
+
+
+

@@ -1,0 +1,69 @@
+
+1.
+
+代码对比工具命令: meld
+
+图像编辑工具命令: gimp
+
+关于 Git:
+Gogs HTTP服务停了，直接 git clone 本地仓库就OK: git clone ~/gogs/Woaini.git ./WoAiNi/
+甚至可以把 remote-url 指向本地： git remote set-url origin ~/gogs/Woaini.git
+
+
+
+
+2.
+
+Fix error of 'The following packages have unmet dependencies:'
+
+sudo apt-get install aptitude
+sudo aptitude install winehq-devel
+
+
+
+
+
+
+
+
+3.
+
+GnuTLS recv error (-110): The TLS connection was non-properly terminated.
+
+系统 git 用了 GnuTLS，重编一个 git 用 openssl 的
+
+重编 git :
+
+sudo apt-get install build-essential
+sudo apt-get install autoconf bison build-essential libssl-dev
+sudo apt-get install libz-dev
+sudo apt-get install gettext
+sudo apt-get install libcurl4-openssl-dev 
+
+
+git clone https://github.com/git/git.git -b v2.25.1 --single-branch --depth 1 git_v2.25.1 && cd git_v2.25.1/ && make configure && ./configure --prefix=/home/ubuntu/Disk6T/Workspaces/GitHub/git_v2.25.1/build && make all
+
+
+
+
+
+4. 
+
+cat mysqld.log
+# mysqld: error while loading shared libraries: libaio.so.1: cannot open shared object file: No such file or directory
+# mysqld_safe mysqld from pid file mysql/mysqld.pid ended
+
+sudo apt-get install libaio1 libaio-dev
+
+
+
+
+
+5.
+
+Android Studio: Task list not built
+
+https://stackoverflow.com/questions/67405791/gradle-tasks-are-not-showing-in-the-gradle-tool-window-in-android-studio-4-2
+
+Go to File -> Settings -> Experimental and uncheck Do not build Gradle task list during Gradle sync, then sync the project File -> Sync Project with Gradle Files. If the problem is still there, just reboot Android Studio.
+

@@ -2,15 +2,33 @@ Ubuntu 16.04 LTS
 
 sudo passwd  # 新安装的系统请设置一下 root 的密码
 
-sudo apt --fix-broken install
+sudo apt-get --fix-broken install
 
 sudo apt-get install -y vim git subversion curl wget
 
 
-## 1. 安装Google拼音输入法
-## 2. 安装Sougou拼音输入法
-## 3. 添加五笔输入法： Input Method Configuratioin里添加 Wubi
+## 0. System Settings -> Software & Updates -> Downlaod from 这里选择国内源，如aliyun。
+sudo apt-get update
+
+
+安装输入法( 注意重启, 若其它 deb 的安装, 也要重启 i.e. sogou 拼音输入法 ):
+sudo apt-get install fcitx-googlepinyin  fcitx-table-wubi -y
+
+## 1. 添加五笔输入法： Input Method Configuratioin 里添加 Wubi ( 单击桌面右上角 键盘图标 手选择 Configure )
+
+## 2. 添加Google拼音输入法
+
+## 3. 安装Sougou拼音输入法
+
 ## 4. 安装Sublime Text 3, 并修复/修复Ubuntu下 Sublime Text 3 中文输入问题
+      git clone https://github.com/lyfeyaj/sublime-text-imfix.git && cd sublime-text-imfix && ./sublime-imfix
+
+## 5. 安装Google Chrome浏览器
+
+## 6. Firefox 安装 Decentraleyes 插件，加快打开 StackOverFlow 的速度
+
+## 7. 安装多一个浏览器 Oprea/Chrome , 要不Firefox挂了有得你哭
+
 
 
 注销重新登录一下
@@ -29,25 +47,41 @@ vim ~/.bash_aliases
 
 ------------------ 插入以下内容 ------------------
 
-# 2018-06-08 JDK
-JAVA_HOME=/usr/local/java/jdk1.7.0_80
+# JDK
+
+# JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+# JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+# JAVA_HOME=/usr/local/java/jdk1.7.0_80
+# JAVA_HOME=/usr/local/java/openjdk-7u75
+# JAVA_HOME=/usr/local/java/jdk1.8.0_172
+# JAVA_HOME=/usr/local/java/openjdk-9.0.4
+JAVA_HOME=/usr/local/java/openjdk-1.8.0_40
 JRE_HOME=$JAVA_HOME/jre
 JAVA_BIN=$JAVA_HOME/bin
 CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
-export JAVA_HOME JRE_HOME PATH CLASSPATH
+export JAVA_HOME JRE_HOME JAVA_BIN CLASSPATH
 PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
 
 
-# 2018-06-08 AOSP
-PATH=$PATH:$HOME/Workspaces/bin
+# AOSP
+PATH=$HOME/Workspaces/bin:$PATH
 export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo/'
 
 
-# 2018-06-08 Android SDK
-ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
+# Android SDK
+# ANDROID_SDK=$HOME/Workspaces/AndroidSDK/android-sdk-linux
+# ANDROID_NDK=$HOME/Workspaces/AndroidSDK/android-ndk-r16-beta1
+# If already install AndroidStudio
+ANDROID_SDK=$HOME/Android/Sdk/
+ANDROID_NDK=$HOME/Android/Sdk/ndk-bundle
+PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/platform-tools
 PATH=$PATH:$ANDROID_SDK/tools
+PATH=$PATH:$ANDROID_NDK
 
+# Enable ccache and default in ~/.ccache/
+# export USE_CCACHE=1
+# ccache -M 100G
 
 ------------------ 保存退出vim ------------------
 
@@ -55,7 +89,7 @@ source ~/.bash_aliases && java -version
 
 
 
-## 3. 配置Android SDK
+## 3. 配置Android SDK & NDK
 # 下载好SDK Tools & platform-tools 解压，并把 platform-tools 放到SDK目录下
 mkdir -p ~/Workspaces/AndroidSDK/
 sudo mv ~/Downloads/android-sdk_r24.4.1-linux.tar ~/Workspaces/AndroidSDK/
@@ -65,30 +99,37 @@ tar zxvf android-sdk_r24.4.1-linux.tar
 unzip platform-tools_r22-linux.zip
 mv platform-tools/ android-sdk-linux/
 
+sudo mv ~/Downloads/android-ndk-r16-beta1-linux-x86_64.zip ~/Workspaces/AndroidSDK/
+unzip android-ndk-r16-beta1-linux-x86_64.zip
+
+
 # adb In Ubuntu 18.04 LTS ：
 adb --help
 sudo apt-get install -y lib32z1c
 sudo apt-get install -y lib32stdc++6
 
-# adb In Ubuntu 14.04 LTS ：
-sudo apt install lib32z1 lib32ncurses5 lib32bz2-1.0 lib32stdc++6
+# adb In Ubuntu 14.04 LTS & Ubuntu 12.04 LTS ：
+sudo apt-get install lib32z1 lib32ncurses5 lib32bz2-1.0 lib32stdc++6 -y
+# 若出现 lib32bz2-1.0 错误，则：
+sudo apt-get install lib32z1 lib32ncurses5 libbz2-1.0:i386 lib32stdc++6 -y
+
 
 
 
 ## 4. AOSP
-cd ~/Workspaces
 
-mkdir -p bin
-mkdir -p AOSP/CyanogenMod/android
-
-cd bin/
+mkdir -p ~/Workspaces/bin/
+cd ~/Workspaces/bin/
 curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o repo
 chmod +x repo
 
+
+mkdir -p ~/Workspaces/AOSP/CyanogenMod/android/
 cd ~/Workspaces/AOSP/CyanogenMod/android/
 git config --global user.email "goodboy@example.com"
 git config --global user.name "Well Done"
 repo init -u https://github.com/CyanogenMod/android.git -b cm-13.0
+
 
 # 不会出现 gerrit.googlesource.com 连接错误，REPO_URL转到清华镜像源
 # 请参考 https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
@@ -169,7 +210,7 @@ cd android/
 sudo add-apt-repository ppa:openjdk-r/ppa
 sudo apt-get update
 
-sudo apt-get install -y zip bison build-essential gnupg flex gperf libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop maven openjdk-7-jdk pngcrush schedtool squashfs-tools xsltproc  zlib1g-dev g++-multilib gcc-multilib lib32ncurses5-dev lib32readline6-dev lib32z1-dev
+sudo apt-get install -y zip curl bison build-essential gnupg flex gperf libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop maven openjdk-7-jdk pngcrush schedtool squashfs-tools xsltproc  zlib1g-dev g++-multilib gcc-multilib lib32ncurses5-dev lib32readline6-dev lib32z1-dev
 
 
 Ubuntu 14.04:
@@ -187,7 +228,7 @@ breakfast cancro
 # cancro 是小米4的代号
 # breakfast 这个命令会自动同步依赖(根据手机不同)，可以看 less .repo/local_manifests/roomservice.xml ，有那些依赖
 
-# 这里出现了个状况：中途下载依赖慢，网络错误 或者 手贱Ctrl+C了一下，导致以后触发这命令都出'找不到文件'的错误
+# 这里出现了个状况：中途下载依赖慢，网络错误 或者 手贱 Ctrl+C 了一下，导致以后触发这命令都出'找不到文件'的错误
 # grep -rn 'XXX' * 来看源码吧。最后定位到roomservice.py，看看，恩，用 repo sync --force-sync device/qcom/common 命令解决
 repo sync --force-sync device/qcom/common
 repo sync --force-sync kernel/xiaomi/cancro
@@ -220,7 +261,7 @@ chmod a+x ./*.sh
 # 4.3.1 A 可以Github上搜索一下看有没有人上传, keyword:"proprietary_vendor_xiaomi or proprietary_vendor_xiaomi_cancro"
 # 搜索到后，选择自己感兴起的branch看一下
 # https://github.com/TheScarastic/proprietary_vendor_xiaomi  # 这个缺少 libTimeService.so 和 rootdir
-# https://github.com/TheMuppets/proprietary_vendor_xiaomi
+# https://github.com/TheMuppets/proprietary_vendor_xiaomi    # 因DMCA版权原因转去了 https://gitlab.com/the-muppets/proprietary_vendor_xiaomi
 # https://github.com/cancro-ubt/proprietary_vendor_xiaomi_cancro
 
 # 如果直接git clone，仓库太大，很慢，浪费时间，用svn下载指定的目录就好
@@ -258,8 +299,8 @@ chmod a+x sdat2img.py
 
 ## 4.4 设置缓存 &　编译
 cd ~/Workspaces/AOSP/CyanogenMod/android
-source build/envsetup.sh   	# 如果期间退出过Terminal或当前Session不同，需要重新issue这条命令
-croot  						# 如果当前pwd不在项目根目录，可以issue这条命令回到ROM源码目录
+source build/envsetup.sh   	  # 如果期间退出过Terminal或当前Session不同，需要重新issue这条命令
+croot  						            # 如果当前pwd不在项目根目录，可以issue这条命令回到ROM源码目录
 
 export USE_CCACHE=1
 export ANDROID_CCACHE_DIR="$HOME/Workspaces/AOSP/CyanogenMod/.ccache"
@@ -275,12 +316,19 @@ brunch cancro
 
 
 
+
+
+
 -------------------- 编译过程的一些错误摘录 开始 --------------------
+
+
+
 
 ## 一开始 svn checkout 的是 https://github.com/TheScarastic/proprietary_vendor_xiaomi 导致了下面两个错误
 错误1：
+--------------------------------
 make: *** No rule to make target 'vendor/xiaomi/cancro/proprietary/rootdir/chargeonlymode', needed by '~/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/root/sbin/chargeonlymode'.  Stop.
-
+--------------------------------
 解决1：
 cp -r vendor/xiaomi/cancro/sbin vendor/xiaomi/cancro/proprietary/
 mv vendor/xiaomi/cancro/proprietary/sbin vendor/xiaomi/cancro/proprietary/rootdir
@@ -288,14 +336,16 @@ mv vendor/xiaomi/cancro/proprietary/sbin vendor/xiaomi/cancro/proprietary/rootdi
 
 
 错误2：
+--------------------------------
 make: *** No rule to make target 'vendor/xiaomi/cancro/proprietary/vendor/lib/libTimeService.so', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/system/vendor/lib/libTimeService.so'.  Stop.
-
+--------------------------------
 解决2：
 curl https://github.com/TheMuppets/proprietary_vendor_xiaomi/blob/cm-13.0/cancro/proprietary/vendor/lib/libTimeService.so -o vendor/xiaomi/cancro/proprietary/vendor/lib/
 
 
 
 错误3：
+--------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact org.cyanogenmod:gello:apk:40 from/to central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds): Connect to maven.cyanogenmod.org:443 [maven.cyanogenmod.org/216.168.38.166] failed: Connection refused
 [ERROR] org.cyanogenmod:gello:apk:40
 [ERROR] 
@@ -309,7 +359,7 @@ curl https://github.com/TheMuppets/proprietary_vendor_xiaomi/blob/cm-13.0/cancro
 [ERROR] 
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
-
+--------------------------------
 解决3：
 # 可参考文章：https://blog.csdn.net/feiniao8651/article/details/70183652
 # 因 CyanogenMod (https://github.com/CyanogenMod/android) 由 LineageOS (https://github.com/LineageOS/android)
@@ -320,10 +370,60 @@ curl https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-13.0/gello
 
 
 错误4：
+--------------------------------
 make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/kernel', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/boot.img'.  Stop.
+--------------------------------
 解决4：
 # 跟上面的 breakfast 网络出错一样：
 repo sync --force-sync kernel/xiaomi/cancro
+
+
+
+
+
+错误5：
+--------------------------------
+No private recovery resources for TARGET_DEVICE cancro
+...
+...
+...
+Lex: checkpolicy <= external/selinux/checkpolicy/policy_scan.l
+flex-2.5.39: loadlocale.c:130: _nl_intern_locale_data: Assertion `cnt < (sizeof (_nl_value_type_LC_TIME) / sizeof (_nl_value_type_LC_TIME[0]))' failed.
+--------------------------------
+解决5：
+export LC_ALL=C
+
+
+
+
+
+错误6：
+--------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-dependency-plugin:2.10:get (default-cli) on project standalone-pom: Couldn't download artifact: Could not transfer artifact org.cyanogenmod:gello:apk:40 from/to central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds): Transfer failed for https://maven.cyanogenmod.org/artifactory/gello_prebuilds/org/cyanogenmod/gello/40/gello-40.apk
+[ERROR]   org.cyanogenmod:gello:apk:40
+[ERROR] 
+[ERROR] from the specified remote repositories:
+[ERROR]   central (https://repo.maven.apache.org/maven2, releases=true, snapshots=false),
+[ERROR]   central (https://maven.cyanogenmod.org/artifactory/gello_prebuilds, releases=true, snapshots=true)
+[ERROR] : Connect to maven.cyanogenmod.org:443 [maven.cyanogenmod.org/216.168.38.166] failed: Connection timed out (Connection timed out)
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
+--------------------------------
+解决6：
+curl -o ~/Downloads/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-13.0/gello/Android.mk
+meld ~/Downloads/Android.mk vendor/cm/gello/Android.mk
+覆盖它:
+curl -o vendor/cm/gello/Android.mk https://raw.githubusercontent.com/LineageOS/android_vendor_cm/cm-13.0/gello/Android.mk
+
+
+
+
+
 
 -------------------- 编译过程的一些错误摘录 结束 --------------------
 
@@ -337,16 +437,16 @@ adb reboot bootloader
 # adb -> 进入 fastboot 模式
 
 # fastboot devices 提示 no permissions	fastboot
-# fastboot常规的一些参数跟adb一样，直接用，但因 fastboot no perssions，所以用 fastboot 需要这样用 sudo $(which fastboot)
+# fastboot常规的一些参数跟adb一样，直接用，但因 fastboot no permissions，所以用 fastboot 需要这样用 sudo $(which fastboot)
 
 sudo $(which fastboot) devices
 sudo $(which fastboot) reboot
-# fastboot -> 进入 adb 模式，即正常重启
+# 由 fastboot 模式 -> 进入 adb 模式，即正常重启
 
-# It's not safe and not good practice to just run everything with root permissions
+# But, it's not safe and not good practice to just run everything with root permissions
 # 参考 https://stackoverflow.com/a/28127944 &　https://askubuntu.com/a/733299
 
-fastboot -l devices
+sudo $(which fastboot) -l devices
 lsusb
 
 # 拿出 USB vendorID ，这里是 18d1 ， 注意替换自己的
@@ -366,13 +466,52 @@ fastboot reboot
 
 
 
+______________________________
 
-# 小米4 cm-13.0 刷时Baseband错误，基带问题
+adb: insufficient permissions for device: missing udev rules? user is in the plugdev group
+See [http://developer.android.com/tools/device.html] for more information
+
+______________________________
+
+sudo sh -c "echo 'SUBSYSTEM==\"usb\", ATTR{idVendor}==\"18d1\", MODE=\"0666\", GROUP=\"plugdev\"' >> /etc/udev/rules.d/51-android.rules"
+
+adb shell
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 小米4 cm-13.0 刷时Baseband upgrade错误，基带问题
 # http://www.miui.com/forum.php?mod=viewthread&tid=4265979
-curl -O https://github.com/jrizzoli/dotfiles/raw/master/cancro/cm13Upgrade.zip
 
-
+# 解压cm13BaseBandUpgrade.zip, 然后运行flash_all.bat
 # 升级基带后，cm-13.0刷进去了，并且启动成功。进去后会看到Android 6.0
+
+
+
+
+
+
+_____________________________________________________________
+
+http://www.miui.com/thread-5548571-1-1.html
+https://tieba.baidu.com/p/4461331644?red_tag=3303868346
+
+CM-13 卡在了 设置向导 过不去，进不了桌面的问题：
+fastboot.exe boot recovery.img
+进入rec后挂载system分区，然后 高级选项->文件管理器->system/priv-app/CyanogenSetupWizard 删除即可
+
+_____________________________________________________________
+
+
 
 
 
@@ -547,9 +686,9 @@ svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm
 svn checkout https://github.com/CyanogenMod/android_kernel_xiaomi_cancro/branches/cm-12.1 kernel_cancro_cm-12.1/
 svn checkout https://github.com/MiCode/Xiaomi_Kernel_OpenSource/branches/cancro-kk-oss kernel_cancro-kk-oss/
 
-mv proprietary_cancro_cm-11.0/ ~/Workspaces/AOSP/CyanogenMod/android/vendor/xiaomi/cancro
-mv device_cancro_cm-11.0/ ~/Workspaces/AOSP/CyanogenMod/android/device/xiaomi/cancro
-mv kernel_cancro-kk-oss/ ~/Workspaces/AOSP/CyanogenMod/android/kernel/xiaomi/cancro
+cp -r proprietary_cancro_cm-11.0/ ~/Workspaces/AOSP/CyanogenMod/android/vendor/xiaomi/cancro
+cp -r device_cancro_cm-11.0/ ~/Workspaces/AOSP/CyanogenMod/android/device/xiaomi/cancro
+cp -r kernel_cancro-kk-oss/ ~/Workspaces/AOSP/CyanogenMod/android/kernel/xiaomi/cancro
 
 
 # 保存退出vim
@@ -769,8 +908,19 @@ lib/libqdutils.so
 
 
 
+——————————————————————————————————————————————————————————————
+collect2: error: ld terminated with signal 7 [Bus error], core dumped
+build/core/shared_library.mk:81: recipe for target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-11.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libwebviewchromium_intermediates/LINKED/libwebviewchromium.so' failed
+make: *** [/home/ubuntu/Workspaces/AOSP/CyanogenMod/android_cm-11.0/out/target/product/cancro/obj/SHARED_LIBRARIES/libwebviewchromium_intermediates/LINKED/libwebviewchromium.so] Error 1
+make: *** Waiting for unfinished jobs....
+——————————————————————————————————————————————————————————————
+# 网上的资料（无论是国内的还是国外的）都说是要为 ubuntu 加 swap，都是扯蛋的。其实就是 make clean 一下，重新编译就完事了！
 
 
+
+
+
+错误 TAG A:
 ——————————————————————————————————————————————————————————————
 target thumb C++: libgui <= frameworks/native/libs/gui/Surface.cpp
 frameworks/native/libs/gui/Surface.cpp:38:26: fatal error: gralloc_priv.h: No such file or directory
@@ -780,6 +930,11 @@ make: *** Waiting for unfinished jobs....
 ——————————————————————————————————————————————————————————————
 因为没有 cm-11.0 分支， device/xiaomi/cancro 是手动copy过来的，因此 envsetup.sh Line 589 会执行 build/tools/roomservice.py $product true 代码
 那么修改roomservice.py，让它走一下 fetch_dependencies 函数，这样它会去递归的下载依赖 device/xiaomi/cancro/cm.dependencies。
+(此 Github的这Repo 有，Diff一下看看，然后直接覆盖即可)
+
+详情请看builid/下的源码:
+build/envsetup.sh
+build/tools/roomservice.py
 
 
 
@@ -798,11 +953,16 @@ acp: missing destination file
 make: *** [/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/kernel] Error 2
 make: *** Waiting for unfinished jobs....
 ——————————————————————————————————————————————————————————————
-pushd ~/Downloads/ && curl -O https://raw.githubusercontent.com/thornbirdblue/unpackbootimg/master/unpack-bootimg.pl 
+pushd ~/Downloads/
+curl -O https://raw.githubusercontent.com/thornbirdblue/unpackbootimg/master/unpack-bootimg.pl 
+
 # 再下载个cm-11.0的刷机包(去Lineage官网下载)，解压boot.img出来
+curl -O https://raw.githubusercontent.com/SnowGirls/CyanogenMod-cancro-building-flow/master/boot.img
+
 perl unpack-bootimg.pl boot.img
 mv boot.img-kernel kernel
-popd && cp ~/Download/kernel out/target/product/cancro/
+popd && cp ~/Downloads/kernel out/target/product/cancro/
+
 
 # Or try:
 # Step 4. Configuring the fallback to prebuilts In
@@ -811,6 +971,20 @@ popd && cp ~/Download/kernel out/target/product/cancro/
 vim device/xiaomi/cancro/BoardConfig.mk:
 TARGET_PREBUILT_KERNEL := device/xiaomi/cancro/kernel
 cp ~/Download/kernel device/xiaomi/cancro/
+
+
+
+
+
+
+——————————————————————————————————————————————————————————————
+make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/host/linux-x86/bin/dtbToolCM', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/cancro/dt.img'.  Stop.
+make: *** Waiting for unfinished jobs....
+host C: libz <= external/zlib/src/zutil.c
+——————————————————————————————————————————————————————————————
+这个出现，是因为我在新机子上编译遇到的。
+参照上面 错误TAG A, 修改roomservice.py后，再breakfast cancro一次，后面build就没这个问题了。是因为没有 qcom 造成的 (如 android/device/qcom)。
+
 
 
 
@@ -894,12 +1068,57 @@ make sure to run ./get-prebuilts from /vendor/cm first.. that will solve the ter
 
 
 
+一些小问题：
+1.
+——————————————————————————————————————————————————————————————
+breakfast: command not found
+——————————————————————————————————————————————————————————————
+# 新开Terminal时, 低级错误, source build/envsetup.sh 一下就好了。
+
+2.
+——————————————————————————————————————————————————————————————
+$ adb devices
+List of devices attached
+51ada589        device
+emulator-5566   connecting
+——————————————————————————————————————————————————————————————
+# 多了个不知名的 emulator-5566， 而且是一直 connecting。
+# 原因是自己的VMware网络NAT设置里开了个5567的端口转发，删掉即可。
+# 而WMware又因不正常关闭，导致不能上网(或虚拟机网络恢复默认设置、或重新点Ubuntu右上角的网络连接重连)。
+# 若不删掉转发配置，此时用 adb -d shell 来进入shell
+# https://stackoverflow.com/a/31819106
+# https://stackoverflow.com/a/38248504
+
+3.
+——————————————————————————————————————————————————————————————
+$ adb devices
+List of devices attached
+adb server version (31) doesn't match this client (40); killing...
+could not read ok from ADB Server
+* failed to start daemon
+error: cannot connect to daemon
+——————————————————————————————————————————————————————————————
+# 经验之谈
+# 如果发现有上面的错误，可以用下面的不同的adb命令，若有一个成功之后，便后面的adb命令都会成功．最后就可以adb shell了
+# adb kill-server && adb start-server
+# adb push / adb pull / adb shell ls / adb shell "echo > /dev/null" ...
 
 
 
 
 
-kernel 的源码已经加进去了，但上面还是用了boot.img来编译，需要配置些make参数，以后有时间再弄
+
+
+
+
+
+
+
+
+
+
+
+kernel 的源码已经加进去了，但上面还是用了提取boot.img出来的kernel来编译，需要配置些make参数，以后有时间再弄
 
 TODO:
 
@@ -908,8 +1127,6 @@ build/core/tasks/kernel.mk:92: * Kernel source found, but no configuration was d
 build/core/tasks/kernel.mk:93: * Please add the TARGET_KERNEL_CONFIG variable to your   *
 build/core/tasks/kernel.mk:94: * BoardConfig.mk file                                    *
 build/core/tasks/kernel.mk:95: **********************************************************
-
-
 
 
 
@@ -1018,6 +1235,25 @@ https://forum.xda-developers.com/chef-central/android/guide-android-rom-developm
 
 
 
+别的分支的kernel, 有空了试试：
+-----------------------------------------
+对比
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource/compare/cancro-kk-oss...stempox:cancro-kk-oss
+也即 
+https://github.com/stempox/android_kernel_xiaomi_cancro/tree/cancro-kk-oss
+
+拿来试试可不可以 用kernel源码 来编译 cm-11
+
+另
+https://github.com/MiCode/Xiaomi_Kernel_OpenSource/network/members
+以 ‘cancro’ 搜索，有许多 cancro 的 fork ，看看哪个适合的！！！
+
+参考下面几个试试
+https://source.android.com/setup/build/initializing
+https://blog.csdn.net/mxgg123/article/details/26269313
+https://blog.csdn.net/shulianghan/article/details/51592930
+https://blog.csdn.net/kevin_nazgul/article/details/53191993
+-----------------------------------------
 
 
 
@@ -1029,31 +1265,119 @@ https://forum.xda-developers.com/chef-central/android/guide-android-rom-developm
 
 
 
+
+
+
+
+# 按照 https://github.com/MiCode/Xiaomi_Kernel_OpenSource/wiki/How-To-Use ，单独编译小米KK内核:
+# a. 把整个 boot.img 刷到 cm-11系统去，开不机，logcat 报错
+# b. 把编译 出来的 kernel 放到 cm-11 去重新编 ROM, 能开机，但许多硬件设备不工作，如相机、WIFI、充电等
+
+# 后来按东哥所说的，cm-12.1 的内核 兼容 cm-11.0的内核，那么再尝试一遍:
+
+# 1. 在 /device/xiaomi/cancro/cm.dependencies 加上:
+,
+  {
+    "repository": "android_kernel_xiaomi_cancro",
+    "target_path": "kernel/xiaomi/cancro",
+    "branch": "cm-12.1"
+  }
+
+# 2. 在 /device/xiaomi/cancro/BoardConfig.mk 的 KERNEL 配置加上: 
+
+TARGET_KERNEL_SOURCE := kernel/xiaomi/cancro
+TARGET_KERNEL_ARCH := arm
+TARGET_KERNEL_CONFIG := cyanogen_cancro_defconfig
+
+# breakfast 一遍, 自动拉下 cm-12.1 的kernel， 用在cm-11.0上
+
+source build/envsetup.sh && breakfast cancro && brunch cancro
+
+
+# 最终得出的ROM是有问题的，但问题比小米KK内核的少，比如WIFI、充电正常，但相机还是不工作。
+
+
+
+
+
+
+
+
+
+
+----------------------------------------- 另外一些小问题 -----------------------------------------
+1.
+adb root && adb shell , su -> Permission Denied:
+Settings -> Developer options -> Root access, and change option to "Apps and ADB".
+
+
+
+2. 单独编译时 framework.jar时: (cd frameworks/base/ && mm)
+——————————————————————————————————————————————————————————————
+make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/system/framework/framework-res.apk', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/system/framework/framework.jar'.  Stop.
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
+——————————————————————————————————————————————————————————————
+# 参考：　https://bbs.csdn.net/topics/370150557
+
+croot  ## source build/envsetup.sh
+## 也可先 breakfast cancro, 这样出来的就不是 ‘generic’ 的了
+mmm frameworks/base/core/res/
+mmm frameworks/base/
+
+有下面的Ｉnstall:结果出现，说明模块编译成功
+Install: .../out/target/product/generic/system/framework/framework.jar
+然后把编译出来的framework.jar替换掉 android设备的/system/framework下的对应文件就行，不需要完整编译．
+
+adb root
+adb shell mount -o remount,rw /system
+adb push ./framework.jar /system/framework/
+adb push ./framework2.jar /system/framework/
+adb push ./ext.jar /system/framework/
+
+
+
+
+## 如果先前 breakfast cancro,  那么直接拿中间文件来编译，于是出现：
+——————————————————————————————————————————————————————————————
+make: Nothing to be done for 'all_modules'.
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
+——————————————————————————————————————————————————————————————
+## 删除 \out\target\product\XXX\obj\JAVA_LIBRARIES 就好
+
+
+
+
+3. 单独编译 libandroid_runtime.so 时
+source build/envsetup.sh
+mmm frameworks/base/core/jni
+——————————————————————————————————————————————————————————————
+No private recovery resources for TARGET_DEVICE generic
+......
+make: *** No rule to make target '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/obj/SHARED_LIBRARIES/libEGL_intermediates/export_includes', needed by '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android/out/target/product/generic/obj/SHARED_LIBRARIES/libandroid_runtime_intermediates/import_includes'.  Stop.
+make: Leaving directory '/home/ubuntu/Workspaces/AOSP/CyanogenMod/android'
+——————————————————————————————————————————————————————————————
+# 先
+breakfast cancro
+# 再
+mmm frameworks/base/core/jni
+adb push out/target/product/cancro/system/lib/libandroid_runtime.so /system/lib/
+
+# 因为 TARGET_DEVICE、PRODUCT_NAME 等编译变量没设置。参考：
+# https://blog.csdn.net/wh_19910525/article/details/7992570
+# https://blog.csdn.net/ly890700/article/details/54586527
+
+
+
+
+4. 单独编译 mmm system/vold/ 时
+# 同理，缺少Target
+source build/envsetup.sh
+breakfast cancro
+mmm system/vold/
 
 
 
 ----------------------------------------- OK , 最后总结 -----------------------------------------
-
-# 以后新的CyanogenMod AOSP:
-
-source build/envsetup.sh
-
-pushd vendor/cm/
-./get-prebuilts
-popd
-
-# cm-11.0的需要自己手动复制过来
-# 因 https://github.com/CyanogenMod/android_device_xiaomi_cancro 没有cm-11.0分支
-# 用 https://github.com/mi3-dev/android_device_xiaomi_cancro 的cm-11.0分支
-
-pushd device/xiaomi/cancro/
-./extract-files.sh
-popd
-
-breakfast cancro && brunch cancro
-
-
-
 
 
 1. Issue on xda:
@@ -1076,5 +1400,194 @@ format: https://undocumented.software/wiki_dump/{ACTION}.html
 
 https://undocumented.software/wiki_dump/Build_guide.html
 https://undocumented.software/wiki_dump/Doc%3A_integrated_kernel_building.html
+
+
+
+
+
+
+# 以后新的CyanogenMod AOSP (建议可以的话, 还是用继承于CyanogenMod的LineageOS):
+
+source build/envsetup.sh
+
+pushd vendor/cm/
+./get-prebuilts
+popd
+
+
+
+## cm-11.0 的 device
+# 因为 https://github.com/CyanogenMod/android_device_xiaomi_cancro 没有cm-11.0分支
+# 于是，我们用 https://github.com/mi3-dev/android_device_xiaomi_cancro 的cm-11.0分支
+
+svn checkout https://github.com/mi3-dev/proprietary_vendor_xiaomi/branches/cm-11.0/cancro proprietary_cancro_cm-11.0/
+svn checkout https://github.com/mi3-dev/android_device_xiaomi_cancro/branches/cm-11.0 device_cancro_cm-11.0/
+svn checkout https://github.com/MiCode/Xiaomi_Kernel_OpenSource/branches/cancro-kk-oss kernel_cancro-kk-oss/
+
+mkdir -p ~/Workspaces/AOSP/CyanogenMod/android/vendor/xiaomi/cancro
+mkdir -p ~/Workspaces/AOSP/CyanogenMod/android/device/xiaomi/cancro
+mkdir -p ~/Workspaces/AOSP/CyanogenMod/android/kernel/xiaomi/cancro
+
+cp -r proprietary_cancro_cm-11.0/* ~/Workspaces/AOSP/CyanogenMod/android/vendor/xiaomi/cancro
+cp -r device_cancro_cm-11.0/* ~/Workspaces/AOSP/CyanogenMod/android/device/xiaomi/cancro
+cp -r kernel_cancro-kk-oss/* ~/Workspaces/AOSP/CyanogenMod/android/kernel/xiaomi/cancro
+
+
+
+pushd device/xiaomi/cancro/
+./extract-files.sh
+popd
+
+
+export USE_CCACHE=1
+export ANDROID_CCACHE_DIR="$HOME/Workspaces/AOSP/CyanogenMod/.ccache"
+export ANDROID_CCACHE_SIZE="50G"
+prebuilts/misc/linux-x86/ccache/ccache -M 50G
+
+
+# 因为有上面的 错误 TAG A，是因为'breakfast cancro'后, roomservice.py有bug, 并没有将 device/xiaomi/cancro/cm.dependencies 里的依赖完整的下载下来。
+# 所以，修复一下roomservice.py (此 Github的这Repo 有，直接覆盖即可)
+# 在breakfast前后，注意观察变化: less .repo/local_manifests/roomservice.xml
+
+
+breakfast cancro && brunch cancro
+
+
+
+
+
+
+# 如果接下来要做修改源码，然后编译的话，开个分支好管理知道自己以后改了哪些
+# repo help start, repo help status, repo help diff
+
+repo start development --all
+repo status
+repo diff frameworks/base/
+repo status frameworks/base/
+
+
+
+
+
+
+
+
+
+----------------------------------------- cm-12.1 -----------------------------------------
+
+repo init -u git://github.com/CyanogenMod/android.git -b cm-12.1
+
+
+vim .repo/manifest.xml
+// ----- vim content begin -----
+-           fetch="https://android.googlesource.com"
++           fetch="https://aosp.tuna.tsinghua.edu.cn"
+// ----- vim content end -----
+
+
+repo sync
+
+
+source build/envsetup.sh
+
+
+breakfast cancro
+
+
+
+----------------- 小插曲 1 ------------------------>>>
+# 又手戝 Ctrl-C 了一下, 导致以后出现'找不到文件'的错误
+
+# 1. Look into build/tools/roomservice.py, method 'add_to_manifest'.
+pushd .repo/local_manifests/
+
+cat roomservice.xml 
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <manifest>
+      <project name="CyanogenMod/android_device_xiaomi_cancro" path="device/xiaomi/cancro" remote="github" />
+      <project name="CyanogenMod/android_device_qcom_common" path="device/qcom/common" remote="github" />
+      <project name="CyanogenMod/android_kernel_xiaomi_cancro" path="kernel/xiaomi/cancro" remote="github" />
+    </manifest>
+
+vim roomservice.xml # Delete the contents
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <manifest>
+
+    </manifest>
+
+# 2. Then sync again
+
+breakfast cancro
+----------------- 小插曲 1 ------------------------<<<
+
+
+----------------- 小插曲 2 ------------------------>>>
+# build/core/product_config.mk:239: xxx "vendor/xiaomi/cancro/cancro-vendor.mk" does not exist.  Stop.
+
+pushd ~/Downloads/
+curl https://codeload.github.com/mi3-dev/proprietary_vendor_xiaomi/zip/lollipop -o lollipop.zip
+unzip lollipop.zip -d lollipop/
+popd
+
+mkdir -p vendor/xiaomi/cancro
+cp -r ~/Downloads/lollipop/proprietary_vendor_xiaomi-lollipop/cancro/* vendor/xiaomi/cancro/
+
+
+# 再 breakfast 一次，发现没错了
+breakfast cancro
+
+
+# 提示： 下面这些提取设备专有文件的步骤就不用做了，上面的步骤 download & cp -r 已经做了。
+pushd device/xiaomi/cancro/
+chmod a+x *.sh
+./extract-files.sh
+popd
+
+
+# You asked for an OpenJDK 7 build but your version is xxx
+# 用 apt-get 安装 OpenJDK 后，安装目录在/usr/lib/jvm/
+
+  export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+----------------- 小插曲 2 ------------------------<<<
+
+
+
+brunch cancro
+
+
+
+
+
+
+
+
+
+# 2019-03-05 edited 关于 cm-11.0: 把 ~/Workspaces/AOSP/CyanogenMod/android 改名为  ~/Workspaces/AOSP/CyanogenMod/android_cm-11.0/
+
+
+
+
+
+
+
+
+
+
+-----------------
+/bin/bash: gperf: command not found
+make: *** [external/chromium_org/third_party/WebKit/Source/platform/make_platform_generated.target.linux-arm.mk:48: /AOSP/CyanogenMod/cm-12.1/out/target/product/cancro/obj/GYP/shared_intermediates/blink/platform/ColorData.cpp] Error 127
+-----------------
+sudo apt-get install gperf
+
+
+-----------------
+/home/ubuntu/Disk6T/Workspaces/AOSP/CyanogenMod/cm-12.1/out/host/linux-x86/bin/aapt: error while loading shared libraries: libz.so.1: cannot open shared object file: No such file or directory
+make: *** [build/core/static_java_library.mk:113: /home/ubuntu/Disk6T/Workspaces/AOSP/CyanogenMod/cm-12.1/out/target/common/obj/JAVA_LIBRARIES/com.android.emailcommon_intermediates/src/R.stamp] Error 127
+-----------------
+sudo apt-get install lib32z1
+
 
 

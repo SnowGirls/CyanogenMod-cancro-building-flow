@@ -1,0 +1,78 @@
+# Backup the PATH
+if [ -n "$O_PATH" ]; then
+  echo "Please Issue Following Command For Reset PATH: PATH=O_PATH"
+else
+  export O_PATH=$PATH
+fi
+
+
+PATH=$PATH:$HOME/.local/bin
+PATH=$PATH:$HOME/Workspaces/Bin
+PATH=$PATH:$HOME/Disk6T/Workspaces/Bin
+
+
+# Use Disk6T
+export D_PATH=$HOME/Disk6T
+export W_PATH=$HOME/Disk6T/Workspaces
+export S_PATH=$HOME/Disk6T/Workspaces/Softwares
+
+
+
+# JDK
+# JAVA_HOME=$W_PATH/JDK/jdk-6u45-linux-x64
+# JAVA_HOME=$W_PATH/JDK/jdk-7u80-linux-x64
+# JAVA_HOME=$W_PATH/JDK/jdk-8u172-linux-x64
+# JAVA_HOME=$W_PATH/JDK/jdk-9.0.4_linux-x64_bin
+# JAVA_HOME=$W_PATH/JDK/jdk-10.0.2_linux-x64_bin
+# JAVA_HOME=$W_PATH/JDK/jdk-11.0.13_linux-x64_bin
+# JAVA_HOME=$W_PATH/JDK/jdk-12.0.2_linux-x64_bin
+# JAVA_HOME=$W_PATH/JDK/openjdk-7u75-b13-linux-x64-18_dec_2014
+# JAVA_HOME=$W_PATH/JDK/openjdk-8u40-b25-linux-x64-10_feb_2015
+ JAVA_HOME=$W_PATH/JDK/openjdk-9.0.4_linux-x64_bin
+
+JRE_HOME=$JAVA_HOME/jre
+JAVA_BIN=$JAVA_HOME/bin
+CLASSPATH=.:$JAVA_HOME/lib/:$JRE_HOME/lib
+export JAVA_HOME JRE_HOME JAVA_BIN CLASSPATH
+
+PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+
+
+
+# Android SDK
+ANDROID_HOME=$W_PATH/Android_Sdk
+ANDROID_SDK=$ANDROID_HOME
+# ANDROID_SDK_HOME=$ANDROID_HOME
+ANDROID_SDK_ROOT=$ANDROID_HOME
+SDK_ROOT=$ANDROID_HOME
+
+ANDROID_NDK=$ANDROID_HOME/ndk/22.1.7171670
+ANDROID_NDK_HOME=$ANDROID_NDK
+ANDROID_NDK_ROOT=$ANDROID_NDK
+NDK_ROOT=$ANDROID_NDK
+
+PATH=$PATH:$ANDROID_HOME/tools
+PATH=$PATH:$ANDROID_HOME/tools/bin
+PATH=$PATH:$ANDROID_HOME/platform-tools
+PATH=$PATH:$ANDROID_HOME/build-tools/31.0.0
+PATH=$PATH:$ANDROID_HOME/emulator
+PATH=$PATH:$ANDROID_HOME/cmake/3.18.1/bin
+PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+PATH=$PATH:$ANDROID_NDK
+PATH=$PATH:$ANDROID_NDK/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/aarch64-linux-android/bin
+
+# export ANDROID_SDK_HOME
+export ANDROID_NDK_HOME
+export ANDROID_HOME ANDROID_SDK ANDROID_SDK_ROOT SDK_ROOT ANDROID_NDK ANDROID_NDK_ROOT NDK_ROOT
+
+
+# Enable ccache and default in ~/.ccache/
+export USE_CCACHE=1
+
+
+
+# Flutter
+export CHROME_EXECUTABLE=/snap/bin/chromium  # for Linux
+# PATH=$PATH:$W_PATH/Flutter_Sdk/flutter_linux_2.8.1-stable/bin
+PATH=$PATH:$W_PATH/Flutter_Sdk/flutter_linux_2.10.1-stable/bin
+

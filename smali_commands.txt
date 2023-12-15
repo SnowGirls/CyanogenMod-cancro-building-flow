@@ -1,0 +1,119 @@
+
+## 1. install scrcpy using snap
+
+# sudo apt install scrcpy
+sudo snap install scrcpy
+which scrcpy.adb
+/snap/bin/scrcpy.adb
+
+##### adb server version (41) doesn't match this client (39) #####
+# 本机存在多个版本的adb, 而启动了的 adb server 的版本与当前的 adb 用的版本不一致
+# 关掉Android Studio, 先尝试了用 adb server 对应的 adb 来 kill-server 与 start-server, 如果问题依旧，说明没有启动到对应版本的 adb daemon 
+# 那么此时把需要用的版本的 adb 放到 PATH 的最前，重启电脑来记它来启动它的 adb daemon
+
+# 后面再把 Android Studio 开启来，adb server 的版本又去到 41 了，原来是 Android Studio 搞的鬼，跟系统用的和scrcpy用的版本不一致了。
+# ADB=$ANDROID_HOME/platform-tools/adb /snap/bin/scrcpy -s [address]:[port]
+
+sudo update-alternatives --install /usr/bin/adb adb /usr/lib/android-sdk/platform-tools/adb 100
+sudo update-alternatives --install /usr/bin/adb adb $HOME/Disk6T/Workspaces/Android_Sdk/platform-tools/adb 150
+
+
+
+
+
+
+// https://github.com/JesusFreke/smali
+// https://github.com/testwhat/SmaliEx
+
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-framework.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-framework.vdex
+adb shell ls -al /system/framework/arm64/boot-framework.vdex
+
+baksmali-2.5.2.sh list dex boot-framework.oat
+
+
+
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot.vdex
+adb shell ls -al /system/framework/arm64/boot.vdex
+
+
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-core-libart.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-core-libart.vdex
+adb shell ls -al /system/framework/arm64/boot-core-libart.vdex
+
+
+baksmali-2.5.2.sh x boot-framework.oat  ## 发现不断在缺失.oat & .vdex，干脆把 boot-* 的 oar & vdex 都pull下来
+
+
+
+
+
+
+cd /system/framework/arm64/
+
+for f in boot*.oat;do echo scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/$f; done;
+
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-android.hidl.base-V1.0-java.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-android.hidl.manager-V1.0-java.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-android.test.base.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-apache-xml.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-bouncycastle.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-conscrypt.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-core-libart.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-ext.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-framework-oahl-backward-compatibility.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-framework.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-ims-common.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-okhttp.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-telephony-common.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot-voip-common.oat
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/boot.oat
+
+# 因为 system/framework/arm64/boot*.vdex 都 link 到上层目录去，故从上层目录 pull 同名:
+
+for f in boot*.vdex;do echo scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/$f; done;
+
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-android.hidl.base-V1.0-java.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-android.hidl.manager-V1.0-java.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-android.test.base.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-apache-xml.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-bouncycastle.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-conscrypt.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-core-libart.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-ext.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-framework-oahl-backward-compatibility.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-framework.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-ims-common.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-okhttp.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-telephony-common.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot-voip-common.vdex
+scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/boot.vdex
+
+
+
+# 下面两个不用的
+for f in boot*.art;do echo scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/$f; done;
+for f in boot*.art.rel;do echo scrcpy.adb -s 127.0.0.1:30088 pull /system/framework/arm64/$f; done;
+
+
+
+
+
+baksmali-2.5.2.sh --help && smali-2.5.2.sh --help
+
+
+
+baksmali-2.5.2.sh x boot-framework.oat -o boot-framework/  		## 最终成功，所有smali生成在 (无 -o 时默认 out/目录) boot-framework/目录 下
+
+smali-2.5.2.sh assemble boot-framework/ -o boot-framework.dex  	## 之后用 jadx-gui & 打开 boot-framework.dex
+
+
+
+$S_PATH/jadx-1.2.0/bin/jadx-gui &
+
+
+
+baksmali-2.5.2.sh x boot.oat -o boot/ && smali-2.5.2.sh assemble boot/ -o boot.dex
+baksmali-2.5.2.sh x boot-ext.oat -o boot-ext/ && smali-2.5.2.sh assemble boot-ext/ -o boot-ext.dex
+baksmali-2.5.2.sh x boot-core-libart.oat -o boot-core-libart/ && smali-2.5.2.sh assemble boot-core-libart/ -o boot-core-libart.dex

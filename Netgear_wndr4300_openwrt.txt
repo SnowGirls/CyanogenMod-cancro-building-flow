@@ -1,0 +1,100 @@
+
+
+
+---------------------------------- 刷入 Openwrt ----------------------------------
+
+// 参考:
+// http://www.5lazy.cn/post-146.html
+// http://www.5lazy.cn/post-144.html
+// https://pylist.com/t/1583242216
+// https://archive.openwrt.org/ && https://archive.openwrt.org/releases/19.07.2/targets/ar71xx/nand/
+
+
+
+apt install tftp
+
+ping 192.168.1.1
+
+
+1. 关闭路由器电源
+2. 用牙签等按住”Reset”键不放
+3. 接通电源，等待指示灯从黄灯->黄灯闪烁->绿灯->绿灯闪烁
+4. 松开”Reset”键 
+
+tftp 192.168.1.1
+tftp>verbose
+tftp>binary
+tftp>put openwrt-ar71xx-nand-wndr4300-ubi-factory.img
+
+
+5. 等待3到5分钟路由器重启成功。注意看是否一直能ping通持续10秒以上
+6. 最后一步很重要，恢复5G信号，步骤如下：先拔掉电源插座，然后关掉路由器上的开关，等5秒，然后插上电源插座，等待5秒，再打开路由器上的开关。
+7. 浏览器打开 192.168.1.1 进入 luci，开启 ssh 登录。
+
+
+
+
+---------------------------------- Openwrt socks5 透明代理 ----------------------------------
+
+// 参考:
+// https://crosp.net/blog/administration/routing-network-traffic-through-socks5-proxy-using-dd-wrt/
+// https://github.com/madeye/proxydroid
+// https://crosp.net/blog/administration/install-configure-redsocks-proxy-centos-linux/
+// https://github.com/darkk/redsocks
+
+
+## 让所有连到路由器的 客户端 都走socks5的通道
+
+opkg update 
+opkg install redsocks
+
+
+###################################################################
+
+/etc/init.d/redsocks stop
+ 
+/usr/sbin/redsocks -p /var/run/redsocks.pid -c /tmp/redsocks.conf
+
+netstat -tulpn | grep redsocks
+
+cat /var/log/redsocks.log 	// echo "" > /var/log/redsocks.log
+
+wget -q -O - '__get_socks_ip_port_url__'
+
+###################################################################
+
+
+
+------------------------ /tmp/redsocks.conf ------------------------
+
+base {
+	log_info = on;
+	daemon = on;
+	log_debug = on;
+	log = "file:/var/log/redsocks.log";
+	redirector = iptables;
+ }
+redsocks {
+	local_ip = 0.0.0.0;
+	local_port = 8123;
+	ip = 140.255.45.17;
+	port = 4385;
+	type = socks5;	
+}
+
+------------------------ /tmp/redsocks.conf ------------------------
+
+
+Add iptables rules when started：
+
+iptables -A INPUT -p tcp --dport 8123 -j ACCEPT
+iptables -A PREROUTING -t nat -p tcp -d 192.168.8.1/24 -j RETURN
+iptables -A PREROUTING -t nat -p tcp -j REDIRECT --to 8123
+
+
+Drop iptables rules when stopped：
+
+iptables -D INPUT -p tcp --dport 8123 -j ACCEPT
+iptables -D PREROUTING -t nat -p tcp -d 192.168.8.1/24 -j RETURN
+iptables -D PREROUTING -t nat -p tcp -j REDIRECT --to 8123
+

@@ -1,0 +1,252 @@
+######### Using nvm to manage multi version fo npm #########
+
+xpel@xpels-iMac AwesomeProject % nvm list       
+       v14.16.1
+->     v16.20.2
+
+xpel@xpels-iMac ReactNative % react-native init AwesomeProject 
+This will walk you through creating a new React Native project in /Users/xpel/Workspaces/ReactNative/AwesomeProject
+Installing react-native...
+Consider installing yarn to make this faster: https://yarnpkg.com
+
+added 703 packages in 16s
+
+41 packages are looking for funding
+  run `npm fund` for details
+/Users/xpel/.nvm/versions/node/v16.20.2/lib/node_modules/react-native-cli/index.js:302
+  cli.init(root, projectName);
+      ^
+
+TypeError: cli.init is not a function
+    at run (/Users/xpel/.nvm/versions/node/v16.20.2/lib/node_modules/react-native-cli/index.js:302:7)
+    at createProject (/Users/xpel/.nvm/versions/node/v16.20.2/lib/node_modules/react-native-cli/index.js:249:3)
+    at init (/Users/xpel/.nvm/versions/node/v16.20.2/lib/node_modules/react-native-cli/index.js:200:5)
+    at Object.<anonymous> (/Users/xpel/.nvm/versions/node/v16.20.2/lib/node_modules/react-native-cli/index.js:153:7)
+    at Module._compile (node:internal/modules/cjs/loader:1198:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1252:10)
+    at Module.load (node:internal/modules/cjs/loader:1076:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:911:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:81:12)
+    at node:internal/main/run_main_module:22:47
+xpel@xpels-iMac ReactNative % 
+
+
+npm uninstall -g react-native react-native-cli  ; npm install -g react-native react-native-cli
+
+xpel@xpels-iMac ReactNative % rm -rf AwesomeProject 
+xpel@xpels-iMac ReactNative % react-native init AwesomeProject                                                               
+
+✖ Installing CocoaPods dependencies (this may take a few minutes)
+error /Users/xpel/Workspaces/ReactNative/AwesomeProject/vendor/bundle/ruby/3.2.0/gems/activesupport-7.1.1/lib/active_support/core_ext/array/conversions.rb:108:in `<class:Array>': undefined method `deprecator' for ActiveSupport:Module (NoMethodError)
+
+  deprecate to_default_s: :to_s, deprecator: ActiveSupport.deprecator
+                                                          ^^^^^^^^^^^
+Did you mean?  deprecate_constant
+	from /Users/xpel/Workspaces/ReactNative/AwesomeProject/vendor/bundle/ruby/3.2.0/gems/activesupport-7.1.1/lib/active_support/core_ext/array/conversions.rb:8:in `<top (required)>'
+	from <internal:/usr/local/lib/ruby/site_ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:38:in `require'
+	from <internal:/usr/local/lib/ruby/site_ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:38:in `require'
+	from /Users/xpel/Workspaces/ReactNative/AwesomeProject/vendor/bundle/ruby/3.2.0/gems/cocoapods-1.13.0/lib/cocoapods.rb:9:in `<top (required)>'
+	from <internal:/usr/local/lib/ruby/site_ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:38:in `require'
+	from <internal:/usr/local/lib/ruby/site_ruby/3.2.0/rubygems/core_ext/kernel_require.rb>:38:in `require'
+	from /Users/xpel/Workspaces/ReactNative/AwesomeProject/vendor/bundle/ruby/3.2.0/gems/cocoapods-1.13.0/bin/pod:36:in `<top (required)>'
+	from /Users/xpel/Workspaces/ReactNative/AwesomeProject/vendor/bundle/ruby/3.2.0/bin/pod:25:in `load'
+	from /Users/xpel/Workspaces/ReactNative/AwesomeProject/vendor/bundle/ruby/3.2.0/bin/pod:25:in `<main>'
+	from /usr/local/bin/ruby_executable_hooks:22:in `eval'
+	from /usr/local/bin/ruby_executable_hooks:22:in `<main>'
+✖ Installing CocoaPods dependencies (this may take a few minutes)
+error Looks like your iOS environment is not properly set. Please go to https://reactnative.dev/docs/environment-setup?os=macos&platform=android and follow the React Native CLI QuickStart guide for macOS and iOS.
+info Run CLI with --verbose flag for more details.
+xpel@xpels-iMac ReactNative % 
+
+
+
+
+####### 参考: https://reactnative.dev/docs/environment-setup?os=macos&platform=android
+####### 发现上面的旧的方式了，会有各种问题存在，所以 `npm uninstall -g react-native-cli @react-native-community/cli` ; `npx react-native@latest init AwesomeProject` , 但同样出现 『ActiveSupport.deprecator』 问题， 下面用 0.62.0 尝试了没问题
+####### 先用 Expo 试试先:
+
+xpel@xpels-iMac ReactNative % rm -rf AwesomeProject 
+xpel@xpels-iMac ReactNative % npx create-expo-app AwesomeProject
+Need to install the following packages:
+  create-expo-app@2.1.1
+Ok to proceed? (y) y
+✔ Downloaded and extracted project files.
+> npm install
+
+added 1208 packages in 32s
+
+69 packages are looking for funding
+  run `npm fund` for details
+
+✅ Your project is ready!
+
+To run your project, navigate to the directory and run one of the following npm commands.
+
+- cd AwesomeProject
+- npm run android
+- npm run ios
+- npm run web
+xpel@xpels-iMac ReactNative % 
+xpel@xpels-iMac ReactNative % cd ReactNative
+xpel@xpels-iMac AwesomeProject % npx expo start
+xpel@xpels-iMac AwesomeProject % npm run ios
+xpel@xpels-iMac AwesomeProject % npm run android
+
+
+####### 然后试试旧版本 react-native: rm -rf AwesomeBoyProject ; npx react-native@0.62.0 init AwesomeBoyProject --version 0.62.0 
+####### 没问题:
+
+✔ Installing CocoaPods dependencies (this may take a few minutes)
+
+  Run instructions for iOS:
+    • cd "/Users/xpel/Workspaces/ReactNative/AwesomeBoyProject/ios/AwesomeBoyProject" && npx react-native run-ios
+    - or -
+    • Open AwesomeBoyProject/ios/AwesomeBoyProject.xcworkspace in Xcode or run "xed -b ios"
+    • Hit the Run button
+
+  Run instructions for Android:
+    • Have an Android emulator running (quickest way to get started), or a device connected.
+    • cd "/Users/xpel/Workspaces/ReactNative/AwesomeBoyProject/ios/AwesomeBoyProject" && npx react-native run-android
+
+  Run instructions for Windows and macOS:
+    • See https://aka.ms/ReactNative for the latest up-to-date instructions.
+
+
+为了fix了一些错，改一下代码和改一下 Podfile:
+
+# https://github.com/facebook/flipper/issues/834
+# https://github.com/facebook/flipper/issues/834#issuecomment-905806177
+
+########################## Podfile Begin ##########################
+platform :ios, '11.0' ## 原先是 9.0
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+def add_flipper_pods!
+  version = '~> 0.87.0'   ## 原先是 0.33.1
+
+  .............
+
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable these next few lines.
+  add_flipper_pods!
+  post_install do |installer|
+    flipper_post_install(installer)
+    
+    # >>>>>>>>>>>>> https://github.com/facebook/flipper/issues/834#issuecomment-905806177
+    # Apple Silicon builds require a library path tweak for Swift library discovery or "symbol not found" for swift things
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.user_project.native_targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings['LIBRARY_SEARCH_PATHS'] = ['$(SDKROOT)/usr/lib/swift', '$(inherited)']
+        end
+      end
+      aggregate_target.user_project.save
+    end
+
+     # Flipper requires a crude patch to bump up iOS deployment target, or "error: thread-local storage is not supported for the current target"
+    # I'm not aware of any other way to fix this one other than bumping iOS deployment target to match react-native (iOS 11 now)
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+       end
+    end
+
+    # ...but if you bump iOS deployment target, Flipper barfs again "Time.h:52:17: error: typedef redefinition with different types"
+    # We need to make one crude patch to RCT-Folly - set `__IPHONE_10_0` to our iOS target + 1
+    # https://github.com/facebook/flipper/issues/834 - 84 comments and still going...
+    `sed -i -e  $'s/__IPHONE_10_0/__IPHONE_12_0/' Pods/Flipper-Folly/folly/portability/Time.h `  ## here, i change the path
+    # >>>>>>>>>>>>> https://github.com/facebook/flipper/issues/834#issuecomment-905806177
+    
+  end
+########################## Podfile End ##########################
+
+# 最终 `npx react-native run-ios --verbose --simulator "iPhone 14 Pro"` 成功运行
+
+# 但没有起 To start Metro:
+npm start --reset-cache     # 换端口则(注意原生端代码是写死8081，需要可配置化及修改): npm start -- --reset-cache --port 8083
+
+# 再起一个新 Terminal:
+npx react-native run-ios --verbose --simulator
+
+
+
+# https://github.com/babel/babel/issues/14139#issuecomment-1011836916
+# 若出现下面这种问题，用 `npm start --reset-cache` 是解决不了问题的，需要用 `yarn start --reset-cache`
+--------------------------------------------------------
+Unhandled JS Exception: Unexpected token ':'. Expected a ')' or a ',' after a parameter declaration.
+
+no stack
+--------------------------------------------------------
+xpel@xpels-iMac AwesomeBoyProject % yarn start --reset-cache
+zsh: command not found: yarn
+npm install --global yarn
+yarn start --reset-cache
+
+
+
+
+
+######################### pod install 超时，或许是 DNS 问题，把谷歌及阿里的DNS加上 #########################
+# 在 /usr/local/lib/ruby/gems/3.2.0/gems/cocoapods-core-1.13.0/lib/cocoapods-core/cdn_source.rb, Line 407
+# 它这里默认 重试 5 次，可改环境变量修改: MAX_NUMBER_OF_RETRIES = (ENV['COCOAPODS_CDN_MAX_NUMBER_OF_RETRIES'] || 5).to_i
+# 它设置的超时是 10 秒，重试 5 遍，那么至少要等 50 秒 了。
+        :timeout => 10,
+        :connecttimeout => 10,
+
+xpel@xpels-iMac ios % pod install 
+Analyzing dependencies
+Fetching podspec for `DoubleConversion` from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`
+Fetching podspec for `Folly` from `../node_modules/react-native/third-party-podspecs/Folly.podspec`
+Fetching podspec for `glog` from `../node_modules/react-native/third-party-podspecs/glog.podspec`
+[!] CDN: trunk Repo update failed - 32 error(s):
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.193.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.194.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.195.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.196.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.197.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.198.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.199.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.200.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.201.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.202.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.203.0/FlipperKit.podspec.json Response: Timeout was reached
+CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.208.0/FlipperKit.podspec.json Response: Timeout was reached
+...
+# 这个 CDN URL 粘到浏览器去 loading 了很久，是能打开的，能打开一次后，再次打开就很快，估计是DNS问题，能打开再去 pod install 很快就ok了。加了谷歌DNS后，看看还会不会出现。
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------- Debug ReactNative --------------------------------------------------------
+
+# 1. 默认用 浏览器 调试
+会自动打开 http://localhost:8083/debugger-ui，然后自己 Command + Option + I 打开 开发者调试模式Pannel，去到 Sources 标签，一路展开 debuggerWorker -> index.ios.bundle -> 去到 js 文件代码下断点就好
+
+
+# 2. 用 VSCode 调试，推荐，因用 浏览器 每次重新加载 就需要重开Command + Option + I 开发者调试模式Pannel，再一路去到源码，好麻烦
+
+https://github.com/microsoft/vscode-react-native
+
+- VSCode Install Extendsion: React Native Tools
+-  (⌘ + ⇧ + D)新建一个launch.json -> Add Configuration -> React Native -> Attach to application -> classic application -> host port (i.e. localhost, 8083)
+- npm start 一个node server到上述port, 若已经启动可忽略
+- 在 VSCode Debug Tab 选中这个 configuration，点击绿色小箭头，显示Established a connection with the Proxy (Packager) to the React Native application
+- 设备 remote 访问这个 node server，摇晃后点击debug，模拟器按 Command + Ctrl + Z ，此时这个 debug session 可以被 vscode 拦截，不再走到浏览器，可以断点和查看变量了
+
+
+
+
+
+
+

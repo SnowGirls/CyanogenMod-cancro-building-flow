@@ -1,0 +1,437 @@
+
+
+################## MacOSX sdks ##################
+
+# xcode-select xcodebuild xcrun
+/Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/
+/Library/Developer/CommandLineTools/
+
+
+
+
+
+
+
+################## AOSP On Macosx ##################
+
+https://51wlb.top/aosp/
+https://www.jianshu.com/p/53e590eb237a
+https://www.jianshu.com/p/6d2e3055c3ff
+
+
+https://github.com/phracker/MacOSX-SDKs
+
+for f in *.tar.xz;do tar xvfJ $f;done;
+PWD=`pwd`
+for f in $(find . -type d -maxdepth 1);do if [ $f != '.' ]; then echo $f; fi;done;
+for f in $(find . -type d -maxdepth 1);do if [ $f != '.' ]; then echo ${f:2}; fi;done;
+for f in $(find . -type d -maxdepth 1);do if [ $f != '.' ]; then echo $PWD/${f:2}; fi;done;
+for f in $(find . -type d -maxdepth 1);do if [ $f != '.' ]; then echo sudo ln -s $PWD/${f:2} /Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/${f:2}; fi;done;
+for f in $(find . -type d -maxdepth 1);do if [ $f != '.' ]; then sudo ln -s $PWD/${f:2} /Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/${f:2}; fi;done;
+ls -al /Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/
+
+
+Host library `-lrt` not available
+Remove "-lrt" lines from the external/v8/Android.bp
+
+dyld: Library not loaded: /usr/local/opt/isl/lib/libisl.21.dylib
+  Referenced from: /Volumes/AOSP/mkq-mr1/prebuilts/gcc/darwin-x86/host/x86_64-apple-darwin-9.2.0/bin/../libexec/gcc/x86_64-apple-darwin19/9.2.0/cc1
+  Reason: image not found
+brew install isl
+ls -al  /usr/local/Cellar/isl/
+ls -al  /usr/local/opt/isl/lib/
+install_name_tool -change '/usr/local/opt/isl/lib/libisl.21.dylib' /usr/local/opt/isl/lib/libisl.dylib /Volumes/AOSP/mkq-mr1/prebuilts/gcc/darwin-x86/host/x86_64-apple-darwin-9.2.0/libexec/gcc/x86_64-apple-darwin19/9.2.0/cc1
+
+
+dyld: Library not loaded: /usr/local/opt/libmpc/lib/libmpc.3.dylib
+  Referenced from: /Volumes/AOSP/mkq-mr1/prebuilts/gcc/darwin-x86/host/x86_64-apple-darwin-9.2.0/bin/../libexec/gcc/x86_64-apple-darwin19/9.2.0/cc1
+  Reason: image not found
+ls -al /usr/local/Cellar/libmpc/1.2.1/
+ls -al /usr/local/opt/libmpc && ls -al /usr/local/opt/libmpc/
+ls -al /usr/local/opt/libmpc/lib/libmpc.3.dylib
+
+
+/Volumes/AOSP/mkq-mr1/kernel/oneplus/msm8996/arch/arm64/kernel/vdso32/../../../arm/vdso/vdsomunge.c:50:10: fatal error: byteswap.h: No such file or directory
+   50 | #include <byteswap.h>
+      |          ^~~~~~~~~~~~
+https://patchwork.kernel.org/project/linux-arm-kernel/patch/2039A9BE-ADA4-4D28-84F4-C8B9D76834AD@goldelico.com/
+
+
+
+
+
+
+
+
+
+################## Flutter Firebase ##################
+
+# Android:
+https://github.com/FirebaseExtended/flutterfire
+
+https://github.com/firebase/quickstart-android
+
+https://pub.dev/packages/firebase_core
+https://pub.dev/packages/firebase_messaging
+https://firebase.google.cn/docs/flutter/setup
+https://firebase.google.com/support/release-notes/android
+https://firebase.google.cn/docs/test-lab/android/continuous?hl=zh-cn
+
+
+https://firebase.flutter.dev/docs/messaging/notifications
+https://firebase.flutter.dev/docs/messaging/notifications/#foreground-notifications
+
+
+https://console.firebase.google.com
+https://console.cloud.google.com/getting-started?pli=1
+
+
+https://www.jianshu.com/p/8b5cba526c63
+https://www.jianshu.com/p/cc77dd21e687
+https://blog.csdn.net/fengyulinde/article/details/84891351
+
+# iOS
+https://github.com/lizhuoyuan/flutter_google_fcm
+https://zhuoyuan.blog.csdn.net/article/details/110878313
+https://blog.csdn.net/u011272795/article/details/110874555
+
+https://firebase.google.cn/docs/cloud-messaging/ios/client
+https://firebase.google.cn/docs/flutter/setup?platform=ios
+
+https://www.jianshu.com/p/8281047bcdec
+https://firebase.flutter.dev/docs/messaging/apple-integration/
+https://blog.csdn.net/zgpeace/article/details/85007247
+
+
+
+
+
+
+
+
+################## Jenkins on Macos ##################
+
+brew install jenkins # brew install jenkins-lts
+
+To restart jenkins-lts after an upgrade:
+  brew services restart jenkins-lts
+Or, if you don't want/need a background service you can just run:
+  /opt/homebrew/opt/openjdk@17/bin/java -Dmail.smtp.starttls.enable=true -jar /opt/homebrew/opt/jenkins-lts/libexec/jenkins.war --httpListenAddress=127.0.0.1 --httpPort=8080
+
+# 1. start with java war
+java -jar jenkins.war --httpPort=18086
+
+# 2. homebrew launch
+brew services start jenkins --httpPort=18086 # brew services start jenkins-lts --httpPort=18086
+# brew services --help ; brew services list 
+# cat ~/Library/LaunchAgents/homebrew.mxcl.jenkins-lts.plist
+
+````
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>homebrew.mxcl.jenkins-lts</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/opt/openjdk@11/bin/java</string>
+    <string>-Dmail.smtp.starttls.enable=true</string>
+    <string>-DJENKINS_HOME=~/.workspaces/jenkins/</string>    ## Here !!!
+    <string>-jar</string>
+    <string>/opt/homebrew/opt/jenkins-lts/libexec/jenkins.war</string>
+    <string>--httpListenAddress=0.0.0.0</string>
+    <string>--httpPort=18086</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>
+
+````
+
+
+```` vim $HOME/Library/LaunchAgents/homebrew.mxcl.jenkins-lts.plist
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>homebrew.mxcl.jenkins-lts</string>
+  <key>LimitLoadToSessionType</key>
+  <array>
+    <string>Aqua</string>
+    <string>Background</string>
+    <string>LoginWindow</string>
+    <string>StandardIO</string>
+    <string>System</string>
+  </array>
+      <key>EnvironmentVariables</key>
+      <dict>
+           <key>JENKINS_HOME</key>                    ## or Here !!!
+           <string>~/.workspaces/jenkins</string>
+      </dict>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/opt/openjdk@17/bin/java</string>
+    <string>-Dmail.smtp.starttls.enable=true</string>
+    <string>-jar</string>
+    <string>/opt/homebrew/opt/jenkins-lts/libexec/jenkins.war</string>
+    <string>--httpListenAddress=0.0.0.0</string>
+    <string>--httpPort=18086</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+</dict>
+</plist>
+
+````
+
+# ps -ef | gre jen ## /opt/homebrew/opt/openjdk@11/bin/java -Dmail.smtp.starttls.enable=true -DJENKINS_HOME=${HOME}/.workspaces/jenkins/ -jar /opt/homebrew/opt/jenkins-lts/libexec/jenkins.war --httpListenAddress=0.0.0.0 --httpPort=18086
+
+
+# Open in browser: http://localhost:18086/
+
+cat $HOME/.workspaces/jenkins/secrets/initialAdminPassowrd
+
+
+
+
+### Restart Jenkins
+
+launchctl list | grep jenkins   ## status is -9
+
+launchctl start homebrew.mxcl.jenkins-lts
+
+ps -ef | grep jenkins
+
+# How to resolve stuck "Uninstallation pending" of Jenkins plugin?
+https://stackoverflow.com/a/75169160/1749293
+
+
+
+
+
+
+
+
+
+
+
+################## nginx ##################
+
+  brew install nginx
+
+Docroot is: /usr/local/var/www
+  vim /usr/local/etc/nginx/nginx.conf, append tail:
+    include servers/*.conf;
+
+To start nginx now and restart at login:
+  brew services start nginx
+Or, if you don't want/need a background service you can just run:
+  /usr/local/opt/nginx/bin/nginx -g daemon off;
+
+==> gdb
+gdb requires special privileges to access Mach ports.
+You will need to codesign the binary. For instructions, see:
+
+  https://sourceware.org/gdb/wiki/PermissionsDarwin
+
+
+nginx -T
+
+sudo lsof -i -P -n | grep LISTEN
+
+Macos: netstat -an | grep LISTEN   ## Linux: sudo netstat -tulpn | grep LISTEN
+
+
+# 如果 localhost/127.0.0.1 行页 自己的LAN IP(192.168.*.*/10.193.*.*) 不行，看看是不是 Macos 设置了http/https代理
+
+
+
+
+
+
+
+################## pod --version error: ##################
+ERROR:  While executing gem ... (Gem::Exception)
+    Failed to find gems ["ffi"] = 1.15.5
+
+## 卸载干净以前版本的 cocoapods 及其相关的 gem (cocoapods为缀的)， 重装一下~
+gem list
+sudo gem uninstall cocoapods** ...
+sudo gem install cocoapods
+
+
+
+
+
+
+
+
+################## VSCode for navigate codes ##################
+
+## Download Flutter engine source codes, then use VSCode open flutter-engine-vscode folder as follow:
+mkdir flutter-engine-vscode/ && mv flutter-master flutter-engine-vscode/flutter
+
+
+## Link source/header files into project
+ln -s $HOME/Workspaces/FlutterSDK/skia-main $HOME/Workspaces/FlutterSDK/flutter-engine-vscode/flutter/third_party/skia
+ln -s $HOME/Workspaces/FlutterSDK/dart-sdk-main $HOME/Workspaces/FlutterSDK/flutter-engine-vscode/flutter/third_party/dart
+
+
+## Replace $HOME with your absolute path
+
+${workspaceFolder}/**
+${workspaceFolder}/flutter/
+$HOME/Workspaces/AndroidSDK/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/**
+$HOME/Workspaces/AndroidSDK/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android/**
+$HOME/Workspaces/AndroidSDK/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include/aarch64-linux-android/**
+$HOME/Workspaces/FlutterSDK/skia-main/
+
+
+## TODO ... Try CMakeList.txt ...
+
+
+
+
+
+
+
+
+
+
+
+## About debug xnu :)
+https://github.com/apple/swift
+https://github.com/apple/darwin-xnu
+https://shadowfile.inode.link/blog/2018/10/source-level-debugging-the-xnu-kernel/
+https://bbs.ichunqiu.com/thread-48301-1-1.html ## https://www.freebuf.com/column/190699.html
+
+
+
+
+## M1设备的Xcode编译问题深究
+https://juejin.cn/post/7037037120158269448
+
+config.build_settings['ARCHS[sdk=iphonesimulator*]'] =  "x86_64" ## `uname -m`
+config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = "arm64"
+
+
+
+## 一些注意的问题
+1. dart 进程吃内存达 10GB
+https://github.com/dart-lang/sdk/issues/40243
+flutter clean 一下
+
+
+
+
+## AI 汇总
+https://flowus.cn/flowus101/share/10037b40-88c3-43b3-85f6-b6602dced060
+
+
+
+
+
+
+
+## 关于 dart mixin, 一篇就够了
+https://medium.com/flutter-community/dart-what-are-mixins-3a72344011f3
+
+################################### minxin 助记忆简单例子 [START]###################################
+
+mixin A {
+  String getMessage() => 'A';
+}
+
+mixin B {
+  String getMessage() => 'B';
+}
+
+class P {
+  String getMessage() => 'P';
+}
+
+class ConcretePAB extends P with A, B {}   // ConcretePAB -> PAB -> PA -> P  ## P -> 'P', PA overrides -> 'A', PAB - overrides -> 'B', final subclass impl is in 'B'
+
+class ConcretePBA extends P with B, A {}   // ConcretePBA -> PBA -> PB -> P  ## P -> 'P', PB overrides -> 'B', PBA - overrides -> 'A', final subclass impl is in 'A'
+
+// So, the out put will be 'BA'
+void main() {
+  String result = '';
+
+  ConcretePAB pAB = ConcretePAB();
+  result += pAB.getMessage();
+
+  ConcretePBA pBA = ConcretePBA();
+  result += pBA.getMessage();
+
+  print(result);    // 'BA'
+  
+  print(pAB is P);  // true
+  print(pAB is A);  // true
+  print(pAB is B);  // true
+  
+  print(pBA is P);  // true
+  print(pBA is A);  // true
+  print(pBA is B);  // true
+}
+
+# 快速记忆: C extends P with A, B 即: C -> PAB -> PA -> P
+
+################################### minxin 助记忆简单例子 [OVER]###################################
+
+
+
+
+
+
+
+
+flutter create --org com.xpel.net.flutter --ios-language objc --android-language java --template=plugin --platforms=ios,android flutter_project_game
+
+
+pod lib create your_pod_lib
+
+pod repo add your_pods_specs http://gitlab.super_me.local:10086/iOS/specs.git
+
+pod repo push your_pods_specs your_pod_lib.podspec  --verbose --skip-tests --sources='https://github.com/CocoaPods/Specs.git, https://mirrors.tuna.tsinghua.edu.cn/git/CocoaPods/Specs.git' --skip-import-validation --use-libraries
+
+
+
+# Error - [!] The 'Pods-Runner' target has transitive dependencies that include statically linked binaries:
+# https://stackoverflow.com/a/73554665/1749293
+use_frameworks! :linkage => :static
+# use_modular_headers!
+
+
+
+
+
+
+
+################################### String.fromEnvironment("key") 实现查找路径 ###################################
+
+-> 打开 dart-sdk 源码工程
+-> sdk/lib/_internal/vm/lib/string_patch.dart: @pragma("vm:external-name", "String_fromEnvironment") -> runtime/lib/string.cc: DEFINE_NATIVE_ENTRY(String_fromEnvironment, 0, 3)
+-> #define DEFINE_NATIVE_ENTRY(name, type_argument_count, argument_count)
+-> Api::GetEnvironmentValue(thread, name) -> Api::CallEnvironmentCallback -> Dart_SetEnvironmentCallback -> Dart_SetEnvironmentCallback(DartUtils::EnvironmentCallback);
+-> Dart_SetEnvironmentCallback(DartUtils::EnvironmentCallback); -> environment_->Lookup(GetHashmapKeyFromString(name_chars)
+-> void DartUtils::SetEnvironment(dart::SimpleHashMap* environment) -> DartUtils::SetEnvironment(Options::environment());
+-> 那么最终来源于 Options::environment() -> runtime/bin/main_options.cc 
+-> runtime/bin/options.cc 的 bool OptionProcessor::ProcessEnvironmentOption 来分配出来
+  if (*environment == NULL) {
+    *environment = new SimpleHashMap(&SimpleHashMap::SameStringValue, 4);
+  }
+
+
+
+
+
+
+
+
+

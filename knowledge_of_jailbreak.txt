@@ -1,0 +1,331 @@
+
+
+# 1
+iPhone 6S. iOS 13.3
+checkra1n [iPhone SE/6S~iPhone X]
+
+#####1 Install checkra1n application on your macosx, and open it.
+#####2 Connect your iPhone with USB to your mac, checkra1n will display device info.
+#####3 Click 'Start' button on checkra1n, read the instructions and click 'Next' to rec mode.
+#####4 Continue follow the instruction, click 'Start'. Hold 'Side' & 'Home' button on device. 
+#####5 Then release 'Side' button after 6 seconds but keep holding on 'Home' button.
+#####6 Finally the device enter DFU mode, and the less jobs will automatically done. 
+
+一句话概括就是：先进入REC模式，再同时按HOME+关机键后松开关机键进入DFU模式。
+
+# 2
+brew install usbmuxd
+iproxy 2222 22
+ssh -p 2222 root@127.0.0.1
+# enter default password: alpine
+whoami  # check if i'm root or not :P
+ls -al /Developer/usr/bin/    # checkout the debugserver
+echo $PATH
+
+Try unplug & plug USB again if below error occurred:
+    kex_exchange_identification: read: Connection reset by peer
+    Connection reset by 127.0.0.1 port 2222
+
+ls -al /System/Library/Caches/com.apple.dyld/
+scp -r -P2222 root@localhost:/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64 ./
+ls -al $HOME/Library/Developer/Xcode/iOS\ DeviceSupport/[__Version__]/Symbols/System/Library/Caches/com.apple.dyld/
+
+# for iOS 16.x and above is:
+$HOME/Library/Developer/Xcode/iOS\ DeviceSupport/16.1\ \(20B82\)\ arm64e/Symbols/private/preboot/Cryptexes/OS/System/Library/Caches/com.apple.dyld
+# and the dyld_shared_cache_xxxx is splited to many pieces
+https://github.com/keith/dyld-shared-cache-extractor/issues/1
+
+	git clone https://github.com/keith/dyld-shared-cache-extractor.git
+	cd dyld-shared-cache-extractor
+	cmake -B build
+	cmake --build build
+	./build/dyld-shared-cache-extractor $HOME/Library/Developer/Xcode/iOS\ DeviceSupport/15.5\ \(19F77\)\ arm64e/Symbols/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e ./build/dyld_shared_cache_arm64e_ios15.5_extracted/
+
+
+## 都是 dlopen /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/usr/lib/dsc_extractor.bundle
+## 然后 dlsym 拿 dyld_shared_cache_extract_dylibs_progress 函数来 dump 出来的
+
+
+# 3
+On Mac:
+# debugserver on device's path /Developer/usr/bin/debugserver, once you connect device with xcode 
+ls -al /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/DeviceSupport/13.3/DeveloperDiskImage.dmg # also have a debugserver in it.
+scp -r -P2222 root@localhost:/Developer/usr/bin/debugserver $HOME/Desktop/
+cd $HOME/Desktop/ && file debugserver && lipo -thin arm64 debugserver -output debugserver_arm64
+
+---------------------------- vim en.plist ----------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.springboard.debugapplications</key>
+    <true/>
+    <key>run-unsigned-code</key>
+    <true/>
+    <key>get-task-allow</key>
+    <true/>
+    <key>task_for_pid-allow</key>
+    <true/>
+</dict>
+</plist>
+---------------------------- vim en.plist ----------------------------
+OR 
+---------------------------- vim en.plist ----------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>task_for_pid-allow</key>
+    <true/>
+    <key>run-unsigned-code</key>
+    <true/>
+    <key>platform-application</key>
+    <true/>
+    <key>get-task-allow</key>
+    <true/>
+    <key>com.apple.system-task-ports</key>
+    <true/>
+    <key>com.apple.frontboard.launchapplications</key>
+    <true/>
+    <key>com.apple.frontboard.debugapplications</key>
+    <true/>
+    <key>com.apple.springboard.debugapplications</key>
+    <true/>
+    <key>com.apple.backboardd.launchapplications</key>
+    <true/>
+    <key>com.apple.backboardd.debugapplications</key>
+    <true/>
+    <key>com.apple.private.memorystatus</key>
+    <true/>
+    <key>com.apple.private.cs.debugger</key>
+    <true/>
+    <key>com.apple.private.logging.diagnostic</key>
+    <true/>
+</dict>
+</plist>
+---------------------------- vim en.plist ----------------------------
+
+codesign -s - --entitlements en.plist -f debugserver_arm64
+scp -P 2222 debugserver_arm64 root@localhost:/usr/bin/debugserver
+
+# 4
+On iOS:
+ls -al /usr/bin/debugserver
+ps -A  # ps aux
+debugserver -x backboard *:12345 /Applications/MobileSMS.app/MobileSMS  # error: rejecting incoming connection from ::ffff:127.0.0.1 (expecting ::1)，change * to 127.0.0.1
+# debugserver localhost:12345 -p 768 # pid, debugserver *:12345 -a Cydia
+debugserver -x backboard 127.0.0.1:12345 /Applications/MobileSMS.app/MobileSMS
+debugserver -x backboard 127.0.0.1:12345  /var/containers/Bundle/Application/9BC5831A-1B80-40A2-AB2D-E39E31E088D4/Runner.app/Runner --enable-dart-profiling --disable-service-auth-codes 
+
+On Macosx:    
+iproxy 54321 12345
+lldb
+(lldb)process connect connect://127.0.0.1:54321
+(lldb)c
+(lldb)breakpoint set -name Precompiled__MyAppState_19445837_staticVarAIncrement_5749
+(lldb)br set -name '-[AppDelegate application:didFinishLaunchingWithOptions]'
+(lldb)br set -r '-\[PHCollection *'
+(lldb)breakpoint list
+(lldb)breakpoint disable/delete
+(lldb)process interrupt
+(lldb)bt
+(lldb)register read
+(lldb)po $x0
+(lldb)p (char *)$x1
+(lldb)c
+
+
+cd /
+find -name *.app
+ls -al /var/containers/Bundle/Application/
+ls -al /var/mobile/Containers/Data/Application/
+ls -al /var/mobile/Library/FrontBoard/applicationState.db
+cat /var/mobile/Library/FrontBoard/applicationState.db | grep -a "com.ss"
+
+scp -P 2222 root@127.0.0.1:/var/mobile/Library/FrontBoard/applicationState.db  ./
+sqlite3 applicationState.db 
+
+
+
+
+
+
+
+
+---------------------------------- dsc_extractor the /System/Library/Caches/com.apple.dyld/ Mach-O file ----------------------------------
+
+1. Download dyld source https://opensource.apple.com/tarballs/dyld/
+
+2. Go to file dyld3/shared-cache/dsc_extractor.cpp, withdraw the source from the end of this file:
+
+	vim and save to file -> vim ~/Workspaces/bin/dyld_shared_cache/dsc_extractor.cpp:
+
+	// test program
+	#include <stdio.h>
+	#include <stddef.h>
+	#include <dlfcn.h>
+
+
+	typedef int (*extractor_proc)(const char* shared_cache_file_path, const char* extraction_root_path,
+	                              void (^progress)(unsigned current, unsigned total));
+
+	int main(int argc, const char* argv[])
+	{
+	    if ( argc != 3 ) {
+	        fprintf(stderr, "usage: dsc_extractor <path-to-cache-file> <path-to-device-dir>\n");
+	        return 1;
+	    }
+
+	    //void* handle = dlopen("/Volumes/my/src/dyld/build/Debug/dsc_extractor.bundle", RTLD_LAZY);
+	    void* handle = dlopen("/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/usr/lib/dsc_extractor.bundle", RTLD_LAZY);
+	    if ( handle == NULL ) {
+	        fprintf(stderr, "dsc_extractor.bundle could not be loaded\n");
+	        return 1;
+	    }
+
+	    extractor_proc proc = (extractor_proc)dlsym(handle, "dyld_shared_cache_extract_dylibs_progress");
+	    if ( proc == NULL ) {
+	        fprintf(stderr, "dsc_extractor.bundle did not have dyld_shared_cache_extract_dylibs_progress symbol\n");
+	        return 1;
+	    }
+
+	    int result = (*proc)(argv[1], argv[2], ^(unsigned c, unsigned total) { printf("%d/%d\n", c, total); } );
+	    fprintf(stderr, "dyld_shared_cache_extract_dylibs_progress() => %d\n", result);
+	    return 0;
+	}
+
+
+3. cd ~/Workspaces/bin/dyld_shared_cache/ && clang++ dsc_extractor.cpp -o dsc_extractor && chmod a+x dsc_extractor
+
+4. Extract the mach-o file already pulled down from device by xcode (no need to extract again, cause already xcode extracted on outside parent dir Symbols/System/Library/, but you can try to extract it for researching :)):
+
+	./dsc_extractor $HOME/Library/Developer/Xcode/iOS\ DeviceSupport/__VERSION__/Symbols/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e  $HOME/Library/Developer/Xcode/iOS\ DeviceSupport/__VERSION__/Symbols/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64e_extracted/
+
+5. Extract the 
+	/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64
+	$HOME/Library/Developer/Xcode/iOS\ DeviceSupport/__VERSION__/Symbols/System/Library/Caches/com.apple.dyld/
+that pulled from jailbroken device
+
+6. Finally, drag the output files to IDA
+
+
+
+
+
+
+
+---------------------------------- Cycript For iOS ---------------------------------- 
+
+In Cydia.app search Cycript and install it. After install open your app.
+
+
+ssh -p 2222 root@127.0.0.1
+
+cycript -p [app_pid]
+
+cy# UIApp
+#"<UIApplication: 0x110a162e0>"
+cy# [UIApplication sharedApplication]
+#"<UIApplication: 0x110a162e0>"
+cy# [NSBundle mainBundle].bundleIdentifier
+@"com.xpel.dev"
+
+cy#  [[NSBundle mainBundle] bundlePath];
+@"/private/var/containers/Bundle/Application/33B26716-41C4-4C81-A232-4F13AF196F68/Runner.app"
+
+cy#  [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+@"/var/mobile/Containers/Data/Application/8EBA6EBC-F5B5-483B-BAC5-E26B794553B1/Library/Caches"
+
+cy#  [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+@"/var/mobile/Containers/Data/Application/8EBA6EBC-F5B5-483B-BAC5-E26B794553B1/Documents"
+
+cy#  [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+@"/var/mobile/Containers/Data/Application/8EBA6EBC-F5B5-483B-BAC5-E26B794553B1/Library/Application Support"
+
+cy# [[NSFileManager defaultManager] temporaryDirectory]
+#"file:///private/var/mobile/Containers/Data/Application/8EBA6EBC-F5B5-483B-BAC5-E26B794553B1/tmp/"
+
+
+
+
+
+---------------------------------- Cycript For Macos ---------------------------------- 
+
+Cycript 太久没更新了，frida-cycript 维护了份新的
+
+https://github.com/nowsecure/frida-cycript
+pip3 install meson
+brew install ninja
+git clone --recurse-submodules https://github.com/nowsecure/frida-cycript.git
+cd frida-cycript
+meson build --buildtype minsize --strip
+
+## 如果有错: src/meson.build:168:2: ERROR: File cycript0.9 does not exist.
+## 在 src/meson.build 文件里，删掉两处 'cycript0.9'。（Line 172 & Line 175），估计是 meson 问题判断不到这个目录存在 （它以为是文件了）
+## 因为这两个在下面 command 命令里作为参数传给 generate-runtime.py, 去到 generate-runtime.py 文件，写死路径和改index：
+
+		standard_library = "../src/cycript0.9" 		# sys.argv[3]
+		output_js = sys.argv[3] 					# sys.argv[4]
+		output_standard_library = "src/cycript0.9" 	# sys.argv[5]
+
+
+rm -rf build/ && meson build --buildtype minsize --strip
+
+ninja -C build
+
+./build/src/cycript 
+
+## 运行成功, 但 -p 注入不成功，算了，不折腾了
+
+
+
+
+
+
+---------------------------------- Macos Frida inspect iOS Simulator App process ---------------------------------- 
+
+
+chmod a+x frida-server-15.1.17-macos-x86_64
+
+./frida-server-15.1.17-macos-x86_64 &          # should allow in System Preference - Security & Privacy
+
+ps -ef | grep XPel.app/XPel					   # 虽然在模拟器中显示，实际上是个普通的Macos系统中的进程
+
+frida -p [Pid]
+
+-> ObjC.available
+-> ObjC.classes
+-> const { XPTeeSecurityStore } = ObjC.classes; XPTeeSecurityStore.secretKeys().toString();
+-> ObjC.classes.XPTeeSecurityStore.secretKeys().toString();
+-> quit;
+
+
+
+
+
+---------------------------------- FridaGadget.dylib 注入进程后或一起编译打包运行后 ---------------------------------- 
+
+Console output indicate success:
+
+Frida: Listening on 127.0.0.1 TCP port 27042
+
+frida-ps -U
+frida -U Everything 
+[iPhone::Everything ]-> ObjC.classes.__NSSetM
+[iPhone::Everything ]-> console.log(ObjC.classes.__NSSetM.superclass());
+[iPhone::Everything ]-> console.log(ObjC.classes.NSSet["- containsObject:"])
+
+
+
+
+
+
+
+---------------------------------- Homeless ----------------------------------
+
+MDM: https://www.jianshu.com/p/6112050ea31a
+
+
+
+
+

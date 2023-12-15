@@ -1,0 +1,166 @@
+
+
+
+
+https://halfrost.com/objc_runtime_isa_class/
+
+https://github.com/draveness/analyze/tree/master/contents/objc
+
+
+
+__LP64__ 宏由预处理器定义: cpp -dM /dev/null
+
+
+
+/// base on objc4-818.2
+
+@interface Object {
+    Class isa;
+}
+
+@interface NSObject <NSObject> {
+    Class isa  OBJC_ISA_AVAILABILITY;
+}
+
+typedef struct objc_class *Class;
+typedef struct objc_object *id;
+typedef struct objc_selector *SEL;
+typedef id (*IMP)(id, SEL, ...); 
+
+struct objc_object {
+    isa_t isa;
+}
+
+struct objc_class : objc_object {
+    // Class ISA;
+    Class superclass;
+    cache_t cache;             // formerly cache pointer and vtable
+    class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
+}
+
+union isa_t {
+	uintptr_t bits;
+	Class cls;
+	struct {
+        # ISA_BITFIELD;  // defined in isa.h
+        uintptr_t nonpointer        : 1;      # 0 普通的指针, 1 开启指针优化, 比如 Tagged Pointer                         
+        uintptr_t has_assoc         : 1;                                      
+        uintptr_t has_cxx_dtor      : 1;                                      
+        uintptr_t shiftcls          : 33; /*MACH_VM_MAX_ADDRESS 0x1000000000*/
+        uintptr_t magic             : 6;                                      
+        uintptr_t weakly_referenced : 1;                                      
+        uintptr_t unused            : 1;                                      
+        uintptr_t has_sidetable_rc  : 1;                                      
+        uintptr_t extra_rc          : 19;
+    };
+}
+
+struct cache_t {
+    struct bucket_t *_bucketsAndMaybeMask;
+    union {
+        struct {
+            explicit_atomic<mask_t>    _maybeMask;
+            uint16_t                   _flags;
+            uint16_t                   _occupied;
+        };
+        explicit_atomic<preopt_cache_t *> _originalPreoptCache;
+    };
+}
+
+struct bucket_t {
+    explicit_atomic<uintptr_t> _imp;
+    explicit_atomic<SEL> _sel;
+}
+
+struct class_data_bits_t {
+	uintptr_t bits;
+
+	class_rw_t* data() const {
+        return (class_rw_t *)(bits & FAST_DATA_MASK);
+    }
+}
+
+struct class_rw_t {
+    uint32_t flags;
+    uint16_t witness;
+    explicit_atomic<uintptr_t> ro_or_rw_ext;
+
+    Class firstSubclass;
+    Class nextSiblingClass;
+
+    const class_ro_t *ro() const {
+        auto v = get_ro_or_rwe();
+        if (slowpath(v.is<class_rw_ext_t *>())) {
+            return v.get<class_rw_ext_t *>(&ro_or_rw_ext)->ro;
+        }
+        return v.get<const class_ro_t *>(&ro_or_rw_ext);
+    }
+}
+
+struct class_ro_t {
+    uint32_t flags;
+    uint32_t instanceStart;
+    uint32_t instanceSize;
+    uint32_t reserved;
+
+    union {
+        const uint8_t * ivarLayout;
+        Class nonMetaclass;
+    };
+
+    explicit_atomic<const char *> name;
+    void *baseMethodList;
+    protocol_list_t * baseProtocols;
+    const ivar_list_t * ivars;
+
+    const uint8_t * weakIvarLayout;
+    property_list_t *baseProperties;
+}
+
+
+
+
+
+
+
+
+
+x0~x7：传递子程序的参数和返回值，使用时不需要保存，多余的参数用堆栈传递，64位 的返回结果保存在x0中,更多参数用堆栈传递。
+x8：用于保存子程序的返回地址，使用时不需要保存。
+x9~x15：临时寄存器，也叫可变寄存器，子程序使用时不需要保存。
+x16~x17：子程序内部调用寄存器（IPx），使用时不需要保存，尽量不要使用。
+x18：平台寄存器，它的使用与平台相关，尽量不要使用。
+x19~x28：临时寄存器，子程序使用时必须保存。
+x29：帧指针寄存器（FP），用于连接栈帧，使用时必须保存。
+x30：链接寄存器（LR），用于保存子程序的返回地址。
+x31：堆栈指针寄存器（SP），用于指向每个函数的栈顶。
+PC：记录当前CPU当前指令的哪一条指令,存储当前CPU正在执行的指令地址,类似IP
+链接：https://www.jianshu.com/p/b6de34ed6942
+
+
+
+
+
+
+
+
+
+
+_________________________________ 总结一下导致Crash的情况 _________________________________
+
+block 为 nil 时调用会 crash
+
+NSLog log a nil 也没事
+
+NSString stringWithFormat format a nil 没事, isEqualToString: nil 也没事
+
+NSArray containsObject/indexOfObject:nil 也没事
+
+
+
+
+
+
+
+
+
