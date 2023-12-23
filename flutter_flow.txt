@@ -160,6 +160,32 @@ fn + option + F12 key open Terminal -> cd android -> ./gradlew assembleDevelopme
 
 
 
+################### Flutter lib ###################
+// Android Studio -> New Flutter Project -> Porject Type 选择 Plugin ， 出来的项目里已经包含 example 子项目
+// 但这时，外层了 lib 的 ios XxxPlugin.m/h 或者 android XxxPlugin.java 就不好写了，会没了编译及自动提示填充等
+
+iOS:
+## 第一种方式:
+// 用 XCode 打开 example/ios/ 目录下的工程 Runner.xcworkspace 就好，注意pod install，注意一路展开Pods下面的 库名 -> ../.. -> example -> ios -> .symlinks -> plugins -> 库名 -> ios/Classes OK就可以好好写代码了
+(这里注意如果 pod install,  s.dependency 'Xlightweight-Store-iOS' 的 `pod repo update` or with `pod install --repo-update` 都没有，在 example 的 podfile 里显示指定一下 pod git url & commit 再 pod install 一下)
+
+
+## 第二种方式:
+// 这时把 example下的 ios/目录的 Flutter/ & Runner/ & Runner.xcodeproj & Runner.xcworkspace & Podfile 都拷过来
+
+// 然后 pod install 一下，打开 Runner.xcworkspace ，拖入 XxxPlugin.m/h 所在的 Classes 源码，就能愉快的写了
+
+// 弄个干净的 Podfile 是新的也行，pod isntall 后要改两个地方: 
+1. Runner -> PROJECT Runner -> Info (在Build Settings左侧) -> Configurations -> Debug/Relase/Profile 都修改成对应的 Pods-Runner.debug/release/profile
+2. Runner -> TARGETS Runner -> Build Phases -> 在 Run Script & Thin Binary 脚本的第一行都export FLUTTER_ROOT 指向的 flutter sdk 路径 如:
+export FLUTTER_ROOT=$HOME/Workspaces/FlutterSDK/flutter_macos_3.7.8-stable/
+
+Android:
+## 第一种方式:
+// 用 Android Studio 打开 example/android/ 目录就好，然后有引用到外面库的 android 目录的 XxxPlugin.java 源码，这样编写就好
+## 第二种方式:
+// Android 的话用 Android Studio 另打开 android/ 目录就好，build.gradle 写好 maven 地址 及 dependencies, 点一下 大象 下载同步 后 Make 一下就好
+// 但 Flutter 相关的类标红了 找不到， 后面看看
 
 
 

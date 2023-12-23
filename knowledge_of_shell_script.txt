@@ -35,6 +35,16 @@ $符号也是用来界定变量名的边界,表示${namebin}和.bin是两个独�
 
 
 ***** 注意 if 判断中对于变量的处理,需要加引号,以免一些不必要要的错误。没有加双引号会在一些含空格等的字符串变量判断的时候产生错误。比如[ -n "$var" ]如果var为空会出错
+```
+#!/bin/sh
+
+var="" 
+
+if [ -n $var ]; then echo "not empty"; else echo "empty"; fi;       ## 输出了 not empty
+if [ -n "$var" ]; then echo "not empty"; else echo "empty"; fi;		## 输出了 empty
+if [[ -n $var ]]; then echo "not empty"; else echo "empty"; fi;		## 输出了 empty
+```
+
 pid="12345"
 [ -z "$pid" ] 单对中括号,变量必须加双引号
 [[ -z $pid ]] 双对中括号,变量不用加双引号
@@ -70,5 +80,22 @@ $ 	检测字符串是否不为空，不为空返回 true。 	[ $a ] 返回 true�
 [ EXPR1 -o EXPR2 ]逻辑或,如果 EXPR1 or EXPR2 为真则返回为真
 [] || [] 用OR来合并两个条件
 [] && [] 用AND来合并两个条件
+
+
+
+
+
+
+
+
+
+
+###### 正则 ######
+https://www.cnblogs.com/OwlInTheOaktree/p/16218714.html
+
+(?s)  在正则前面加这个 ------> 则 Dot All 匹配多模式
+(?i)  不区分大小写
+
+
 
 

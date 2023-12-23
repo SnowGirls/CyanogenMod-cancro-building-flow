@@ -156,7 +156,7 @@ NSString stringWithFormat format a nil 没事, isEqualToString: nil 也没事
 
 NSArray containsObject/indexOfObject:nil 也没事
 
-
+[[NSFileManager defaultManager] fileExistsAtPath:nil]; 不会CRASH
 
 
 
