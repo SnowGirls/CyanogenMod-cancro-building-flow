@@ -12,82 +12,6 @@ https://storage.googleapis.com/play_public/supported_devices.html
 
 mkdir Google && cd Google
 
-################################### android-9.0.0_r57 ###################################
-
-git config --global http.proxy 'socks5://127.0.0.1:1090'
-git config --global https.proxy 'socks5://127.0.0.1:1090'
-
-
-mkdir android-9.0.0_r57 && cd android-9.0.0_r57
-
-repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-9.0.0_r57
-
-
-git config --global --unset http.proxy
-git config --global --unset https.proxy
-
-./ReRepoSync.sh
-
-
-source build/envsetup.sh
-
-lunch aosp_taimen-userdebug
-
-make update-api
-
-make
-
-
-
-
-----------------------------------------------------------------------------
-FAILED: out/soong/build.ninja 
-out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp
-error: bionic/libc/system_properties/Android.bp:1:1: dependency "libjson" of "libsystemproperties" missing variant:
-  arch:android_arm64_armv8-a_cortex-a73, image:core, link:static
-available variants:
-  arch:android_arm64_armv8-a_cortex-a73, image:vendor, link:static
-  arch:android_arm_armv8-a_cortex-a73, image:vendor, link:static
-ninja: build stopped: subcommand failed.
-22:24:29 soong bootstrap failed with: exit status 1
-----------------------------------------------------------------------------
-vim external/json-c/Android.bp
-## 加上: 
-vendor_available: true,
-## 如果有 vendor: true, 则删掉
-
-
-
-----------------------------------------------------------------------------
-FAILED: out/soong/build.ninja 
-out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp
-error: frameworks/base/core/jni/Android.bp:11:1: dependency "sandhook" of "libandroid_runtime" missing variant:
-  arch:android_arm64_armv8-a_cortex-a73, image:core, link:static
-available variants:
-  arch:android_arm64_armv8-a_cortex-a73, image:vendor, link:static
-  arch:android_arm_armv8-a_cortex-a73, image:vendor, link:static
-ninja: build stopped: subcommand failed.
-22:18:35 soong bootstrap failed with: exit status 1
-----------------------------------------------------------------------------
-vim external/sandhook/Android.bp
-## 如果有 vendor: true, 则删掉，替换或加上:
-vendor_available: true,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -171,6 +95,75 @@ adb reboot recovery
 
 
 
+################################### android-9.0.0_r57 ###################################
+
+git config --global http.proxy 'socks5://127.0.0.1:1090'
+git config --global https.proxy 'socks5://127.0.0.1:1090'
+
+
+mkdir android-9.0.0_r57 && cd android-9.0.0_r57
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-9.0.0_r57
+
+
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+
+./ReRepoSync.sh
+
+
+source build/envsetup.sh
+
+lunch aosp_taimen-userdebug
+
+make update-api
+
+make
+
+
+
+
+----------------------------------------------------------------------------
+FAILED: out/soong/build.ninja 
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp
+error: bionic/libc/system_properties/Android.bp:1:1: dependency "libjson" of "libsystemproperties" missing variant:
+  arch:android_arm64_armv8-a_cortex-a73, image:core, link:static
+available variants:
+  arch:android_arm64_armv8-a_cortex-a73, image:vendor, link:static
+  arch:android_arm_armv8-a_cortex-a73, image:vendor, link:static
+ninja: build stopped: subcommand failed.
+22:24:29 soong bootstrap failed with: exit status 1
+----------------------------------------------------------------------------
+vim external/json-c/Android.bp
+## 加上: 
+vendor_available: true,
+## 如果有 vendor: true, 则删掉
+
+
+
+----------------------------------------------------------------------------
+FAILED: out/soong/build.ninja 
+out/soong/.bootstrap/bin/soong_build -t -l out/.module_paths/Android.bp.list -b out/soong -n out -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp
+error: frameworks/base/core/jni/Android.bp:11:1: dependency "sandhook" of "libandroid_runtime" missing variant:
+  arch:android_arm64_armv8-a_cortex-a73, image:core, link:static
+available variants:
+  arch:android_arm64_armv8-a_cortex-a73, image:vendor, link:static
+  arch:android_arm_armv8-a_cortex-a73, image:vendor, link:static
+ninja: build stopped: subcommand failed.
+22:18:35 soong bootstrap failed with: exit status 1
+----------------------------------------------------------------------------
+vim external/sandhook/Android.bp
+## 如果有 vendor: true, 则删掉，替换或加上:
+vendor_available: true,
+
+
+
+
+
+
+
+
+
 
 
 
@@ -197,15 +190,6 @@ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b 
 
 
 
-
-
-
-
-
-
-
-
-
 ################################### android-11.0.0_r46 ###################################
 
 mkdir android-11.0.0_r46 && cd android-11.0.0_r46
@@ -217,4 +201,49 @@ repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b 
 ./ReRepoSync.sh
 
 
+
+
+
+
+
+
+
+
+################################### android-13.0.0_r78 ###################################
+
+mkdir android-13.0.0_r78 && cd android-13.0.0_r78
+
+
+
+vim ReRepoSync.sh
+--------------------------- ReRepoSync.sh ----------------------------
+#!/bin/sh
+
+count=0
+
+./repo sync --force-sync --current-branch -j 4
+
+
+while [ $? -ne 0 ] 
+
+do
+
+    count=`expr $count + 1`
+    echo "---------- try repo sync again ${count} -------------"
+
+    ./repo sync --force-sync --current-branch -j 4
+
+done
+--------------------------- ReRepoSync.sh ----------------------------
+chmod a+x ReRepoSync.sh
+
+
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-13.0.0_r78
+.repo/repo/repo --version  # 注意 python 版本要 3.XX 的 (可用 sudo update-alternatives --config python 切换)
+cp .repo/repo/repo ./repo
+
+./ReRepoSync.sh
+
+# 无意外，sync 成功完成。
 
