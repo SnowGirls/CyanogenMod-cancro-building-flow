@@ -8,6 +8,9 @@ https://developers.google.cn/android/drivers
 https://developers.google.com/android/drivers
 https://storage.googleapis.com/play_public/supported_devices.html
 
+# 编译在模拟器运行请看:
+https://source.android.com/docs/setup/create/avd?hl=zh-cn
+
 
 
 mkdir Google && cd Google
@@ -245,5 +248,78 @@ cp .repo/repo/repo ./repo
 
 ./ReRepoSync.sh
 
+# 毫无意外, sync 成功完成。
+
+source build/envsetup.sh
+
+lunch sdk_phone_x86_64  # 可以看看 lunch 的输出菜单, 但别仅信它, 之前用 sdk_pc_x86_64-userdebug 尝试了结果 emulator 命令出一个大屏也进入不了系统
+
+m -j8
+
+# 毫无意外, compile 成功完成。
+
+
+cd out/target/product/emulator64_x86_64/
+ls -al
+
+---------------------- KVM ----------------------
+# https://help.ubuntu.com/community/KVM/Installation 
+
+# https://developer.android.com/studio/run/emulator-acceleration?utm_source=android-studio#vm-linux
+$ sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+$ groups ; sudo adduser `id -un` kvm ; sudo adduser `id -un` libvirtd 
+$ ls -l /dev/kvm ; # sudo chown root:libvirtd /dev/kvm , if needed
+---------------------- KVM ----------------------
+
+
+
+which emulator
+# emulator -list-avds
+# ./prebuilts/android-emulator/linux-x86_64/emulator -list-avds
+emulator    # 注意要的是 prebuilts/ 下面的, 执行 source & lunch 选择后会改变 环境变量 把 emulator 指向 prebuilts/ 下的了
+emulator -help  # 查看一下, 发现可以指定 -k 来指定 kernel 路径
+
+
+
+
+
+
+
+
+
+
+
+
+################################### android-12.1.0_r11 ###################################
+
+mkdir android-12.1.0_r11 && cd android-12.1.0_r11
+
+
+repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-12.1.0_r11
+.repo/repo/repo --version  # 注意 python 版本要 3.XX 的 (可用 sudo update-alternatives --config python 切换)
+cp .repo/repo/repo ./repo
+
+
+cp ../android-13.0.0_r78/ReRepoSync.sh ./
+./ReRepoSync.sh
+
+
 # 无意外，sync 成功完成。
+
+
+source build/envsetup.sh
+
+
+-------------- failed try --------------
+lunch aosp_x86_64-eng  # 用下面 lunch sdk_phone_x86_64 的, 这个没有 userdata.img 编译出来
+m -j8
+cd out/target/product/generic_x86_64/
+emulator   # 发现没有 userdata-qemu.img 编译出来， 再试一下下面的
+-------------- failed try --------------
+
+
+lunch sdk_phone_x86_64
+m -j8
+cd out/target/product/emulator_x86_64/
+emulator   # OK, 成功打开
 
