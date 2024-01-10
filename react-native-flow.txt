@@ -190,7 +190,7 @@ yarn start --reset-cache
 
 ######################### pod install 超时，或许是 DNS 问题，把谷歌及阿里的DNS加上 #########################
 # 在 /usr/local/lib/ruby/gems/3.2.0/gems/cocoapods-core-1.13.0/lib/cocoapods-core/cdn_source.rb, Line 407
-# 它这里默认 重试 5 次，可改环境变量修改: MAX_NUMBER_OF_RETRIES = (ENV['COCOAPODS_CDN_MAX_NUMBER_OF_RETRIES'] || 5).to_i
+# 它这里默认 重试 5 次，可改环境变量修改 env COCOAPODS_CDN_MAX_NUMBER_OF_RETRIES=1 pod install. 源码: MAX_NUMBER_OF_RETRIES = (ENV['COCOAPODS_CDN_MAX_NUMBER_OF_RETRIES'] || 5).to_i
 # 它设置的超时是 10 秒，重试 5 遍，那么至少要等 50 秒 了。
         :timeout => 10,
         :connecttimeout => 10,
@@ -214,7 +214,7 @@ CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/
 CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.203.0/FlipperKit.podspec.json Response: Timeout was reached
 CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/5/FlipperKit/0.208.0/FlipperKit.podspec.json Response: Timeout was reached
 ...
-# 这个 CDN URL 粘到浏览器去 loading 了很久，是能打开的，能打开一次后，再次打开就很快，估计是DNS问题，能打开再去 pod install 很快就ok了。加了谷歌DNS后，看看还会不会出现。
+# 这个 CDN URL 粘到浏览器去 loading 了很久，是能打开的，能打开一次后，再次打开就很快，估计是DNS问题，能打开再去 pod install 很快就ok了。加了谷歌DNS后，还是会，加了 Cloudflare 的DNS 1.1.1.1 OK，非常的快。
 
 
 
