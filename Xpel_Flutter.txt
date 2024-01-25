@@ -410,6 +410,33 @@ use_frameworks! :linkage => :static
 
 
 
+# 发布到 cocoapods  (https://blog.csdn.net/lyz0925/article/details/113951189)
+
+pod lib lint Xlightweight-Store-iOS.podspec 
+
+git tag 0.0.1 ; git push origin master --tags   ## same as s.version, cause use as tag in s.source value
+
+pod spec lint Xlightweight-Store-iOS.podspec
+
+pod trunk me    ## 检查是否有 trunk 账号
+
+pod trunk register user_name@gmail.com 'user_name' --description='elements is everything' --verbose  ## 如果没有账号先注册一个, 需要登录邮箱 verification, 后面再 pod trunk me 试试是否OK
+
+pod trunk push Xlightweight-Store-iOS.podspec   
+## 把 podspec 推到 trunk 上
+--------------------------------------------------------------------------------
+ 🎉  Congrats
+
+ 🚀  Xlightweight-Store-iOS (0.0.1) successfully published
+ 📅  January 23rd, 00:52
+ 🌎  https://cocoapods.org/pods/Xlightweight-Store-iOS
+ 👍  Tell your friends!
+--------------------------------------------------------------------------------
+## 等待结果: 打开 https://github.com/CocoaPods/Specs/tree/master/Specs 利用搜索功能搜一下自己 podspec 名字是否推成功
+## 或者打开 https://cocoapods.org/pods/Xlightweight-Store-iOS
+
+
+
 
 
 

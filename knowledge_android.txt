@@ -1,0 +1,42 @@
+
+# https://stackoverflow.com/a/18472135/1749293
+# https://stackoverflow.com/a/22751947/1749293
+
+cd ~/Downloads
+
+PackageName=com.tesla.sales
+DirName=databases/
+FileName=cache.db
+
+
+adb exec-out run-as $PackageName cat $DirName/$FileName > $FileName
+
+
+# 1. Use /sdcard/ for stransfer station
+
+adb push $FileName /sdcard/$FileName
+cat <<EOF | adb shell
+run-as $PackageName
+cat /sdcard/$FileName > /data/data/$PackageName/$DirName/$FileName
+exit
+exit
+EOF
+
+
+# 1. Use /data/local/tmp/ for stransfer station
+
+adb push $FileName /data/local/tmp/$FileName
+cat <<EOF | adb shell
+run-as $PackageName
+cat /data/local/tmp/$FileName > /data/data/$PackageName/$DirName/$FileName
+exit
+exit
+EOF
+
+
+
+if your device does not have the cp command:
+
+adb shell run-as $PackageName dd if=/data/local/tmp/$FileName of=$DirName/$FileName
+
+
