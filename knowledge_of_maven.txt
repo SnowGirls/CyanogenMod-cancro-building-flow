@@ -106,6 +106,7 @@ dependencyResolutionManagement {
 dependencies {
 	......
     // implementation project(path: ':module')  // use the debug source
+    // use the release aar from local/private maven repo server
     implementation 'com.github.Tesla:Xlightweight-Store-Android:0.0.3-SNAPSHOT'
 }
 
