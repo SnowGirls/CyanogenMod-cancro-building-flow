@@ -2,6 +2,9 @@
 # 搭建 Maven 私服
 
 
+-------------------------- 搭建服务器 --------------------------
+
+
 1. 首先去 sonatype 官网 https://www.sonatype.com/products/sonatype-nexus-oss-download 下载 nexus-3.63.0-01-mac.tgz
 
 
@@ -24,12 +27,16 @@ http://127.0.0.1:8081
 # 登录的账号密码是 admin:admin
 
 
+
+-------------------------- 上传模块库 --------------------------
+
+
 5. 获取仓库URL: Browser -> 选择hosted的仓库点击Copy按扭
 
 
 6. 
 
-# 6.1 写一个gradle文件, vim publish_local_nexus.gradle:
+# 6.1 写一个gradle文件, vim publish_local_nexus.gradle (注意上传到snapshots仓库的version要以 -SNAPSHOT 为后缀):
 
 // ----------- Gradle 7.5, Gradle Plugin 7.4.2 -----------
 apply plugin: 'maven-publish'
@@ -44,11 +51,19 @@ publishing {
             }
         }
     }
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.Tesla'
-            artifactId = 'Xlightweight-Store-Android'
-            version = '0.0.2-SNAPSHOT'
+}
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                // from components.release
+                from components.findByName('release')
+                // groupId, artifactId, version
+                groupId = 'com.github.Tesla'
+                artifactId = 'Xlightweight-Store-Android'
+                version = '1.0.0-SNAPSHOT'
+            }
         }
     }
 }
@@ -62,4 +77,48 @@ apply from: "${rootDir}/module/publish_local_nexus.gradle"
 
 ./gradlew :module:publish
 # 或者点击右击 Android Studio 右侧工具栏的 大象gradle 图标，出现常用的 gradle 任务列表，点击 publish。 然后不管有没有 error 出现，都刷新一下 http://127.0.0.1:8081/repository/maven-snapshots/ 仓库链接看看有没有上传成功
+
+
+
+-------------------------- 使用下载库 --------------------------
+
+
+8. 首先在 settings.gradle 加入要下拉库的私库地址: 
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenLocal()
+        mavenCentral()
+
+        // Private maven repository here
+        maven {
+            allowInsecureProtocol = true
+            url 'http://127.0.0.1:8081/repository/maven-snapshots/'
+        }
+    }
+}
+
+
+9. 然后在 app/build.gradle 的 dependencies 里加入:
+
+dependencies {
+	......
+    // implementation project(path: ':module')  // use the debug source
+    implementation 'com.github.Tesla:Xlightweight-Store-Android:0.0.3-SNAPSHOT'
+}
+
+
+10. 然后 Sync 一下，你会看到 External Libraries 下面栏目里就有 Gradle: com.github.Tesla:Xlightweight-Store-Android:1.0.0-SNARSHOT@aar 了
+
+
+
+
+
+-------------------------- 以上步骤及代码配置 具体可参考 Xlightweight-Store-Android 这个项目 --------------------------
+
+
+
+
 
