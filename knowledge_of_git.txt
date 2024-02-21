@@ -93,6 +93,15 @@ git merge --squash feature/doing_patching
 
 
 
+---------------- 用不同用户推到不同源 ----------------
+
+git config --local user.name "Goodman" ; git config --local user.email "Goodman@tesla.com"  # 修改 commit 时的 author 信息
+
+# 1. 添加源时就带上 [用户名@], 那么会直接提示输入token/password
+git remote add upstream https://Tellmeok@github.com/Tellmeok/flutter_camera_android.git
+
+# 2. 不使用系统默认的密钥管理, 那么 push 时会提示输入用户名和token/password
+git config --local credential.helper ""
 
 
 
