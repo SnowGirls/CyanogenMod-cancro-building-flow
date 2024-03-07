@@ -1,0 +1,24 @@
+// Usage: apply this file in build.gradle, then sync, then click 'publishToMaveLocal'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+// Publish to mavenLocal
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                //如果发布到maven仓库
+                artifact bundleReleaseAar
+                artifact sourcesJar
+
+                // Applies the component for the release build variant.
+                // from components.release
+                from components.findByName('release')
+                // groupId, artifactId, version
+                groupId = 'com.xpel.ui'
+                artifactId = 'easyphotos-picker'
+                version = '3.1.5-SNAPSHOT'
+            }
+        }
+    }
+}

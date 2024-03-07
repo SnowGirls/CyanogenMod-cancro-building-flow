@@ -338,7 +338,7 @@ https://flowus.cn/flowus101/share/10037b40-88c3-43b3-85f6-b6602dced060
 
 
 
-## 关于 dart mixin, 一篇就够了
+## 关于 dart mixin, 看这一篇就够了
 https://medium.com/flutter-community/dart-what-are-mixins-3a72344011f3
 
 ################################### minxin 助记忆简单例子 [START]###################################
@@ -396,6 +396,25 @@ flutter create --org com.xpel.net.flutter --ios-language objc --android-language
 
 pod lib create your_pod_lib
 
+
+----------------------------------------------------------------
+/// If Error Occured:
+/// <internal:/usr/local/Cellar/ruby/3.3.0/lib/ruby/3.3.0/rubygems/core_ext/kernel_require.rb>:127:in `require': cannot load such file -- xcodeproj (LoadError)
+> sudo gem install xcodeproj
+/// 还是不行
+> whereis gem # /usr/bin/gem
+> gem env # 看一下，这个gem 用回了 /Library/Ruby/Gems/2.6.0 的了...
+> whereis ruby; ls -al `which ruby`
+> /usr/local/Cellar/ruby/3.3.0/bin/gem env  # 这才是需要用到了 ruby 对应的 gem 。
+# 但看 gem path /usr/local/lib/ruby/gems/3.3.0 发现是空的，隔壁 3.2.0/ 就很多了，估计 brew/rvm 帮我升级了 ruby 没帮我迁移 gems ??? 没事了，改一下吧:
+
+ls -al /usr/local/bin/ruby ## /usr/local/bin/ruby -> ../Cellar/ruby/3.3.0/bin/ruby
+ln -s ../Cellar/ruby/3.3.0/bin/gem /usr/local/bin/gem
+ls -al  /usr/local/bin/gem 
+# 再把 /usr/local/lib/ruby/gems/3.2.0 改名成 3.3.0, 懒得又为 3.3.0 一个个下载 gem 了，麻烦且浪费空间
+----------------------------------------------------------------
+
+
 pod repo add your_pods_specs http://gitlab.super_me.local:10086/iOS/specs.git
 
 pod repo push your_pods_specs your_pod_lib.podspec  --verbose --skip-tests --sources='https://github.com/CocoaPods/Specs.git, https://mirrors.tuna.tsinghua.edu.cn/git/CocoaPods/Specs.git' --skip-import-validation --use-libraries
@@ -440,6 +459,72 @@ pod trunk push Xlightweight-Store-iOS.podspec
 
 
 
+____________________________________________ Example XXX.podspec that only package dylib ____________________________________________
+Pod::Spec.new do |s|
+  s.name             = 'Xpel-JSI-FFI'
+  s.version          = '1.0.0'
+  s.summary          = 'JSI OR FFI api for Xpel APP.'
+
+  s.description      = <<-DESC
+TODO: Add long description of the pod here.
+                       DESC
+
+  s.homepage         = 'http://gitlab.xpel.local:8002/pods/xpel-jsi-ffi'
+  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
+  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.author           = { 'loveme' => 'loveme@tesla.com' }
+  s.source           = { :git => 'ssh://git@gitlab.xpel.local:10086/pods/xpel-jsi-ffi.git', :tag => s.version.to_s }
+  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+
+  s.ios.deployment_target = '9.0'
+  # s.source_files = 'cpp/**/*'
+
+  # s.vendored_frameworks = 'framework/1.framework', 'framework/2.framework'
+  # s.vendored_libraries = "lib/1.dylib", "lib/2.dylib"
+  s.vendored_libraries = "ios/libxpel.dylib"
+  
+  # s.resource_bundles = {
+  #   'your_pod_lib' => ['your_pod_lib/Assets/*.png']
+  # }
+
+  # s.public_header_files = 'Pod/Classes/**/*.h'
+  # s.frameworks = 'UIKit', 'MapKit'
+  # s.dependency 'AFNetworking', '~> 2.3'
+end
+____________________________________________________________________________________________________________________________________
+
+
+
+____________________________________________ Example cmake c++ for iOS ____________________________________________
+// https://github.com/leetal/ios-cmake
+
+cd cpp # 无需建立并进入 build/ 了，下面 cmake 命令会创建
+
+# 加 CODE_SIGNING_ALLOWED=NO 是因为 Xcode 14 后要求库也签名 https://github.com/leetal/ios-cmake/issues/141
+
+cmake -B build/arm64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=OS64 . 
+cmake --build build/arm64 --config Release -- CODE_SIGNING_ALLOWED=NO
+
+# 这里编译模拟器时用了 Xcode 14.3.1 编译成功, Xcode 15失败, 不要用 Xcode 14.3, 它打包出来的在iOS 13.x 会运行不了
+
+cmake -B build/x86_64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=SIMULATOR .
+cmake --build build/x86_64 --config Release -- CODE_SIGNING_ALLOWED=NO
+
+# 合并多个架构FAT: 
+lipo arm64/libxpel.dylib x86_64/libxpel.dylib -output ios/libxpel.dylib -create
+
+____________________________________________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
 ################################### String.fromEnvironment("key") 实现查找路径 ###################################
 
 -> 打开 dart-sdk 源码工程
@@ -455,6 +540,13 @@ pod trunk push Xlightweight-Store-iOS.podspec
   }
 
 
+
+
+
+
+################ Dart FFI使用指南篇 ################
+
+https://zhuanlan.zhihu.com/p/471028492
 
 
 
