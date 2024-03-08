@@ -500,18 +500,31 @@ ____________________________________________ Example cmake c++ for iOS _________
 
 cd cpp # 无需建立并进入 build/ 了，下面 cmake 命令会创建
 
-# 加 CODE_SIGNING_ALLOWED=NO 是因为 Xcode 14 后要求库也签名 https://github.com/leetal/ios-cmake/issues/141
 
+
+# 加 CODE_SIGNING_ALLOWED=NO 是因为 Xcode 14 后要求库也签名 https://github.com/leetal/ios-cmake/issues/141
 cmake -B build/arm64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=OS64 . 
+
 cmake --build build/arm64 --config Release -- CODE_SIGNING_ALLOWED=NO
 
-# 这里编译模拟器时用了 Xcode 14.3.1 编译成功, Xcode 15失败, 不要用 Xcode 14.3, 它打包出来的在iOS 13.x 会运行不了
 
+
+# 这里编译模拟器时用了 Xcode 14.3.1 编译成功, Xcode 15.3 失败, 不要用 Xcode 14.3, 它打包出来的在iOS 13.x 会运行不了
 cmake -B build/x86_64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=SIMULATOR .
+
+# 或者指定 Xcode 15.0.1版本也能成功
+cmake -B build/x86_64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=SIMULATOR -DCMAKE_OSX_SYSROOT=$HOME/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.0.sdk .
+
 cmake --build build/x86_64 --config Release -- CODE_SIGNING_ALLOWED=NO
 
+
+
 # 合并多个架构FAT: 
-lipo arm64/libxpel.dylib x86_64/libxpel.dylib -output ios/libxpel.dylib -create
+lipo build/arm64/Release-iphoneos/libxpel.dylib build/x86_64/Release-iphonesimulator/libxpel.dylib -output build/libxpel.dylib -create
+
+file build/libxpel.dylib
+cp build/libxpel.dylib ../ios/
+
 
 ____________________________________________________________________________________________________________________
 
