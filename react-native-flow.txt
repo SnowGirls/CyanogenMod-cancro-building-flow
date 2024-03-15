@@ -1,4 +1,12 @@
-######### Using nvm to manage multi version fo npm #########
+######### Using nvm to manage multi version fo node 和 npm #########
+[
+npm 会打包在 node 里面:
+/Users/xpel/.nvm/versions/node/v14.16.1/bin/npm
+/Users/xpel/.nvm/versions/node/v16.20.2/bin/npm
+]
+
+nvm --help
+nvm ls-remote
 
 xpel@xpels-iMac AwesomeProject % nvm list       
        v14.16.1
@@ -222,8 +230,39 @@ CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/2/
 
 
 
+-------------------------------------------------------- 老是用回内置系统的旧版本ruby问题 --------------------------------------------------------
+
+which ruby
+/usr/local/bin/ruby
+
+where ruby
+/usr/local/bin/ruby
+/usr/bin/ruby
+
+/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby --version
+ruby 2.6.10p210 (2022-04-12 revision 67958) [universal.x86_64-darwin23]
+
+/usr/bin/ruby --version
+ruby 2.6.10p210 (2022-04-12 revision 67958) [universal.x86_64-darwin23]
 
 
+然后发现 bundle  又用回了！！！！
+which bundle
+/usr/bin/bundle
+
+cat /usr/bin/bundle 
+#!/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby
+#
+xxxxx
+
+系统自带的 bundle 使用的是 系统自带的 ruby
+那就安装一个 gem install bundler 然后改 PATH 的优先级
+
+发现各处都装有ruby:
+系统一个，这个不用说，在: /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby , /usr/bin/ruby 就是用它的
+Cellar一个: /usr/local/Cellar/ruby/3.3.0/bin , 这个估计就是 brew 安装的
+这里也有一个 /usr/local/lib/ruby/gems/3.3.0/bin/ , 有 ruby 相关的命令，但没 ruby
+还有一个在 HOME: $HOME/.rvm/gems/ruby-3.0.0/bin  , 估计是 rvm 安装的
 
 
 

@@ -509,10 +509,11 @@ cmake --build build/arm64 --config Release -- CODE_SIGNING_ALLOWED=NO
 
 
 
-# 这里编译模拟器时用了 Xcode 14.3.1 编译成功, Xcode 15.3 失败, 不要用 Xcode 14.3, 它打包出来的在iOS 13.x 会运行不了
+# 这里编译模拟器时在旧系统用了 Xcode 14.3.1 编译成功, Xcode 15.3 失败, 不要用 Xcode 14.3, 它打包出来的在iOS 13.x 会运行不了
 cmake -B build/x86_64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=SIMULATOR .
+# cmake -B build/x86_64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=SIMULATOR -DCMAKE_OSX_SYSROOT=$HOME/Workspaces/Softwares/Xcodes/Xcode_14.3.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator16.4.sdk .
 
-# 或者指定 Xcode 15.0.1版本也能成功
+# 或者新系统指定 Xcode 15.0.1版本也能成功
 cmake -B build/x86_64 -G Xcode -DCMAKE_TOOLCHAIN_FILE=../ios/ios.toolchain.cmake -DPLATFORM=SIMULATOR -DCMAKE_OSX_SYSROOT=$HOME/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator17.0.sdk .
 
 cmake --build build/x86_64 --config Release -- CODE_SIGNING_ALLOWED=NO
@@ -558,7 +559,7 @@ ________________________________________________________________________________
 
 
 ################ Dart FFI使用指南篇 ################
-
+对于 dart ffi 的基础知识，可以看这一篇:
 https://zhuanlan.zhihu.com/p/471028492
 
 

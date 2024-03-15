@@ -108,6 +108,19 @@ git config --local credential.helper ""
 
 
 
+---------------- 大文件如超过了 100M 的 用 git-lfs 来管理push ----------------
+brew install git-lfs
+git lfs install
+
+git lfs track *.ipa
+git add .
+git commit -m "commit all with the big files"
+git push
+
+
+
+
+
 
 
 
