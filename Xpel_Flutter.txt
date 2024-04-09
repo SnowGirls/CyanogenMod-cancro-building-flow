@@ -459,6 +459,10 @@ pod trunk push Xlightweight-Store-iOS.podspec
 
 
 
+
+
+
+
 ____________________________________________ Example XXX.podspec that only package dylib ____________________________________________
 Pod::Spec.new do |s|
   s.name             = 'Xpel-JSI-FFI'
@@ -492,6 +496,26 @@ TODO: Add long description of the pod here.
   # s.dependency 'AFNetworking', '~> 2.3'
 end
 ____________________________________________________________________________________________________________________________________
+
+
+
+
+
+
+
+
+____________________________________________ Trick subpath of pod ____________________________________________
+
+https://stackoverflow.com/a/35509484/1749293
+pod 'PodName', :podspec => 'https://raw.githubusercontent.com/owner/project/branch/subfolder/project.podspec'
+
+
+
+
+
+
+
+
 
 
 

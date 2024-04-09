@@ -100,6 +100,8 @@ lsof -n -i:8081
 
 netstat -anv | grep 8081
 
+sudo lsof -i -P -n | grep LISTEN | grep 8081 
+
 
 ________________________________________________ Android Studio Gradle sync 更快 ________________________________________________
 

@@ -267,6 +267,9 @@ Cellar一个: /usr/local/Cellar/ruby/3.3.0/bin , 这个估计就是 brew 安装�
 
 
 
+
+
+
 -------------------------------------------------------- Debug ReactNative --------------------------------------------------------
 
 # 1. 默认用 浏览器 调试
@@ -274,6 +277,7 @@ Cellar一个: /usr/local/Cellar/ruby/3.3.0/bin , 这个估计就是 brew 安装�
 
 
 # 2. 用 VSCode 调试，推荐，因用 浏览器 每次重新加载 就需要重开Command + Option + I 开发者调试模式Pannel，再一路去到源码，好麻烦
+
 
 https://github.com/microsoft/vscode-react-native
 
@@ -284,8 +288,72 @@ https://github.com/microsoft/vscode-react-native
 - 设备 remote 访问这个 node server，摇晃后点击debug，模拟器按 Command + Ctrl + Z ，此时这个 debug session 可以被 vscode 拦截，不再走到浏览器，可以断点和查看变量了
 
 
+-------------------- Example of launch.json --------------------
+{
+    "configurations": [
+        
+        {
+            "name": "Attach to packager",
+            "request": "attach",
+            "type": "reactnative",
+            "cwd": "${workspaceFolder}",
+            "port": 8081
+        }
+    ]
+}
+-------------------- Example of launch.json --------------------
+
+
+
+https://blog.logrocket.com/debugging-react-native-vs-code/
+https://stackoverflow.com/a/69567851/1749293
+# 真的 disable Dart & Flutter 重新 打开 lauch.json 右下角 Add Configuration ... 真的可以了 ...
 
 
 
 
+
+
+
+
+
+
+
+-------------------------------------------------------- 创建 React-Native 库 --------------------------------------------------------
+
+# https://www.npmjs.com/package/create-react-native-module
+
+npx create-react-native-module --generate-example HttpTee
+
+
+########## error:
+# Error: Unable to resolve module missing-asset-registry-path from node_modules/react-native/Libraries/LogBox/UI/LogBoxImages/close.png: missing-asset-registry-path could not be found
+npm install --save-dev react-native-svg-transformer
+env JAVA_HOME=$W_PATH/JDK/jdk-17_macos-x64_bin/Contents/Home npx react-native start --reset-cache
+
+
+########## error:
+# error: Error: Unable to resolve module react-native from ../index.js: react-native could not be found within the project
+上层库目录有 package.json 也需要 yarn install 一下
+
+
+# error: Error: Unable to resolve module react-native/Libraries/NativeComponent/NativeComponentRegistry
+需要 example/package.json 和 库的package.json 里的react & react-native 的版本号固定一致
+rm -rf node_modules ; yarn install
+env JAVA_HOME=$W_PATH/JDK/jdk-17_macos-x64_bin/Contents/Home npx react-native start --reset-cache
+
+
+# env JAVA_HOME=$W_PATH/JDK/jdk-17_macos-x64_bin/Contents/Home npx react-native run-android
+# ANDROID_HOME=~/Library/Android/sdk npx react-native run-android
+
+
+
+########## error:
+# Could not find org.jetbrains.kotlin:kotlin-gradle-plugin:
+把 example/package.json 的react-native的版本一改回0.73.6就没事了Orz....: "react-native": "0.73.6",
+
+
+
+# 每次修改原生代码后得重新运行，不能 hot reload，有点麻烦:
+env JAVA_HOME=$W_PATH/JDK/jdk-17_macos-x64_bin/Contents/Home npx react-native start --reset-cache
 

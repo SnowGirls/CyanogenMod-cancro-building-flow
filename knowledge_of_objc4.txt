@@ -150,6 +150,13 @@ _________________________________ 总结一下导致Crash的情况 _____________
 
 block 为 nil 时调用会 crash
 
+dictionary 的 key 若为 nil 会 crash
+
+往 collection (如dictionary/array) 放 nil 会 crash
+
+传统调用 -> 是通过 offset 来获取偏移地址的，因此 nil->properties/method 也会 crash
+
+
 NSLog log a nil 也没事
 
 NSString stringWithFormat format a nil 没事, isEqualToString: nil 也没事
