@@ -22,3 +22,38 @@ ndk.dir=~/Workspaces/AndroidSDK/ndk/17.2.4988734
 
 
 
+
+************ 源码方式 让子 project 查找 project ************
+
+settings.gradle
+// :vision-camera 不打包 aar 了用源码依赖的方式
+include ':vision-camera'
+rootProject.children.each { proj ->
+    if (proj.name == "flutter_vision_camera") {
+        println "🍀🍀🍀 Making source dependency(NOT .AAR) for project :vision-camera on path: ${proj.projectDir}/../../android/vision-camera\n"
+        project(':vision-camera').projectDir = new File(proj.projectDir, '../../android/vision-camera')
+    }
+}
+
+
+
+************ 最新的 publishToMavenLocal on build.gradle ************
+
+apply plugin: 'maven-publish'
+
+afterEvaluate {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.release
+                groupId = "com.xiaopeng.xiaolong.react-native"
+                artifactId = "rn-gallery-saver"
+                version = "1.0.0-SNAPSHOT"
+            }
+        }
+        // 只发布到本地的可以不写下面指定指定仓库地址了
+        repositories {
+            mavenLocal()
+        }
+    }
+}

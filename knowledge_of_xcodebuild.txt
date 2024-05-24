@@ -18,8 +18,16 @@ xcodebuild -project ios-deploy.xcodeproj -scheme ios-deploy -showBuildSettings |
 
 
 
+--------------------------------- 查找所有安装 Xcode.app 路径 ---------------------------------
+mdfind "kMDItemCFBundleIdentifier = 'com.apple.dt.Xcode'"
 
 
+
+
+
+
+
+--------------------------------- How to Debug Podfile ---------------------------------
 
 ##### 如何调试 Podfile
 
@@ -38,6 +46,9 @@ IDE 用 RubyMine
 3. 双击打开 Podfile.rb , 设置断点
 
 4. 点击 Debug
+
+
+
 
 
 

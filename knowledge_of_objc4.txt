@@ -166,7 +166,7 @@ NSArray containsObject/indexOfObject:nil 也没事
 [[NSFileManager defaultManager] fileExistsAtPath:nil]; 不会CRASH
 
 
-
+NSURL *savedDirURL = [NSURL fileURLWithPath: nil];  ## 待验证 会不会CRASH...
 
 
 

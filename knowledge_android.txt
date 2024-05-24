@@ -39,4 +39,6 @@ if your device does not have the cp command:
 
 adb shell run-as $PackageName dd if=/data/local/tmp/$FileName of=$DirName/$FileName
 
+adb shell 'run-as com.xpel.dev cat  /data/user/0/com.xpel.dev/cache/mrousavy9007007825584794393.mov' > ~/Download/mrousavy9007007825584794393.mov
+
 

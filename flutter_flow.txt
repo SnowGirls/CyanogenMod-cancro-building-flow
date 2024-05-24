@@ -155,6 +155,19 @@ Run/Debug Configurations -> "+" -> Remote JVM Debug -> Enter a random Name for e
 
 fn + option + F12 key open Terminal -> cd android -> ./gradlew assembleDevelopmentDebug -Pdart-defines=xdragon.env%3Dproduction,xdragon.experiment%3Dtrue,xdragon.phase%3DDEV -Dorg.gradle.debug=true --no-daemon -> Click the 'Debug' icon on toolbar on android studio to attach.
 
+Then wait a minute, the debuger will stop on your breakpoints you've set up.
+
+
+
+################################ 那么同理，纯 Android App/Module 项目的 Debug Gradle ################################
+
+Android Studio - Run/Debug Configurations -> "+" -> Remote JVM Debug -> Enter a random Name for example: "Remote Debug Gradle", and leave other settings default -> "OK"
+
+fn + option + F12 key open Terminal -> cd android -> ./gradlew assembleDevelopmentDebug -Dorg.gradle.debug=true --no-daemon --stacktrace -> Click the 'Debug' icon on toolbar to attach ( Notice that is clicking 'Debug' button, not the 'Attach' process button ).
+
+
+
+
 
 
 
@@ -218,6 +231,92 @@ flutter pub publish
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+____________________________________________________ Build Dart SDK ____________________________________________________
+
+// 1. FIRST BUILD
+
+https://github.com/dart-lang/sdk/blob/main/docs/Building.md
+
+# if not have depot_tools in PATH:
+git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+export PATH="$PATH:$PWD/depot_tools"
+
+
+# get the source
+mkdir dart-sdk ; cd dart-sdk ; fetch dart
+
+
+# build the source
+cd sdk 
+./tools/build.py --mode release --arch x64 create_sdk
+
+# build output will locate in: xcodebuild/ReleaseX64/dart-sdk # 2024-05-23: 环境 macOS 14.5 + Xcode 15.3 一次性编译成功
+
+
+
+
+// 2. BUILD WITH SPECIFIED VERSION. i.e. build tag name 2.19.5
+
+cd sdk
+git tag --list | grep 2.19.5
+git checkout -b v2.19.5 2.19.5
+less DEPS
+gclient sync -D
+./tools/build.py --mode release --arch x64 create_sdk
+
+
+
+----------------------------------------------- 错误 -----------------------------------------------
+xpel@Xpens-iMac sdk % ./tools/build.py --mode release --arch x64 create_sdk
+Generating Xcode projects took 48ms
+Done. Made 345 targets from 89 files in 2207ms
+buildtools/ninja/ninja -C xcodebuild/ReleaseX64 create_sdk
+ninja: Entering directory `xcodebuild/ReleaseX64'
+[303/3271] CXX obj/runtime/bin/standalone_dart_io.security_context_macos.o
+FAILED: obj/runtime/bin/standalone_dart_io.security_context_macos.o 
+../../buildtools/mac-x64/clang/bin/clang++ -MMD -MF obj/runtime/bin/standalone_dart_io.security_context_macos.o.d -DTOOLCHAIN_VERSION=pi_zOuxaxIOJ5lf-CkO_qSEq0htHvAiq0dRamA2RjQ8C -DNDEBUG -DTARGET_ARCH_X64 -DDART_TARGET_OS_MACOS -I../../runtime -I../../third_party -I../.. -Igen -I../../runtime/include -I../../third_party/zlib -I../../third_party/boringssl/src/include -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.4.sdk -mmacosx-version-min=10.13  -arch x86_64 -fcolor-diagnostics -Wall -Wextra -Werror -Wendif-labels -Wno-missing-field-initializers -Wno-unused-parameter -Wno-tautological-constant-compare -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wpartial-availability -fdebug-prefix-map=/Users/xpel/Workspaces/GoogleOpenSource/dart-sdk/sdk=../.. -no-canonical-prefixes -stdlib=libc++ -Wheader-hygiene -Wstring-conversion -O3 -fno-ident -fdata-sections -ffunction-sections -g3 -ggdb3 -Werror -Wall -Wextra -Wno-unused-parameter -Wno-unused-private-field -Wnon-virtual-dtor -Wvla -Woverloaded-virtual -Wno-comments -g3 -ggdb3 -fno-rtti -fno-exceptions -Wimplicit-fallthrough -fno-strict-vtable-pointers -O3 -fvisibility-inlines-hidden -fno-omit-frame-pointer -std=c++17 -fno-rtti -c ../../runtime/bin/security_context_macos.cc -o obj/runtime/bin/standalone_dart_io.security_context_macos.o
+../../runtime/bin/security_context_macos.cc:188:17: error: use of undeclared identifier 'noErr'
+  if (status != noErr) {
+                ^
+../../runtime/bin/security_context_macos.cc:196:19: error: use of undeclared identifier 'noErr'
+    if (status != noErr) {
+                  ^
+../../runtime/bin/security_context_macos.cc:205:17: error: use of undeclared identifier 'noErr'
+  if (status != noErr) {
+                ^
+../../runtime/bin/security_context_macos.cc:303:21: error: use of undeclared identifier 'noErr'
+  OSStatus status = noErr;
+                    ^
+../../runtime/bin/security_context_macos.cc:319:23: error: use of undeclared identifier 'noErr'
+            status == noErr && (trust_result == kSecTrustResultProceed ||
+                      ^
+5 errors generated.
+[316/3271] OBJCXX obj/runtime/bin/standalone_dart_io.platform_macos_cocoa.o
+ninja: build stopped: subcommand failed.
+BUILD FAILED
+----------------------------------------------- 错误 -----------------------------------------------
+
+# https://juejin.cn/post/7364698043910930443 ，这篇文章的解决方法是换掉 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h 成旧的 MacOSX13.3.sdk 的 /usr/include/TargetConditionals.h ， 注意备份。
+
+# 我的方法临时换一Xcode版本(也即换了sysroot及对应的编译工具链了), 用 Xcode 15.0.1 版本就可以了:
+
+mdfind "kMDItemCFBundleIdentifier = 'com.apple.dt.Xcode'"
+sudo xcode-select -s /Users/xpeng/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app
+
+
+# 然后重新编译，最后一切OK:
+./tools/build.py --mode release --arch x64 create_sdk
 
 
 

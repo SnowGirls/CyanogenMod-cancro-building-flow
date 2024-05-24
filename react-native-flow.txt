@@ -273,6 +273,7 @@ Cellar一个: /usr/local/Cellar/ruby/3.3.0/bin , 这个估计就是 brew 安装�
 -------------------------------------------------------- Debug ReactNative --------------------------------------------------------
 
 # 1. 默认用 浏览器 调试
+摇晃手机 在 弹出的菜单里点 Debug
 会自动打开 http://localhost:8083/debugger-ui，然后自己 Command + Option + I 打开 开发者调试模式Pannel，去到 Sources 标签，一路展开 debuggerWorker -> index.ios.bundle -> 去到 js 文件代码下断点就好
 
 
@@ -285,7 +286,7 @@ https://github.com/microsoft/vscode-react-native
 -  (⌘ + ⇧ + D)新建一个launch.json -> Add Configuration -> React Native -> Attach to application -> classic application -> host port (i.e. localhost, 8083)
 - npm start 一个node server到上述port, 若已经启动可忽略
 - 在 VSCode Debug Tab 选中这个 configuration，点击绿色小箭头，显示Established a connection with the Proxy (Packager) to the React Native application
-- 设备 remote 访问这个 node server，摇晃后点击debug，模拟器按 Command + Ctrl + Z ，此时这个 debug session 可以被 vscode 拦截，不再走到浏览器，可以断点和查看变量了
+- 设备 remote 访问这个 node server，摇晃(模拟器按Command + Ctrl + Z)后点击debug，此时这个 debug session 可以被 vscode 拦截，不再走到浏览器，可以断点和查看变量了
 
 
 -------------------- Example of launch.json --------------------
@@ -356,4 +357,38 @@ env JAVA_HOME=$W_PATH/JDK/jdk-17_macos-x64_bin/Contents/Home npx react-native st
 
 # 每次修改原生代码后得重新运行，不能 hot reload，有点麻烦:
 env JAVA_HOME=$W_PATH/JDK/jdk-17_macos-x64_bin/Contents/Home npx react-native start --reset-cache
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------- 创建一个 React-Native 例子 --------------------------------------------------------
+# https://github.com/AgoraIO-Extensions/react-native-agora/issues/50#issuecomment-475051638
+
+ react-native init agoraguide --version 0.72.11
+
+
+
+
+
+
+
+
+
+
+------------------------- 如果出现ERROR: Unable to load script -------------------------
+https://stackoverflow.com/a/53326616/1749293
+则端口转发一下: adb reverse tcp:8081 tcp:8081 以及在 AndroidManifest.xml 配上 android:usesCleartextTraffic="true"
+
+
+
 
