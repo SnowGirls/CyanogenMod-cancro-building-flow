@@ -323,4 +323,8 @@ sudo xcode-select -s /Users/xpeng/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app
 
 
 
+# Building the standalone VM only
+$ ./tools/build.py runtime
+
+$ ./tools/build.py --mode release --arch x64 runtime
 
