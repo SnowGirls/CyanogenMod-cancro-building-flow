@@ -42,6 +42,11 @@ solutions = [
 
 
 
+Fix issue on VIVO: The Dart VM service is listening on ************************************
+https://github.com/flutter/flutter/issues/134307
+http://www.vivo.com.cn/kefu?source=openPlatform
+https://dev.vivo.com.cn/documentCenter/doc/581
+
 # 8.1. 另如果修改了third_party 的 dart/ vm 源码，不使用 flutter/prebuilts/ 下预编好的，需要带上 `--no-prebuilt-dart-sdk`:
 # ./flutter/tools/gn --android --unoptimized --android-cpu=arm64 --no-prebuilt-dart-sdk && ninja -C out/android_debug_unopt_arm64
 
@@ -53,7 +58,7 @@ solutions = [
 # 要把 host_debug_unopt 也编出来才行: ./flutter/tools/gn --unoptimized --no-stripped && ninja -C out/host_debug_unopt
 
 # 升级Xcode15后有指针转换错误, 去 build/config/compiler/BUILD.gn 找到 cflags 的 "-Wno-unused-parameter" 下面加一行 "-Wno-incompatible-pointer-types"
-______________________________________
+__________________________________________________________________________________________________________________
 [4198/7259] OBJCXX obj/third_party/skia/src/gpu/ganesh/mtl/gpu.GrMtlGpu.o
 FAILED: obj/third_party/skia/src/gpu/ganesh/mtl/gpu.GrMtlGpu.o 
 ../../buildtools/mac-x64/clang/bin/clang++ -MD -MF obj/third_party/skia/src/gpu/ganesh/mtl/gpu.GrMtlGpu.o.d -DUSE_OPENSSL=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D_FORTIFY_SOURCE=2 -D_LIBCPP_DISABLE_AVAILABILITY=1 -D_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS -D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS -D_DEBUG -DSK_ENABLE_DUMP_GPU -DSK_DISABLE_AAA -DSK_LEGACY_IGNORE_DRAW_VERTICES_BLEND_WITH_NO_SHADER -DSK_DISABLE_LEGACY_SHADERCONTEXT -DSK_DISABLE_LOWP_RASTER_PIPELINE -DSK_FORCE_RASTER_PIPELINE_BLITTER -DSK_METAL_WAIT_UNTIL_SCHEDULED -DSK_DISABLE_EFFECT_DESERIALIZATION -DSK_ENABLE_SKSL -DSK_ENABLE_PRECOMPILE -DSK_USE_PERFETTO -DSK_LEGACY_LAYER_BOUNDS_EXPANSION -DSK_ENABLE_API_AVAILABLE -DSK_GAMMA_APPLY_TO_A8 -DSKIA_IMPLEMENTATION=1 -DSK_GL -DSK_METAL -DSK_SUPPORT_GPU=1 -DSK_VULKAN -I../.. -Igen -I../../third_party/libcxx/include -I../../third_party/libcxxabi/include -I../../build/secondary/third_party/libcxx/config -I../../third_party/skia -isysroot /Users/xpel/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -mmacosx-version-min=10.14.0 -fno-strict-aliasing -fstack-protector-all -arch x86_64 -fcolor-diagnostics -Wall -Wextra -Wendif-labels -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-deprecated-copy -Wno-psabi -Wno-unqualified-std-cast-call -Wno-non-c-typedef-for-linkage -Wno-range-loop-construct -Wunguarded-availability -Wno-deprecated-declarations -fvisibility=hidden -stdlib=libc++ -Wstring-conversion -Wnewline-eof -O0 -g2 -fvisibility-inlines-hidden -std=c++17 -fno-rtti -nostdinc++ -nostdinc++ -fvisibility=hidden -fno-exceptions -fobjc-arc -fvisibility-inlines-hidden -fobjc-call-cxx-cdtors -std=c++17 -fno-rtti -nostdinc++ -nostdinc++ -fvisibility=hidden -fno-exceptions  -c ../../third_party/skia/src/gpu/ganesh/mtl/GrMtlGpu.mm -o obj/third_party/skia/src/gpu/ganesh/mtl/gpu.GrMtlGpu.o
@@ -63,16 +68,68 @@ FAILED: obj/third_party/skia/src/gpu/ganesh/mtl/gpu.GrMtlGpu.o
 ../../third_party/skia/src/gpu/ganesh/mtl/GrMtlGpu.mm:1593:38: error: incompatible types casting 'const void *' to 'dispatch_semaphore_t' (aka 'dispatch_semaphore_s *') with a __bridge cast
     dispatch_semaphore_t semaphore = (__bridge dispatch_semaphore_t)cfFence;
                                      ^         ~~~~~~~~~~~~~~~~~~~~ ~~~~~~~
-______________________________________
+__________________________________________________________________________________________________________________
 # 发现还是不行。于是只能下载Xcode 14 来编译就OK了: sudo xcode-select -s /Users/xpel/Workspaces/Softwares/Xcodes/Xcode_14.3.1.app
 # 编译成功后，下面要运行调试，记得切换回来正确能运行的Xcode:  sudo xcode-select -s /Applications/Xcode.app
+
+# 修改 dart-sdk 源码:
+third_party/dart/sdk/lib/_internal/vm/bin/vmservice_server.dart, 加多base64输出, 防止VIVO脱敏:
+Line 509:  serverPrint("The Dart VM service is listening on $serverAddress, vBASE64: ${base64Encode(utf8.encode(serverAddress.toString()))}");
+(
+编译好需要修改 flutter_sdk 的 /path/to/FlutterSDK/flutter_macos_[version]-stable/packages/flutter_tools/lib/src/globals.dart, Line 289添加:
+final RegExp kVMServiceMessageRegExpVIVO = RegExp(kServicePrefixRegExp + r'.*? vBASE64: ([A-Za-z0-9/=\+]+)');
+然后修改 /path/to/FlutterSDK/flutter_macos_[version]-stable/packages/flutter_tools/lib/src/protocol_discovery.dart, Line 112 添加方法:
+
+    Uri? _getPatternMatchVIVO(String line) {
+        _logger.printTrace("♻️VIVO Checking line: \"$line\"");
+        Match? match = globals.kVMServiceMessageRegExpVIVO.firstMatch(line);
+        if (match != null) {
+            String content = match[1]!;
+            String decoded = utf8.decode(base64Decode(content));
+            _logger.printTrace("♻️VIVO Got match base64 content: \"$decoded\"");
+            return Uri.parse(decoded);
+        }
+    }
+
+    void _handleLine(String line) {
+        # ....... Line 138 添加调用:
+        if (uri == null || uri.host.isEmpty) {
+          try {
+            uri = _getPatternMatchVIVO(line);
+          } on FormatException catch (error, stackTrace) {
+            _uriStreamController.addError(error, stackTrace);
+          }
+        }
+        # ....... 
+    }
+
+# 然后删掉 /path/to/FlutterSDK/flutter_macos_[version]-stable//bin/cache/flutter_tools.snapshot , 它会重新生成并解 base64 出来拿到正常的 uri 来开启调试
+)
 
 # 运行后发现修改的 dart-sdk 代码不生效，重新编译试试:
 flutter/tools/gn --runtime-mode debug --no-goma --unoptimized --no-stripped --no-prebuilt-dart-sdk --android --android-cpu=arm64
 flutter/tools/gn --runtime-mode debug --no-goma --unoptimized --no-stripped --no-prebuilt-dart-sdk
 autoninja -C out/android_debug_unopt_arm64/
 autoninja -C out/host_debug_unopt/
+sudo xcode-select -s /Applications/Xcode.app
+flutter run -v --local-engine=android_debug_unopt_arm64 --local-engine-src-path=/Users/xpel/Workspaces/GoogleOpenSource/flutter_engine/src
+
 # 一键命令: sudo xcode-select -s /Users/xpel/Workspaces/Softwares/Xcodes/Xcode_14.3.1.app && flutter/tools/gn --runtime-mode debug --no-goma --unoptimized --no-stripped --no-prebuilt-dart-sdk --android --android-cpu=arm64 && flutter/tools/gn --runtime-mode debug --no-goma --unoptimized --no-stripped --no-prebuilt-dart-sdk && autoninja -C out/android_debug_unopt_arm64/ && autoninja -C out/host_debug_unopt/
+
+# 只改一点 dart-sdk 代码，那么就增量编译就好，节省时间:
+sudo xcode-select -s /Users/xpel/Workspaces/Softwares/Xcodes/Xcode_14.3.1.app && autoninja -C out/android_debug_unopt_arm64/  ; sudo xcode-select -s /Applications/Xcode.app ; xcode-select --print-path 
+
+# 用自编 engine 运行起来
+flutter run -v --local-engine=android_debug_unopt_arm64 --local-engine-src-path=/Users/xpel/Workspaces/GoogleOpenSource/flutter_engine/src
+
+# 用自编 engine 在 Android Studio 运行起来:
+Edit Configurations... -> Additional run arts: -v --local-engine=android_debug_unopt_arm64 --local-engine-src-path=/Users/xpel/Workspaces/GoogleOpenSource/flutter_engine/src
+# 然后点点击爬虫图标调试运行
+
+
+export FLUTTER_ENGINE=/Users/xpel/Workspaces/GoogleOpenSource/flutter_engine/src/
+flutter --version --local-engine=host_debug_unopt
+
 
 
 ### 9. Compiled 64 Bit Archs belows:
