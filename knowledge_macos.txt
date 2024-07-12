@@ -36,9 +36,9 @@ Gradle Daemon是Gradle的守护进程，需要将其关闭。（若没有用，�
 
 ## IntelliJ
 
-1. 删除掉 ${HOME}/Library/Application\ Support/JetBrains  来不断试用 IntelliJ 
+1. 删除掉 ${HOME}/Library/Application\ Support/JetBrains  来不断试用 IntelliJ, (或者仅删除其下的文件名为 eval/idea212.evaluation.key 也行了). # 但 2024.1 版本已经不行了不把信息放在这个目录了
 
-2. 用 IDE Eval Reset 不断试用 或者 ja-netfilter 来截获密钥License许可请求
+2. 用 IDE Eval Reset 不断试用 或者 ja-netfilter 来截获密钥 License 许可请求
 
 
 ja-netfilter 方式:
