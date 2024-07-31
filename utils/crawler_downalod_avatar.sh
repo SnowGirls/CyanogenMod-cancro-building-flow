@@ -37,6 +37,8 @@ for ((i = 2; i <= 99; ++i)) do curl -s https://www.amccaps.com/nvstx_$i.html | g
 i.e: curl -s https://www.xdn001.com/nvshengtouxiang_281.html | grep jpg | sed -n -e 's/.*\(http[^ ]*jpg\).*$/\1/p'
 for ((i = 2; i <= 280; ++i)) do curl -s https://www.xdn001.com/nvshengtouxiang_$i.html | grep jpg | sed -n -e 's/.*\(http[^ ]*jpg\).*$/\1/p' | xargs -n 1 curl -O ; done;
 
+for ((i = 2; i <= 280; ++i)) do curl -s https://www.xdn001.com/weimeitupian_$i.html | grep jpg | sed -n -e 's/.*\(http[^ ]*jpg\).*$/\1/p' | xargs -n 1 curl -O ; done;
+
 for f in -*.jpg; do echo $f  | xargs -n 1 -I {} mv -- {} $(openssl rand -hex 17).jpg; done
 
 

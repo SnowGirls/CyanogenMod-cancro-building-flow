@@ -124,12 +124,26 @@ pip install frida==12.4.8  && pip install frida-tools==4.0.0
 pip install frida==12.8.6  && pip install frida-tools==7.0.0
 pip install frida==14.2.18 && pip install frida-tools==9.2.5
 pip install frida==15.0.13 && pip install frida-tools==10.0.0
-pip install frida==15.1.17
+pip install frida==15.1.17 (对应的不是 10.4.0, 10.4.0 也是用 15.2.2, 估计是拿最大的)
 
 
 # 查看两者日期来对应版本
 https://pypi.org/project/frida/#history
 https://pypi.org/project/frida-tools/10.5.4/#history
+
+
+------
+pip3 install frida-tools==12.4.4
+pip3 list | grep frida 
+frida                 16.4.3
+frida-tools           12.4.4
+
+------
+pip3 install frida-tools==10.5.4
+pip3 list | grep frida           
+frida                 15.2.2
+frida-tools           10.5.4
+
 ____________________________________________________
 
 

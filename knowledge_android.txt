@@ -41,4 +41,4 @@ adb shell run-as $PackageName dd if=/data/local/tmp/$FileName of=$DirName/$FileN
 
 adb shell 'run-as com.xpel.dev cat  /data/user/0/com.xpel.dev/cache/mrousavy9007007825584794393.mov' > ~/Download/mrousavy9007007825584794393.mov
 
-
+adb -d shell "run-as com.github.iielse.imageviewer.demo cat /data/user/0/com.github.iielse.imageviewer.demo/cache/image_manager_disk_cache/941d20392e823f965e2af72a5f02574de09a37c97b4ae4cb487a11929d85fd23.0" > test.png
