@@ -99,3 +99,23 @@ https://www.cnblogs.com/OwlInTheOaktree/p/16218714.html
 
 
 
+
+
+
+
+
+################## sha1 output to base64 ##################
+# https://stackoverflow.com/a/12430914
+echo -n "hello_world"| openssl sha1 -binary | base64
+
+
+
+################## md5 output to base64 ##################
+# https://stackoverflow.com/a/22983090
+# https://stackoverflow.com/a/4584064
+openssl dgst -md5 -binary your_path_to_file | base64 
+
+
+
+
+

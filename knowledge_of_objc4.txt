@@ -161,6 +161,8 @@ NSLog log a nil 也没事
 
 NSString stringWithFormat format a nil 没事, isEqualToString: nil 也没事
 
+[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]; -> data 为 nil 没事，返回 string 是空字符串 @""
+
 NSArray containsObject/indexOfObject:nil 也没事
 
 [[NSFileManager defaultManager] fileExistsAtPath:nil]; 不会CRASH
