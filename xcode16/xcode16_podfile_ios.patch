@@ -1,0 +1,52 @@
+diff --git a/ios/Podfile b/ios/Podfile
+--- a/ios/Podfile
++++ b/ios/Podfile
+@@ -229,5 +229,8 @@ post_install do |installer|
+     fix_build_darwin_error_for_target(target, 'XRN')
+     fix_build_darwin_error_for_target(target, 'XRNForDebug')
+     
++    ############# FIX XCode 16 build #############
++    fix_clang_16_compile_include_issue(target.name)
++
+   end
+ 
+@@ -259,4 +262,39 @@ def remove_duplicated_link_framework(installer, target_name, framework_name)
+   end
+ end
+ 
++def fix_clang_16_compile_include_issue(target_name)
++    # https://github.dev/pichillilorenzo/flutter_inappwebview/blob/a2595eadaec3d8902f3163d93ce0fcac3039fead/flutter_inappwebview_ios/ios/Classes/InAppWebView/InAppWebView.swift#L1432
++    if target_name == 'Sentry'
++        clang_version = `clang --version`
++        puts "🌹🌹🌹🌹🌹🌹🌹🌹🌹 Clang version is: #{clang_version}"
++        if clang_version.include?("version 16")
++            puts "🌹🌹🌹🌹🌹🌹🌹🌹🌹 Fixing Xcode 16 compile issue ..."
++        else
++            return
++        end
++
++        file_path = 'Pods/Sentry/Sources/SentryCrash/Recording/Monitors/SentryCrashMonitor_CPPException.cpp'
++        insert_line_to_file_if_not_exist(file_path, '#include <exception>')
++
++        file_path = 'Pods/Sentry/Sources/SentryCrash/Recording/Tools/SentryCrashMachineContext.c'
++        insert_line_to_file_if_not_exist(file_path, '#include <sys/_types/_ucontext64.h>')
++
++        file_path = '../pods/plugins/platform_specific/platform_specific/ios/Classes/CheckNetwork/SimplePing.h'
++        insert_line_to_file_if_not_exist(file_path, '#import <sys/_types/_sa_family_t.h>')
++    end
++end
++
++require 'fileutils'
++
++def insert_line_to_file_if_not_exist(file_path, line)
++    FileUtils.chmod('a+w', file_path)
++    contents = File.read(file_path)
++    unless contents.include?(line)
++        File.open(file_path, 'w') do |file|
++            file.puts(line)
++            file.puts(contents)
++        end
++    end
++end
++
+ 
