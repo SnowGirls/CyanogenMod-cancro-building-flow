@@ -312,7 +312,7 @@ BUILD FAILED
 # 我的方法临时换一Xcode版本(也即换了sysroot及对应的编译工具链了), 用 Xcode 15.0.1 版本就可以了:
 
 mdfind "kMDItemCFBundleIdentifier = 'com.apple.dt.Xcode'"
-sudo xcode-select -s /Users/xpeng/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app
+sudo xcode-select -s $HOME/Workspaces/Softwares/Xcodes/Xcode_15.0.1.app
 
 
 # 然后重新编译，最后一切OK:

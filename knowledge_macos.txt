@@ -284,6 +284,21 @@ CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/
 
 # 用浏览器&curl 打开一下 https://cdn.jsdelivr.net/cocoa/Specs/3/f/1/CloudIM/2.10.0/CloudIM.podspec.json ，有正确响应回来后再 pod install 就 OK 了
 
+# 终极方法是去 设置 - 网络，在 DNS 那里加上 cloudflare 的 1.1.1.1
+
+
+##### https://superuser.com/questions/86184/change-dns-server-from-terminal-or-script-on-mac-os-x
+
+networksetup -listallnetworkservices            		# 显示接口 如 有线网络、WIFI网络
+
+networksetup -setdnsservers Ethernet 1.1.1.1 8.8.8.8   	# 对有线网络设置DNS， 这里打开 设置 - 网络 会发现在UI值变化了, 或者命令检查: scutil --dns | grep 'nameserver\[[0-9]*\]'
+
+scutil --dns | grep 'nameserver\[[0-9]*\]'
+
+networksetup -setdnsservers Ethernet empty      		# 恢复默认DNS
+
+
+
 
 
 

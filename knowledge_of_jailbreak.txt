@@ -329,3 +329,33 @@ MDM: https://www.jianshu.com/p/6112050ea31a
 
 
 
+
+
+
+
+
+---------------------------------- Device Management ----------------------------------
+
+ios-deploy --detect 									# list connected device id
+ios-deploy --bundle $HOME/Downloads/Runner.ipa  		# install ipa to the connected one device
+
+ios-deploy --debug --bundle $HOME/Downloads/Runner/Payload/Runner.app   		# 必须得 .app, 因为需要读其 Info.plist 。安装并启动 lldb 调试
+ios-deploy --justlaunch --bundle $HOME/Downloads/Runner/Payload/Runner.app 		# 安装并启动
+
+xcrun devicectl list preferredDDI
+
+xcrun devicectl list devices
+
+xcrun xctrace list devices
+
+
+https://github.com/flutter/flutter/issues/133465#issuecomment-2159512125
+
+	xcrun devicectl device install app --device <device-identifier> <path-to-app>
+	xcrun devicectl device process launch --device <device-identifier> --start-stopped <app-bundle-id>
+	(lldb) device select <device-identifier>
+	(lldb) device process attach --pid <pid>
+
+
+
+
