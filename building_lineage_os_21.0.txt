@@ -1,0 +1,67 @@
+
+----------------------------------------- LineageOS 21.0 -----------------------------------------
+
+mkdir lineage-21.0 && cd lineage-21.0
+
+cp ../lineage-20.0/repo ./ ; cp ../lineage-20.0/ReRepoSync.sh ./
+
+./repo init -u https://github.com/LineageOS/android.git -b lineage-21.0 --git-lfs
+
+./ReRepoSync.sh
+
+# 开另外一个 Terminal Tab 来观看下载情况: 
+for i in `seq 1 1000`; do echo -e "\n################$(date +%Y/%m/%d-%H:%M)################"; du -h -d 1; sleep 60; done;
+
+
+----> 顺利拉完 :) 注意 hotdogb 是 『一加7T』，hotdog 是 『一加7T Pro』，少了字母 b 的哈。 # https://wiki.lineageos.org/devices/#oneplus
+ 
+
+. build/envsetup.sh
+
+
+
+
+－－－－－－－－－－－－－－－－－－－－－－ hotdogb 是 『一加7T』 －－－－－－－－－－－－－－－－－－－－－－
+
+breakfast hotdogb
+
+
+_________________________________________________________________
+
+In file included from build/make/core/config.mk:380:
+In file included from build/make/core/envsetup.mk:369:
+In file included from build/make/target/product/telephony_vendor.mk:21:
+device/oneplus/hotdogb/device.mk:51: error:  vendor/oneplus/hotdogb/hotdogb-vendor.mk does not exist..
+12:18:04 dumpvars failed with: exit status 1
+In file included from build/make/core/config.mk:380:
+In file included from build/make/core/envsetup.mk:369:
+In file included from build/make/target/product/telephony_vendor.mk:21:
+device/oneplus/hotdogb/device.mk:51: error:  vendor/oneplus/hotdogb/hotdogb-vendor.mk does not exist..
+12:18:05 dumpvars failed with: exit status 1
+
+** Don't have a product spec for: 'lineage_hotdogb'
+** Do you have the right repo manifest?
+_________________________________________________________________
+
+# 编辑 .repo/local_manifests/roomservice.xml ， 加入 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件
+vim .repo/local_manifests/roomservice.xml:
+  <project name="TheMuppets/proprietary_vendor_oneplus_hotdogb" path="vendor/oneplus/hotdogb" remote="github" revision="lineage-21" />
+  <project name="TheMuppets/proprietary_vendor_oneplus_sm8150-common" path="vendor/oneplus/sm8150-common" remote="github" revision="lineage-21" />
+
+
+# OK, 一定要 repo sync 一下，这个会同步及只会拉新加入的
+./ReRepoSync.sh
+
+
+
+
+－－－－－－－－－－－－－－－－－－－－－－ hotdog 是 『一加7T Pro』 －－－－－－－－－－－－－－－－－－－－－－
+
+# Download zip from https://github.com/TheMuppets/proprietary_vendor_oneplus_hotdog/tree/lineage-21
+pushd vendor/oneplus/
+cp ~/Downloads/proprietary_vendor_oneplus_hotdog-lineage-21.zip ./
+unzip proprietary_vendor_oneplus_hotdog-lineage-21.zip -d hotdog_temp/
+mv hotdog_temp/proprietary_vendor_oneplus_hotdog-lineage-21 hotdog
+rmdir hotdog_temp/ ; rm proprietary_vendor_oneplus_hotdog-lineage-21.zip
+popd
+

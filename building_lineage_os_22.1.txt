@@ -1,0 +1,20 @@
+
+----------------------------------------- LineageOS 22.1 -----------------------------------------
+
+mkdir lineage-22.1 && cd lineage-22.1
+
+cp ../lineage-21.0/repo ./ ; cp ../lineage-21.0/ReRepoSync.sh ./
+
+./repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs
+
+./ReRepoSync.sh
+
+# 开另外一个 Terminal Tab 来观看下载情况: 
+for i in `seq 1 1000`; do echo -e "\n################$(date +%Y/%m/%d-%H:%M)################"; du -h -d 1; sleep 60; done;
+
+
+----> 顺利拉完 :)
+
+
+
+

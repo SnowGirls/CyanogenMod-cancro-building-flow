@@ -1,0 +1,87 @@
+
+----------------------------------------- LineageOS 20.0 -----------------------------------------
+[openjdk 11.0.13]
+
+
+mkdir lineage-20.0 && cd lineage-20.0
+
+cp ../lineage-19.1/repo ./ ; cp ../lineage-19.1/ReRepoSync.sh ./
+
+./repo init -u https://github.com/LineageOS/android.git -b lineage-20.0 --git-lfs
+
+./ReRepoSync.sh
+
+# 开另外一个 Terminal Tab 来观看下载情况: 
+for i in `seq 1 1000`; do echo -e "\n################$(date +%Y/%m/%d-%H:%M)################"; du -h -d 1; sleep 60; done;
+
+
+----> 顺利拉完 :)
+
+
+
+
+=================== 一加7T 代号: hotdogb ===================
+
+# 对于 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件，TheMuppets github 就已经提供了， breakfast 之后我们写入 .repo/local_manifests/roomservice.xml 再 repo sync 就好
+# https://github.com/TheMuppets/proprietary_vendor_oneplus_hotdogb
+# https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8150-common
+
+
+. build/envsetup.sh
+
+breakfast hotdogb
+
+
+# 编辑 .repo/local_manifests/roomservice.xml ， 加入 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件
+vim .repo/local_manifests/roomservice.xml:
+  <project name="TheMuppets/proprietary_vendor_oneplus_hotdogb" path="vendor/oneplus/hotdogb" remote="github" revision="lineage-20" />
+  <project name="TheMuppets/proprietary_vendor_oneplus_sm8150-common" path="vendor/oneplus/sm8150-common" remote="github" revision="lineage-20" />
+
+
+# OK, repo sync 一下，这个会同步及只会拉新加入的
+./ReRepoSync.sh
+
+# 再来 breakfast 一次，这时就完全 OK 了
+breakfast hotdogb
+
+＃ 编译
+brunch hotdogb
+
+# 编译成功
+
+
+
+
+=================== 一加7T Pro 代号: hotdog ===================
+
+# 因「一加7T Pro」与「一加7T」都是用 sm8150, 而上面编译「一加7T」时下载过了，所以不需要要再下载这个了, 因此 roomservice.xml 加上hotdog的专有文件即可不需再加芯片的：
+
+方式一:
+vim .repo/local_manifests/roomservice.xml:
+  <project name="TheMuppets/proprietary_vendor_oneplus_hotdog" path="vendor/oneplus/hotdog" remote="github" revision="lineage-20" />
+# 保存 vim 后，仅执行 ./repo sync 这样仅会拉没有拉的或刚修改的，不过还是会耗较长时间，推荐下面方式二
+./repo sync
+
+方式二:
+# 目前用 svn 的方式好像不行了，可以去 https://github.com/TheMuppets/proprietary_vendor_oneplus_hotdog/tree/lineage-20 下载zip包，然后解压成 ./vendor/oneplus/hotdog 
+# 这样的方式就是最省磁盘空间的，毕竟用git拉的会拉.git，拉了许多无需用到的分支
+
+pushd vendor/oneplus/
+cp ~/Downloads/proprietary_vendor_oneplus_hotdog-lineage-20.zip ./
+unzip proprietary_vendor_oneplus_hotdog-lineage-20.zip -d hotdog_temp/
+mv hotdog_temp/proprietary_vendor_oneplus_hotdog-lineage-20 hotdog
+rmdir hotdog_temp/
+rm proprietary_vendor_oneplus_hotdog-lineage-20.zip
+popd
+
+
+# 环境/设置/编译，最后成功
+# 这里第一次 brunch 编译到最后是出错了的，有许多 missing class warning 及一个 Validation error: The applied generic arguments have different count than the expected formals.
+# 但我不管第一次 brunch 编译失败，直接重来一次即第二的 brunch 命令，结果编译成功了。不知道是不是 jdk 11 是比较低了需要用高点的，以后再编译时可以尝试一下是不是这个问题。
+
+. build/envsetup.sh
+
+breakfast hotdog
+
+brunch hotdog
+

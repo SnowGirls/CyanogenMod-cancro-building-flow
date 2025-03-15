@@ -286,12 +286,17 @@ emulator
 
 
 
-
-
-
 # 打包 模拟器 zip 包
 make emu_img_zip
 
+
+
+
+# 方便使用, 写在一起:
+
+source build/envsetup.sh ; lunch sdk_phone_x86_64 ; m -j8  # 编译给模拟器使用
+
+source build/envsetup.sh ; lunch aosp_cf_x86_64_phone-userdebug ; m -j8  # 编译给Cuttlefish使用
 
 
 
@@ -336,3 +341,15 @@ m -j8
 cd out/target/product/emulator_x86_64/
 emulator   # OK, 成功打开
 
+
+
+
+
+source build/envsetup.sh ; lunch aosp_cf_x86_64_phone-userdebug ; m -j${nproc}
+# 奇怪的是生成的是 out/target/product/vsoc_arm64, 而 launch_cvd --start_webrtc=true 需要的是 out/target/product/vsoc_x86_64/boot.img
+
+# 那就试试 pc 那个吧, 在它 make 过程中 ls out/target/product/ 确实多了个正确的出来 :) :
+source build/envsetup.sh ; lunch aosp_cf_x86_64_pc-userdebug ; m 
+
+launch_cvd --start_webrtc=true
+# 编译完成后执行，还是有错误， TODO .....

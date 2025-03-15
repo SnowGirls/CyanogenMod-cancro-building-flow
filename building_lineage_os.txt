@@ -2419,6 +2419,8 @@ mkdir lineage-19.0 && cd lineage-19.0
 
 
 ----------------------------------------- LineageOS 19.1 -----------------------------------------
+[openjdk 11.0.13]
+
 
 mkdir lineage-19.1 && cd lineage-19.1
 
@@ -2476,9 +2478,10 @@ hardware/oplus/overlay/qssi/qssi.mk:14: error: _nic.PRODUCTS.[[device/oneplus/ho
 ** Do you have the right repo manifest?
 -------------------------
 # 找了一下，https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8150-common 是只有 lineage-20 的
-其实可以一步到位的，从 TheMuppets 拉完 vendor 的所有下来:
+# 因为 lineage-19.1 的都放在了 https://github.com/TheMuppets/proprietary_vendor_oneplus 中的子文件夹 sm8150-common 中
+# 这样也可以一步到位的写进 roomservice.xml 中让它自动来拉，但这样也拉了这个仓库里许多其它机型的文件下来了
 vim .repo/local_manifests/roomservice.xml
-<project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="mkq-mr1" />
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-19.1" />
 
 但不推荐这种方式，因为上面我们已经 clone TheMuppets 的下来了，复制过来就好:
 cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/sm8150-common vendor/oneplus/
@@ -2686,70 +2689,112 @@ This one finds non-debug symbols:
 
 
 
+=================== 一加7T Pro 代号: hotdog ===================
+
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/hotdog vendor/oneplus/         # 注意 branch 是 lineage-19.1 没错
+
+# 跟 一加7T 用的是同一个，复制过了就不用执行这复制了, 可以去 LineageOS/android_device_oneplus_hotdog 搜索查看其用的芯片
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/sm8150-common vendor/oneplus/  
+
+
+breakfast hotdog
+
+
+______________________________________________________
+
+breakfast hotdog
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:22:42 dumpvars failed with: exit status 1
+Device hotdog not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Found repository: android_device_oneplus_hotdog
+Default revision: lineage-19.1
+Checking branch info
+Checking if device/oneplus/hotdog is fetched from android_device_oneplus_hotdog
+Adding dependency: LineageOS/android_device_oneplus_hotdog -> device/oneplus/hotdog
+Using default branch for android_device_oneplus_hotdog
+Syncing repository to retrieve project.
+remote: Enumerating objects: 40, done.
+remote: Counting objects: 100% (15/15), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 40 (delta 12), reused 9 (delta 9), pack-reused 25 (from 4)
+Unpacking objects: 100% (40/40), 49.02 KiB | 92.00 KiB/s, done.
+project .repo/manifests/
+Updating 2ae1734..d8a4628
+Fast-forward
+
+Fetching: 100% (2/2), done in 8.454s
+info: A new version of repo is available
+warning: repo is not tracking a remote branch, so it will not receive updates
+info: Restarting repo with latest version
+fatal: ['--repo-upgraded']
+Repository synced!
+Looking for dependencies in device/oneplus/hotdog
+device/oneplus/hotdog has no additional dependencies.
+Done
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:24:14 dumpvars failed with: exit status 1
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:24:14 dumpvars failed with: exit status 1
+
+** Don't have a product spec for: 'lineage_hotdog'
+** Do you have the right repo manifest?
+
+______________________________________________________
+
+# 这个错只是 device/oneplus/hotdog 没有被正确 checkout 出来，像是被 repo --repo-upgraded 出阻断了，再来 breakfast 一次就成功了：
+
+breakfast hotdog   # 下面输出成功了:
+______________________________________________________
+
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:34:29 dumpvars failed with: exit status 1
+Device hotdog not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Found repository: android_device_oneplus_hotdog
+Default revision: lineage-19.1
+Checking branch info
+Checking if device/oneplus/hotdog is fetched from android_device_oneplus_hotdog
+LineageOS/android_device_oneplus_hotdog already fetched to device/oneplus/hotdog
+Syncing repository to retrieve project.
+Fetching: 100% (1/1), done in 0.501s
+Checking out: 100% (1/1), done in 0.202s
+repo sync has finished successfully.
+Repository synced!
+Looking for dependencies in device/oneplus/hotdog
+Looking for dependencies in device/oneplus/sm8150-common
+Looking for dependencies in hardware/oplus
+hardware/oplus has no additional dependencies.
+Looking for dependencies in kernel/oneplus/sm8150
+kernel/oneplus/sm8150 has no additional dependencies.
+Done
+
+============================================
+PLATFORM_VERSION_CODENAME=REL
+PLATFORM_VERSION=12
+LINEAGE_VERSION=19.1-20250316-UNOFFICIAL-hotdog
+TARGET_PRODUCT=lineage_hotdog
+...
+...
+______________________________________________________
 
 
 
+brunch hotdog
 
 
+# OK 一次编译成功
+______________________________________________________
+[100% 42660/42660] build bacon
+Package Complete: out/target/product/hotdog/lineage-19.1-20250316-UNOFFICIAL-hotdog.zip
 
-
-
-
-
-
-
-
-
-
-
------------------------------------------ LineageOS 20.0 -----------------------------------------
-
-mkdir lineage-20.0 && cd lineage-20.0
-
-cp ../lineage-19.1/repo ./ ; cp ../lineage-19.1/ReRepoSync.sh ./
-
-./repo init -u https://github.com/LineageOS/android.git -b lineage-20.0 --git-lfs
-
-./ReRepoSync.sh
-
-# 开另外一个 Terminal Tab 来观看下载情况: 
-for i in `seq 1 1000`; do echo -e "\n################$(date +%Y/%m/%d-%H:%M)################"; du -h -d 1; sleep 60; done;
-
-
-----> 顺利拉完 :)
-
-
-# 对于 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件，TheMuppets github 就已经提供了， breakfast 之后我们写入 .repo/local_manifests/roomservice.xml 再 repo sync 就好
-# https://github.com/TheMuppets/proprietary_vendor_oneplus_hotdogb
-# https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8150-common
-
-
-. build/envsetup.sh
-
-breakfast hotdogb
-
-
-# 编辑 .repo/local_manifests/roomservice.xml ， 加入 一加7T(hotdogb) 及其 对应芯片骁龙855(sm8150) 的专有文件
-vim .repo/local_manifests/roomservice.xml:
-  <project name="TheMuppets/proprietary_vendor_oneplus_hotdogb" path="vendor/oneplus/hotdogb" remote="github" revision="lineage-20" />
-  <project name="TheMuppets/proprietary_vendor_oneplus_sm8150-common" path="vendor/oneplus/sm8150-common" remote="github" revision="lineage-20" />
-
-
-# OK, repo sync 一下，这个会同步及只会拉新加入的
-./ReRepoSync.sh
-
-# 再来 breakfast 一次，这时就完全 OK 了
-breakfast hotdogb
-
-＃ 编译
-brunch hotdogb
-
-
-
-===================##### Android Studio #####===================
-
-source build/envsetup.sh && breakfast hotdogb && make idegen && development/tools/idegen/idegen.sh
-
-Android Studio -> File -> Open -> android.ipr
+#### build completed successfully (01:41:00 (hh:mm:ss)) ####
+______________________________________________________
 
 

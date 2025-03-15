@@ -5,6 +5,8 @@
 
 图像编辑工具命令: gimp
 
+# https://www.iconpacks.net/
+
 关于 Git:
 Gogs HTTP服务停了，直接 git clone 本地仓库就OK: git clone ~/gogs/Woaini.git ./WoAiNi/
 甚至可以把 remote-url 指向本地： git remote set-url origin ~/gogs/Woaini.git
