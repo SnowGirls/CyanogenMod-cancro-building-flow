@@ -283,7 +283,7 @@ Cellar一个: /usr/local/Cellar/ruby/3.3.0/bin , 这个估计就是 brew 安装�
 https://github.com/microsoft/vscode-react-native
 
 - VSCode Install Extendsion: React Native Tools
--  (⌘ + ⇧ + D)新建一个launch.json -> Add Configuration -> React Native -> Attach to application -> classic application -> host port (i.e. localhost, 8083)
+-  (⌘ + ⇧ + D)新建一个launch.json -> Add Configuration -> React Native -> Attach to application/packager -> classic application -> host port (i.e. localhost, 8083)
 - npm start 一个node server到上述port, 若已经启动可忽略
 - 在 VSCode Debug Tab 选中这个 configuration，点击绿色小箭头，显示Established a connection with the Proxy (Packager) to the React Native application
 - 设备 remote 访问这个 node server，摇晃(模拟器按Command + Ctrl + Z)后点击debug，此时这个 debug session 可以被 vscode 拦截，不再走到浏览器，可以断点和查看变量了
@@ -304,6 +304,25 @@ https://github.com/microsoft/vscode-react-native
 }
 -------------------- Example of launch.json --------------------
 
+-------------------- Example of launch.json --------------------
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    
+        {
+            "name": "Attach to packager",
+            "cwd": "${workspaceFolder}/example/",
+            "type": "reactnative",
+            "request": "attach",
+            "isDynamic": true,
+            "port": 8081,
+        }
+    ]
+}
+-------------------- Example of launch.json --------------------
 
 
 https://blog.logrocket.com/debugging-react-native-vs-code/
@@ -312,6 +331,28 @@ https://stackoverflow.com/a/69567851/1749293
 
 
 
+
+
+## Using XCode 15 for running in iOS simulator/device
+     /Applications/Xcode_15.3.app/Contents/Developer/usr/bin/xcodebuild -workspace example.xcworkspace -configuration Debug -scheme example -destination id=E05B37CE-4543-4336-A3C9-271AC82E6EB1        # Simulator: iPhone 16 Pro.  OK
+
+      /Applications/Xcode_15.3.app/Contents/Developer/usr/bin/xcodebuild -workspace Runner.xcworkspace -configuration Debug -scheme Runner -destination id=5ce167667aaccae94b39a3a05547c3016e7ff3bb   # Device: iPhone 16 Pro
+
+## Debug React-Native
+    https://reactnative.dev/docs/debugging
+    Break in reload APP ? https://stackoverflow.com/a/53907989/1749293
+    yarn start --experimental-debugger
+
+    https://github.com/facebook/react/tree/main/packages/react-devtools
+    Run `npx react-devtool`s` before tapping `Open Debugger` in the dev menu.
+
+    https://stackoverflow.com/a/79199526/1749293
+    npx react-native start --experimental-debugger 
+    # then press `j` in terminal, then the `DevTools(React Native)` will launched, then in `source` tab set breakpoint for debuging
+
+
+
+    
 
 
 

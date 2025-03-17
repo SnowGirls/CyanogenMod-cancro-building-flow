@@ -291,9 +291,11 @@ CDN: trunk URL couldn't be downloaded: https://cdn.jsdelivr.net/cocoa/Specs/3/f/
 
 networksetup -listallnetworkservices            		# 显示接口 如 有线网络、WIFI网络
 
+scutil --dns | grep 'nameserver\[[0-9]*\]' 				# 先查看一下
+
 networksetup -setdnsservers Ethernet 1.1.1.1 8.8.8.8   	# 对有线网络设置DNS， 这里打开 设置 - 网络 会发现在UI值变化了, 或者命令检查: scutil --dns | grep 'nameserver\[[0-9]*\]'
 
-scutil --dns | grep 'nameserver\[[0-9]*\]'
+scutil --dns | grep 'nameserver\[[0-9]*\]' 				# 再查看一下
 
 networksetup -setdnsservers Ethernet empty      		# 恢复默认DNS
 

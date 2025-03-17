@@ -35,7 +35,7 @@ https://stackoverflow.com/a/52773670/1749293
 https://medium.com/@GalvinLi/tinysolution-cocoapods%E7%B1%BB%E9%87%8D%E5%A4%8D%E5%AE%9E%E7%8E%B0%E8%AD%A6%E5%91%8A%E5%A4%84%E7%90%86-ba88bb3deaf6
 
 
-IDE 用 RubyMine
+########### IDE 用 RubyMine
 
 1. 用 RubyMine 打开一个 支持了 Cocoaspod XCode 工程的目录，如拿 Github TinySolution [https://github.com/bestwnh/TinySolution.git] 为例子
 
@@ -48,6 +48,37 @@ IDE 用 RubyMine
 4. 点击 Debug
 
 
+
+########### IDE 用 VS Code
+1. 打开一个 iOS 项目，有 Podfile 在当前目录
+
+2. 安装插件 VSCode rdbg Ruby Debugger
+
+3. gem install debug , 添加 bin/ 目录进 $PATH (i.e. `export PATH=/usr/local/lib/ruby/gems/3.3.0/bin:$PATH`)
+
+
+command + shift + D -> launch.json:
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "rdbg",
+            "name": "Debug current file with rdbg",
+            "request": "launch",
+            "script": "/usr/local/bin/pod",
+            "args": ["install"],
+            "askParameters": true
+        },
+        {
+            "type": "rdbg",
+            "name": "Attach with rdbg",
+            "request": "attach"
+        }
+    ]
+}
+
+4. 在 Podfile 加断点，command + shift + D 点击绿色三角调试运行
 
 
 

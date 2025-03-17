@@ -1,11 +1,11 @@
 
 
-Install python2.7 in macos
+--------------- Install python2.7 in macos
 # https://blog.tericcabrel.com/install-python2-on-macos/
 # https://www.python.org/downloads/release/python-2718/
 
 
-Install pip of python2.7
+--------------- Install pip of python2.7
 # https://stackoverflow.com/questions/17271319/how-do-i-install-pip-on-macos-or-os-x
 
 
@@ -23,4 +23,12 @@ apksigner sign --ks my.keystore  __path_to_apk__
 
 apksigner verify __path_to_apk__
 
+
+
+
+
+--------------- Show python all site-packages directories
+https://stackoverflow.com/a/46071447/1749293
+
+python -m site
 
