@@ -1,11 +1,16 @@
 
 ----------------------------------------- LineageOS 22.1 -----------------------------------------
+[openjdk 11.0.13]
+
+
+# https://wiki.lineageos.org/devices/hotdogb/build/
+
 
 mkdir lineage-22.1 && cd lineage-22.1
 
 cp ../lineage-21.0/repo ./ ; cp ../lineage-21.0/ReRepoSync.sh ./
 
-./repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs
+./repo init -u https://github.com/LineageOS/android.git -b lineage-22.1 --git-lfs --no-clone-bundle
 
 ./ReRepoSync.sh
 

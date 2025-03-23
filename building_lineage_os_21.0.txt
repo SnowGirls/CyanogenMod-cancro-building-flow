@@ -1,5 +1,10 @@
 
 ----------------------------------------- LineageOS 21.0 -----------------------------------------
+[openjdk 11.0.13]
+
+
+# https://wiki.lineageos.org/devices/hotdogb/build/
+
 
 mkdir lineage-21.0 && cd lineage-21.0
 
@@ -53,6 +58,59 @@ vim .repo/local_manifests/roomservice.xml:
 ./ReRepoSync.sh
 
 
+＃ 编译
+brunch hotdogb
+
+
+_________________________________________________________________
+
+ninja failed with: exit status 137
+_________________________________________________________________
+
+# https://juejin.cn/post/7158741169001168927
+# https://blog.csdn.net/ldswfun/article/details/136219877 文章说 通过查看 out/soong.log 和 /var/log/syslog 发现是内存OOM问题:
+
+第一种，试了不行：
+
+  # 查看目前多少G
+  ls -alh /swapfile
+
+  # 将现有swap移动到主内存，可能需要几分钟
+  sudo swapoff -a
+
+  # 创建新的swap文件，bs×count=最后生成的swap大小，这里设置8G
+  sudo dd if=/dev/zero of=/swapfile bs=1G count=8
+
+  # 再查看目前多少G
+  ls -alh /swapfile
+
+  # 设置权限
+  sudo chmod 0600 /swapfile
+
+  # 设置swap
+  sudo mkswap /swapfile
+
+  # 打开swap
+  sudo swapon /swapfile
+
+  # 检查设置是否有效
+  grep Swap /proc/meminfo # 或者htop看一下
+
+  # 设置永久有效
+  sudo gedit /etc/fstab
+  
+  # 在末尾行加上 
+  # /swapfile swap swap sw 0 0
+
+第二种:
+  1. vim build/soong/java/config/config.go : pctx.StaticVariable("JavacHeapSize", "4096M") 改成 8192M 
+
+
+
+
+
+
+
 
 
 －－－－－－－－－－－－－－－－－－－－－－ hotdog 是 『一加7T Pro』 －－－－－－－－－－－－－－－－－－－－－－
@@ -64,4 +122,27 @@ unzip proprietary_vendor_oneplus_hotdog-lineage-21.zip -d hotdog_temp/
 mv hotdog_temp/proprietary_vendor_oneplus_hotdog-lineage-21 hotdog
 rmdir hotdog_temp/ ; rm proprietary_vendor_oneplus_hotdog-lineage-21.zip
 popd
+
+
+. build/envsetup.sh
+
+breakfast hotdog
+
+＃ 编译
+brunch hotdog
+
+_________________________________________________________________
+
+[ 99% 1159/1169] including vendor/oneplus/hotdog/Android.mk ...
+FAILED: 
+In file included from build/make/core/sbom.mk:15:
+vendor/oneplus/hotdog/Android.mk:9: error: vendor/oneplus/hotdog/radio/LOGO.img SHA1 mismatch (04ecf80141e5c19d5287a51c8d998d7145c96cc4 != 1aebad420d5d3f21306b453e769196e78a50
+a06d).
+17:21:34 ckati failed with: exit status 1
+
+#### failed to build some targets (04:27 (mm:ss)) ####
+_________________________________________________________________
+
+shasum vendor/oneplus/hotdog/radio/* 跟 vendor/oneplus/hotdog/Android.mk 对比一下，发现全都不一样 T_T, 改一下 mk 里的再来
+
 
