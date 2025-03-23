@@ -100,11 +100,11 @@ brunch hotdogb
 ----> 顺利编译成功 :)
 
 
-# 后面的一键: . build/envsetup.sh && breakfast hotdogb && brunch hotdogb
+# 后面的一键: export WITH_SU=true ; . build/envsetup.sh && breakfast hotdogb && brunch hotdogb
 
-# 或者重编整个zip包的话就不用早餐: source build/envsetup.sh && brunch hotdogb
+# 或者重编整个zip包的话就不用早餐: export WITH_SU=true ; source build/envsetup.sh && brunch hotdogb
 
-# 或者仅是编某个模块的话就仅用早餐: source build/envsetup.sh && breakfast hotdogb ; mmm system/extras/su/
+# 或者仅是编某个模块的话就仅用早餐: export WITH_SU=true ; source build/envsetup.sh && breakfast hotdogb ; mmm system/extras/su/
 
 
 
@@ -129,7 +129,7 @@ fastboot flash recovery recovery.img
 # 返回 Apply update -> Apply from adb , 此时用 adb sideload 命令来刷:
 adb sideload lineage-19.1-20230923-UNOFFICIAL-hotdogb.zip
 # 刷完后返回 -> Reboot system now, 之后会进入到这个编译好的系统
-# 详细可以看看这个印度小哥的视频: https://www.youtube.com/watch?v=daQ6KAalToc
+# 详细可以看看这个印度三哥的视频: https://www.youtube.com/watch?v=daQ6KAalToc
 
 
 

@@ -1,6 +1,7 @@
 
 ----------------------------------------- LineageOS 21.0 -----------------------------------------
 [openjdk 11.0.13]
+export WITH_SU=true
 
 
 # https://wiki.lineageos.org/devices/hotdogb/build/
