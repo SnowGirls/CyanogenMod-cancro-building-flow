@@ -1,0 +1,383 @@
+
+----------------------------------------- LineageOS 19.1 -----------------------------------------
+[openjdk 11.0.13]
+export WITH_SU=true 
+
+
+mkdir lineage-19.1 && cd lineage-19.1
+
+# sudo apt install git-lfs
+
+curl --proxy "http://192.168.1.6:8084" -O https://storage.googleapis.com/git-repo-downloads/repo
+
+chmod a+x ./repo
+
+./repo init -u https://github.com/LineageOS/android.git -b lineage-19.1 --git-lfs
+
+
+./ReRepoSync.sh  # becareful use `./repo`
+
+
+
+
+
+一加7T(代号: hotdogb [https://download.lineageos.org/devices/]):
+# svn checkout https://github.com/TheMuppets/proprietary_vendor_oneplus/branches/lineage-19.1/hotdogb/ ./vendor/oneplus/hotdogb
+# vim ~/.subversion/servers, 注意看看设置的代理有没有变了。不行了，这种方式，用 git clone 吧，以后共用
+
+pushd ~/Disk6T/Workspaces/GitHub/TheMuppets/
+git clone https://github.com/TheMuppets/proprietary_vendor_oneplus.git
+pushd proprietary_vendor_oneplus
+git checkout lineage-19.1
+popd
+popd
+
+
+mkdir -p vendor/oneplus/
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/hotdogb vendor/oneplus/
+ls -al vendor/oneplus/
+
+
+. build/envsetup.sh
+
+breakfast hotdogb
+
+# 继续等待下载完毕 
+
+
+
+-------------------------
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+hardware/oplus/overlay/qssi/qssi.mk:14: error: _nic.PRODUCTS.[[device/oneplus/hotdogb/lineage_hotdogb.mk]]: "vendor/oneplus/sm8150-common/sm8150-common-vendor.mk" does not exist.
+01:13:39 dumpvars failed with: exit status 1
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+hardware/oplus/overlay/qssi/qssi.mk:14: error: _nic.PRODUCTS.[[device/oneplus/hotdogb/lineage_hotdogb.mk]]: "vendor/oneplus/sm8150-common/sm8150-common-vendor.mk" does not exist.
+01:13:40 dumpvars failed with: exit status 1
+
+** Don't have a product spec for: 'lineage_hotdogb'
+** Do you have the right repo manifest?
+-------------------------
+# 找了一下，https://github.com/TheMuppets/proprietary_vendor_oneplus_sm8150-common 是只有 lineage-20 的
+# 因为 lineage-19.1 的都放在了 https://github.com/TheMuppets/proprietary_vendor_oneplus 中的子文件夹 sm8150-common 中
+# 这样也可以一步到位的写进 roomservice.xml 中让它自动来拉，但这样也拉了这个仓库里许多其它机型的文件下来了
+vim .repo/local_manifests/roomservice.xml
+  <project name="TheMuppets/proprietary_vendor_oneplus" path="vendor/oneplus" remote="github" revision="lineage-19.1" />
+
+但不推荐这种方式，因为上面我们已经 clone TheMuppets 的下来了，复制过来就好:
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/sm8150-common vendor/oneplus/
+
+
+# OK, 重新来
+
+breakfast hotdogb
+
+# Good, 成功输出可以编译前的各个信息
+
+brunch hotdogb
+
+
+
+-------------------------
+FAILED: ninja: 'external/chromium-webview/prebuilt/arm64/webview.apk', needed by 'out/target/product/hotdogb/obj/APPS/webview_intermediates/package.apk
+', missing and no known rule to make it
+17:54:59 ninja failed with: exit status 1
+-------------------------
+cd external/chromium-webview/prebuilt/arm64 ; git status 
+发现状态有变，有许多东西被 deleted，那就 `git reset --hard HEAD` 恢复吧。但有点不对劲，会不会别的也这样，赶紧去根目录看一下
+repo status 
+发现 external/chromium-webview/prebuilt/ 下的各个架构的都被本地修改了，奇怪，没动哦，为什么会 deleted 了呢 ...，把它们都 `git reset --hard HEAD` 后再
+repo status
+确保 "nothing to commit (working directory clean)"
+
+
+# OK, 重新来
+
+brunch hotdogb
+
+
+----> 顺利编译成功 :)
+
+
+# 后面的一键: export WITH_SU=true ; . build/envsetup.sh && breakfast hotdogb && brunch hotdogb
+
+# 或者重编整个zip包的话就不用早餐: export WITH_SU=true ; source build/envsetup.sh && brunch hotdogb
+
+# 或者仅是编某个模块的话就仅用早餐: export WITH_SU=true ; source build/envsetup.sh && breakfast hotdogb ; mmm system/extras/su/
+
+
+
+
+
+
+
+
+
+===================##### 刷机 #####===================
+
+adb reboot bootloader && fastboot oem unlock 
+# 手机重新进入已 OEM 解锁的系统 
+adb reboot bootloader
+
+echo $ANDROID_PRODUCT_OUT
+cd $ANDROID_PRODUCT_OUT
+fastboot flash dtbo dtbo.img
+fastboot flash recovery recovery.img
+# 此时 按向下音量键 选择进入 Recovery Mode 
+# 进入 Recovery Mode -> 清除数据 Factory Reset -> Format data/factory reset 
+# 返回 Apply update -> Apply from adb , 此时用 adb sideload 命令来刷:
+adb sideload lineage-19.1-20230923-UNOFFICIAL-hotdogb.zip
+# 刷完后返回 -> Reboot system now, 之后会进入到这个编译好的系统
+# 详细可以看看这个印度三哥的视频: https://www.youtube.com/watch?v=daQ6KAalToc
+
+
+
+--->> 后面再刷就直接进入 recovery 模式就好: adb reboot recovery
+
+
+
+
+
+
+===================##### Android Studio #####===================
+
+source build/envsetup.sh && breakfast hotdogb && make idegen && development/tools/idegen/idegen.sh
+
+Android Studio -> File -> Open -> android.ipr
+
+
+
+
+
+
+
+
+
+# 编译工程版本
+. build/envsetup.sh ; breakfast hotdogb eng ; brunch hotdogb eng
+
+
+# 编译 su & libc
+. build/envsetup.sh ; breakfast hotdogb; mmm system/extras/su/ ; mmm bionic/libc/
+
+
+
+
+
+##### 一些其他错误 #####
+# mmm frameworks/base/ 的错:
+--------------------------------------------------
+FAILED: out/target/common/obj/APPS/MultiDexLegacyAndException_intermediates/maindex.list
+/bin/bash -c "(PROGUARD_HOME=external/proguard out/host/linux-x86/bin/mainDexClasses out/target/common/obj/APPS/Mult
+iDexLegacyAndException_intermediates/classes.jar 1>out/target/common/obj/APPS/MultiDexLegacyAndException_intermediat
+es/maindex.list ) && (echo \"com/android/multidexlegacyandexception/Test.class\" >> out/target/common/obj/APPS/Multi
+DexLegacyAndException_intermediates/maindex.list )"
+
+Error: Can't read [/home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/common/obj/APPS/MultiDexLeg
+acyAndException_intermediates/classes.jar] (Can't process class [javax/annotation/CheckForNull.class] (Unsupported c
+lass version number [53.0] (maximum 52.0, Java 1.8)))
+--------------------------------------------------
+# 直接重新编译就好, 或许只删模块的产物就好，懒得折腾了，直接删整个 out 吧:
+rm -rf out/; brunch hotdogb
+
+# 后面尝试了一下下面清除命令，再加上 :framework ，编译是通过了，但 oat 文件并没有重新构建生成出来，还是旧的 
+make clean-framework ; mmma frameworks/base:framework
+
+
+
+
+
+
+===================##### framework.jar framework.jar #####===================
+
+# 后来发现 编译 framework.jar 只需要 `make framework-minus-apex`就好:
+make framework-minus-apex
+# [100% 384/384] Install: out/target/product/hotdogb/system/framework/framework.jar
+
+# 推到手机上:
+adb root; adb remount; adb shell; adb shell "cd /system/framework/ ; rm -rf oat/ arm/ arm64/"
+adb push out/target/product/hotdogb/system/framework/framework.jar /system/framework/
+adb shell ls -al /system/framework/framework.jar
+
+# 然后重启 zygote:
+adb shell stop ; adb shell start
+
+
+
+
+
+
+
+
+# remount 分区
+adb root
+adb remount # adb shell mount -o rw,remount /
+
+
+
+# lldb 源码调试(不需要工程版本也行)
+# https://werat.dev/blog/debugging-lldb-with-source-stepping/
+# [Why lldb remote debug can't locate the libflutter.so's symbol file]: 
+# https://github.com/flutter/flutter/issues/45971
+# https://github.com/vadimcn/codelldb/issues/190
+find -name libc.so
+file ./symbols/apex/com.android.runtime/lib64/bionic/libc.so
+readelf --debug-dump=info ./symbols/apex/com.android.runtime/lib64/bionic/libc.so | grep DW_AT_name | grep cpp
+
+This one finds debug symbols:
+(lldb) image lookup -r -n <FUNC_REGEX>
+
+This one finds non-debug symbols:
+(lldb) image lookup -r -s <FUNC_REGEX>
+
+(lldb) br set -r "SystemProperties::*"
+
+(lldb) br list 
+
+(lldb) image lookup -vn SystemProperties::Find
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/bootstrap/libc.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/liblog.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/libandroid_runtime.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/system/lib64/libutils.so
+
+(lldb) add-dsym /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/out/target/product/hotdogb/symbols/apex/com.android.art/lib64/libart.so
+
+(lldb) settings set target.source-map . /home/ubuntu/Disk6T/Workspaces/AOSP/LineageOS/lineage-19.1/
+
+(lldb) br set -name SystemProperties::Find
+
+(lldb) br set -name SystemProperties::AreaSerial
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=================== 一加7T Pro 代号: hotdog ===================
+
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/hotdog vendor/oneplus/         # 注意 branch 是 lineage-19.1 没错
+
+# 跟 一加7T 用的是同一个，复制过了就不用执行这复制了, 可以去 LineageOS/android_device_oneplus_hotdog 搜索查看其用的芯片
+cp -r ~/Disk6T/Workspaces/GitHub/TheMuppets/proprietary_vendor_oneplus/sm8150-common vendor/oneplus/  
+
+
+breakfast hotdog
+
+
+______________________________________________________
+
+breakfast hotdog
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:22:42 dumpvars failed with: exit status 1
+Device hotdog not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Found repository: android_device_oneplus_hotdog
+Default revision: lineage-19.1
+Checking branch info
+Checking if device/oneplus/hotdog is fetched from android_device_oneplus_hotdog
+Adding dependency: LineageOS/android_device_oneplus_hotdog -> device/oneplus/hotdog
+Using default branch for android_device_oneplus_hotdog
+Syncing repository to retrieve project.
+remote: Enumerating objects: 40, done.
+remote: Counting objects: 100% (15/15), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 40 (delta 12), reused 9 (delta 9), pack-reused 25 (from 4)
+Unpacking objects: 100% (40/40), 49.02 KiB | 92.00 KiB/s, done.
+project .repo/manifests/
+Updating 2ae1734..d8a4628
+Fast-forward
+
+Fetching: 100% (2/2), done in 8.454s
+info: A new version of repo is available
+warning: repo is not tracking a remote branch, so it will not receive updates
+info: Restarting repo with latest version
+fatal: ['--repo-upgraded']
+Repository synced!
+Looking for dependencies in device/oneplus/hotdog
+device/oneplus/hotdog has no additional dependencies.
+Done
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:24:14 dumpvars failed with: exit status 1
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:24:14 dumpvars failed with: exit status 1
+
+** Don't have a product spec for: 'lineage_hotdog'
+** Do you have the right repo manifest?
+
+______________________________________________________
+
+# 这个错只是 device/oneplus/hotdog 没有被正确 checkout 出来，像是被 repo --repo-upgraded 出阻断了，再来 breakfast 一次就成功了：
+
+breakfast hotdog   # 下面输出成功了:
+______________________________________________________
+
+In file included from build/make/core/config.mk:313:
+In file included from build/make/core/envsetup.mk:312:
+build/make/core/product_config.mk:160: error: Can not locate config makefile for product "lineage_hotdog".
+14:34:29 dumpvars failed with: exit status 1
+Device hotdog not found. Attempting to retrieve device repository from LineageOS Github (http://github.com/LineageOS).
+Found repository: android_device_oneplus_hotdog
+Default revision: lineage-19.1
+Checking branch info
+Checking if device/oneplus/hotdog is fetched from android_device_oneplus_hotdog
+LineageOS/android_device_oneplus_hotdog already fetched to device/oneplus/hotdog
+Syncing repository to retrieve project.
+Fetching: 100% (1/1), done in 0.501s
+Checking out: 100% (1/1), done in 0.202s
+repo sync has finished successfully.
+Repository synced!
+Looking for dependencies in device/oneplus/hotdog
+Looking for dependencies in device/oneplus/sm8150-common
+Looking for dependencies in hardware/oplus
+hardware/oplus has no additional dependencies.
+Looking for dependencies in kernel/oneplus/sm8150
+kernel/oneplus/sm8150 has no additional dependencies.
+Done
+
+============================================
+PLATFORM_VERSION_CODENAME=REL
+PLATFORM_VERSION=12
+LINEAGE_VERSION=19.1-20250316-UNOFFICIAL-hotdog
+TARGET_PRODUCT=lineage_hotdog
+...
+...
+______________________________________________________
+
+
+
+brunch hotdog
+
+
+# OK 一次编译成功
+______________________________________________________
+[100% 42660/42660] build bacon
+Package Complete: out/target/product/hotdog/lineage-19.1-20250316-UNOFFICIAL-hotdog.zip
+
+#### build completed successfully (01:41:00 (hh:mm:ss)) ####
+______________________________________________________
+
+
+

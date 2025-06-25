@@ -1,6 +1,7 @@
 
 ----------------------------------------- LineageOS 20.0 -----------------------------------------
 [openjdk 11.0.13]
+export WITH_SU=true
 
 
 mkdir lineage-20.0 && cd lineage-20.0
