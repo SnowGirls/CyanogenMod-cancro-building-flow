@@ -150,7 +150,7 @@ _________________________________ 总结一下导致Crash的情况 _____________
 
 block 为 nil 时调用会 crash
 
-dictionary 的 key 若为 nil 会 crash
+dictionary 的 set key/object 若为 nil 都会 crash
 
 往 collection (如dictionary/array) 放 nil 会 crash
 

@@ -351,6 +351,10 @@ https://stackoverflow.com/a/69567851/1749293
     # then press `j` in terminal, then the `DevTools(React Native)` will launched, then in `source` tab set breakpoint for debuging
 
 
+# 对于旧的 react-native ，如 0.72.11 . 直接安装 Flipper 使用就好, 下载直接用 https://github.com/facebook/flipper/releases/tag/v0.239.0 
+先 yarn start , 再Android手机打开 ReactActivity, Flipper 里选择 React DevTools 就可看到 View 结构. 用 Android 机调试时 有 "NO APPLICATION SELECTED" 错误 https://github.com/facebook/flipper/issues/3027
+在 gradle.properties 把 hermesEnabled=true ， 然后 Flipper 里选择 Hermes Debugger (RN) 标签 即可看到源码并可下断点调试
+
 
     
 
