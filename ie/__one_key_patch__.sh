@@ -2,6 +2,24 @@
 
 # __one_key_patch__.sh [path_to_patches_dir] [path_to_aosp_dir]
 
+echo "\$# is: $#"
+echo "\$0 is: $0"
+
+# 使用 $# 和 $i 遍历所有参数
+for i in $(seq 1 $#); do
+  eval arg=\$$i            # arg=$1, $2, $3 ....
+  echo "\$$i is: $arg"
+done
+
+# 使用 $@ 遍历所有参数
+index=1
+for arg in "$@"; do
+  echo "Argument $index: $arg"
+  index=$((index + 1))
+done
+
+
+
 if [ "$1" = "" ]
 then
 	echo -e "\033[31m 请带上 git diff 输出目录路径[由 modified_source_to_patch.sh 生成] \033[0m"

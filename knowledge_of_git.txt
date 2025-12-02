@@ -121,6 +121,42 @@ git push
 
 
 
+git push <远程仓库名> <本地分支名>:<远程分支名>
+git push origin HEAD:feature/login
+
+
+
+# 按更新时间排序，列出最近远端的更新分支. 看本地的话就把 refs/remotes/origin 换成 refs/heads 就好， 注意先 git fetch 更新一下
+
+git for-each-ref --sort=-committerdate refs/remotes/origin --format='%(authordate:short) %(color:red)%(objectname:short) %(color:yellow)%(refname:short)%(color:reset) (%(color:green)%(committerdate:relative)%(color:reset)) [%(authorname)] %(contents:subject)' 
+
+i.e: git for-each-ref --sort=-committerdate --format='%(committerdate:relative)%09%(authorname)%09%(refname:short)%09%(contents:subject)' refs/remotes/origin
+
+
+
+
+
+
+
+
+---------------- 不用 gerrit，但又想要你它那样在commit message里加上 Change-Id 来标识 ----------------
+可以在: .git/hooks/commit-msg (若没有则创建且chmod a+x它) 加上以下内容:
+
+# Path to the commit message file
+COMMIT_MSG_FILE=$1
+
+# Check if the commit message already contains a Change-Id
+if ! grep -q "^Change-Id:" "$COMMIT_MSG_FILE"; then
+  randomId=$( (whoami ; hostname ; date; cat $1 ; echo $RANDOM) | git hash-object --stdin)
+  # randomId="$(uuidgen | tr -d '-')"
+  CHANGE_ID="Change-Id: $randomId"
+  echo "\n$CHANGE_ID" >> "$COMMIT_MSG_FILE"
+fi
+
+
+
+
+
 
 
 

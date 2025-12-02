@@ -11,7 +11,7 @@ checkra1n [iPhone SE/6S~iPhone X]
 #####5 Then release 'Side' button after 6 seconds but keep holding on 'Home' button.
 #####6 Finally the device enter DFU mode, and the less jobs will automatically done. 
 
-一句话概括就是：先进入REC模式，再同时按HOME+关机键后松开关机键进入DFU模式。
+一句话概括就是：先用checkra1n点start进入REC模式后，再同时按HOME+关机键后松开关机键进入DFU模式。
 
 # 2
 brew install usbmuxd

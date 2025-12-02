@@ -1,0 +1,19 @@
+
+https://github.com/ac0d3r/ac0d3r.github.io/issues/6
+
+https://github.com/ac0d3r/wechat-dumpkey-frida/blob/main/tests/debug.js
+
+https://github.com/WXjzcccc/ForensicsTool/tree/e830353a47c3577aedf5ab48950b179bfdb50122
+
+https://github.com/allen1881996/WeChat-Data-Analysis?tab=readme-ov-file
+
+
+
+
+
+
+
+KEY = MD5( IMEI + UIN )[ 0:7 ]
+https://www.forensicfocus.com/articles/decrypt-wechat-enmicromsgdb-database/
+
+

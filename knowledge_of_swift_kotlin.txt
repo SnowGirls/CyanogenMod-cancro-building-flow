@@ -1,0 +1,19 @@
+
+swift: func -> , kotlin: fun : .
+
+
+swift: var let , kotlin: var val .
+
+
+swift:  x ? a : b , kotlin: if (x) a else b .
+
+
+swift 闭包是:
+{
+	(参数1:类型, 参数2:类型) -> 返回值类型 in
+	方法体 ...
+	return result
+}
+
+
+swift 的 尾随闭包 与 kotlin 非常中的一样了
