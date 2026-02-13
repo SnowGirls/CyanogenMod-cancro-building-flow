@@ -1,0 +1,184 @@
+
+
+----------------------------------- Claude Code -----------------------------------
+
+# claude code
+
+# 0. Register & Topup
+
+https://duckcoding.com/console/topup  | Link with Github SnowGirls
+
+# https://qoder.com/ | Link with Github SnowGirls
+
+Then Create New Token
+
+
+# 1. Install Claude Code
+
+export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
+
+curl -fsSL https://claude.ai/install.sh | bash
+
+export PATH="$PATH:$HOME/.local/bin"
+
+or install using npm : npm install -g @anthropic-ai/claude-code
+
+
+
+# 2. Setting the environment
+
+## Setting login bypass
+
+vim ~/.claude.json:
+"hasCompletedOnboarding": true,
+
+export ANTHROPIC_API_KEY="sk-5QE0OKSisuOtadQMM8WsJ9Z6eoCukMdsa8v7cUDDyF2xhX9Q"
+export ANTHROPIC_BASE_URL="https://jp.duckcoding.com"
+
+## or
+
+vim ~/.claude/settings.json: 
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-5QE0OKSisuOtadQMM8WsJ9Z6eoCukMdsa8v7cUDDyF2xhX9Q",
+    "ANTHROPIC_BASE_URL": "https://jp.duckcoding.com",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "permissions": {
+    "allow": [],
+    "deny": []
+  }
+}
+
+
+
+# 3. Install ccusage to view cost
+
+https://github.com/ryoppippi/ccusage
+npx ccusage@latest
+
+https://ccusage.com/guide/statusline
+Add this to your ~/.claude/settings.json or ~/.config/claude/settings.json:
+{
+  "statusLine": {
+    "type": "command",
+    "command": "npx ccusage statusline"
+  }
+}
+
+
+
+
+# 5. How to use
+
+cd __To_Your_Project_Directory__
+
+claud
+
+>
+
+
+
+# 6. 配置读当前目录下的文件时是无需自己授权, 注意替换 __To_Your_Project_Directory__ 为真实路径
+
+vim __To_Your_Project_Directory__/.claude/settings.json
+{
+  "permissions": {
+    "read": [
+      "__To_Your_Project_Directory__/**"
+    ]
+  }
+}
+
+
+
+
+
+----------------------------------- Codex -----------------------------------
+
+
+# 1. Install Codex
+
+brew install codex    # brew upgrade codex   # npm install -g @openai/codex@latest
+
+codex --version
+codex-cli 0.101.0
+
+
+# 2. Settings
+
+vim ~/.codex/config.toml
+
+model_provider = "duckcoding"
+model = "gpt-5.3-codex"
+model_reasoning_effort = "xhigh"
+network_access = "enabled"
+disable_response_storage = true
+
+[model_providers.duckcoding]
+name = "duckcoding"
+base_url = "https://jp.duckcoding.com/v1"
+wire_api = "responses"
+requires_openai_auth = true
+
+
+
+vim ~/.codex/auth.json 
+
+{
+  "OPENAI_API_KEY": "sk-9GaJVeuE4qtVmLcHp1pcoSrO8VzpK4DyZLKNJE85H2Ie3FaA"
+}
+
+
+
+# 3. Run
+
+codex
+
+
+
+
+
+
+----------------------------------- Gemini Cli -----------------------------------
+
+# 1. Install Codex
+
+brew install gemini-cli    # npm install -g @google/gemini-cli
+
+
+vim ~/.gemini/.env
+
+GOOGLE_GEMINI_BASE_URL=https://jp.duckcoding.com
+GEMINI_API_KEY=sk-kShweGAOlz3ZwMaI9MLNlqoyhs7ZDon11mohlLzkH8t1KwWL
+GEMINI_MODEL=gemini-3-pro-preview
+
+
+
+# 2. Settings
+
+vim ~/.gemini/settings.json
+
+{
+  "ide": {
+    "enabled": true
+  },
+  "security": {
+    "auth": {
+      "selectedType": "gemini-api-key"
+    }
+  }
+}
+
+# 3. Run
+
+gemini
+
+
+
+
+
+
+
+
+

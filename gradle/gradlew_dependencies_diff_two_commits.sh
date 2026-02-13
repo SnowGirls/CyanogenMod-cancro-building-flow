@@ -33,7 +33,7 @@ file_name_of_dependencies_output() {
     local brief="$1"
     local ref="$2"
     TODAY=$(date +"%Y%m%d%M")
-    echo "${BASE_DIR}/${TODAY}_${brief}_${ref}.txt"
+    echo "${BASE_DIR}/${TODAY}_${brief}_${ref//\//_}.txt"
 }
 
 OUTPUT_FILE_START=$(file_name_of_dependencies_output "${BRIEF}_start" "${GIT_REF_START}")
@@ -130,7 +130,12 @@ git_checkout_and_gradle_dependencies() {
     local ref="$1"
     local file="$2"
     local flag_all="$3"
-    git checkout ${ref}; flutter pub get; pushd android/; gradle_flush_specific_dependencies "${file}" "${flag_all}" ; popd
+    echo -e "\n#################################################################################################"
+    git checkout .
+    git checkout ${ref}; 
+    git log -n 5;
+    echo -e "#################################################################################################\n"
+    flutter pub get; pushd android/; gradle_flush_specific_dependencies "${file}" "${flag_all}" ; popd
 }
 
 

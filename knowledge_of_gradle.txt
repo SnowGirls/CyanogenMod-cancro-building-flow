@@ -57,3 +57,39 @@ afterEvaluate {
         }
     }
 }
+
+
+
+************ 打印项目里的所有属性 ************
+// 打印一下所有的全局变量与Project属性，便于调试
+println "================ Project Properties ================"
+project.properties.each { prop ->
+     println "${prop.key} = ${prop.value}"
+    // 如果 key 为 flutter 的话，可以打印更多信息
+    if (prop.key == 'flutter') {
+        // 打印 flutter 所有属性
+        flutter.properties.each { fProp ->
+            println "    ${fProp.key} = ${fProp.value}"
+        }
+    }
+}
+
+
+
+plugins.withId("com.android.library") {
+    val libExt = extensions.getByType<LibraryExtension>()
+    if (libExt.namespace == null || libExt.namespace!!.isBlank()) {
+        val manifestFile = file("${projectDir}/src/main/AndroidManifest.xml")
+        if (manifestFile.exists()) {
+            val manifestContent = manifestFile.readText()
+            val packageName = Regex("""package\s*=\s*["']([^"']+)["']""")
+                .find(manifestContent)
+                ?.groupValues?.getOrNull(1)
+            if (!packageName.isNullOrBlank()) {
+                println("✓ 为插件 ${project.name} 注入 namespace: $packageName")
+                libExt.namespace = packageName
+            }
+        }
+    }
+}
+

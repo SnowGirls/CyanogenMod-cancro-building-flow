@@ -17,3 +17,10 @@ swift 闭包是:
 
 
 swift 的 尾随闭包 与 kotlin 非常中的一样了
+
+
+kotlin function 作为参数传递时: fun doAsync(callback: (success: Boolean) -> Unit ): Unit { ... }
+
+
+
+
