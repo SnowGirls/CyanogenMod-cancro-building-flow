@@ -60,6 +60,15 @@ J = F^2  = B^3^2   = A^^3^2
 
 
 
+---------------- 无需切分支来 同步 分支 ----------------
+https://stackoverflow.com/questions/18857570/how-to-git-pull-without-switching-branches-git-checkout
+
+git fetch <remote> <srcBranch>:<destBranch>
+
+
+
+
+
 
 ---------------- 压缩提交 ----------------
 ##### Pre-condiction: feature/doing_patching is megered origin/develop
@@ -126,7 +135,7 @@ git push origin HEAD:feature/login
 
 
 
-# 按更新时间排序，列出最近远端的更新分支. 看本地的话就把 refs/remotes/origin 换成 refs/heads 就好， 注意先 git fetch 更新一下
+---------------- 按更新时间排序，列出最近远端的更新分支. 看本地的话就把 refs/remotes/origin 换成 refs/heads 就好， 注意先 git fetch 更新一下 ----------------
 
 git for-each-ref --sort=-committerdate refs/remotes/origin --format='%(authordate:short) %(color:red)%(objectname:short) %(color:yellow)%(refname:short)%(color:reset) (%(color:green)%(committerdate:relative)%(color:reset)) [%(authorname)] %(contents:subject)' 
 

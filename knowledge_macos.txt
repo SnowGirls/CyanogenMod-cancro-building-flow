@@ -7,6 +7,19 @@ makeme....@163.... : 4JiLaoQuSiBa.
 
 
 
+## Proxyman 添加 script 解析请求body
+  1. 按 + 号添加个命名为 "TraceBody" 的标签页
+  2. Scripting 那里添加一个脚本, URL填好要作用于的链接规则，插入下面代码: 
+  .....
+  // un gzip 请求Body成明文
+  if (request.body) {
+    const { ungzip } = require("@addons/Pako.js")
+    var rawText = ungzip(request.body);
+    request.customPreviewerTabs["TraceBody"] = rawText.toString();
+  }
+  ....
+
+
 ## Macosx 抓iOS模拟器的Http/Https包
 
 前期准备：
