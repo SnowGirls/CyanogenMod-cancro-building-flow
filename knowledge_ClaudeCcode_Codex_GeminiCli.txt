@@ -32,15 +32,15 @@ or install using npm : npm install -g @anthropic-ai/claude-code
 vim ~/.claude.json:
 "hasCompletedOnboarding": true,
 
-export ANTHROPIC_API_KEY="sk-5QE0OKSisuOtadQMM8WsJ9Z6eoCukMdsa8v7cUDDyF2xhX9Q"
+export ANTHROPIC_API_KEY="sk-5QE0OKSisuOtadQMM8WsJ9Z6eoCukMdsa8v7cUDDyF2xhX9QOK"
 export ANTHROPIC_BASE_URL="https://jp.duckcoding.com"
 
 ## or
 
-vim ~/.claude/settings.json: 
+vim ~/.claude/settings.json:
 {
   "env": {
-    "ANTHROPIC_AUTH_TOKEN": "sk-5QE0OKSisuOtadQMM8WsJ9Z6eoCukMdsa8v7cUDDyF2xhX9Q",
+    "ANTHROPIC_AUTH_TOKEN": "sk-5QE0OKSisuOtadQMM8WsJ9Z6eoCukMdsa8v7cUDDyF2xhX9QOK",
     "ANTHROPIC_BASE_URL": "https://jp.duckcoding.com",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
   },
@@ -123,10 +123,10 @@ requires_openai_auth = true
 
 
 
-vim ~/.codex/auth.json 
+vim ~/.codex/auth.json
 
 {
-  "OPENAI_API_KEY": "sk-9GaJVeuE4qtVmLcHp1pcoSrO8VzpK4DyZLKNJE85H2Ie3FaA"
+  "OPENAI_API_KEY": "sk-9GaJVeuE4qtVmLcHp1pcoSrO8VzpK4DyZLKNJE85H2Ie3FaAOK"
 }
 
 
@@ -150,7 +150,7 @@ brew install gemini-cli    # npm install -g @google/gemini-cli
 vim ~/.gemini/.env
 
 GOOGLE_GEMINI_BASE_URL=https://jp.duckcoding.com
-GEMINI_API_KEY=sk-kShweGAOlz3ZwMaI9MLNlqoyhs7ZDon11mohlLzkH8t1KwWL
+GEMINI_API_KEY=sk-kShweGAOlz3ZwMaI9MLNlqoyhs7ZDon11mohlLzkH8t1KwWLOK
 GEMINI_MODEL=gemini-3-pro-preview
 
 
