@@ -64,7 +64,7 @@ https://www.zzzmode.com/mytools/charles/
 2. Help - SSL Proxying - Save Charles Root Certificate ...
 
 3. 把证书 adb push charles-ssl-proxying-certificate.cer 到手机上, 然后安装用户证书
-把安装好的用户证书从 /data/misc/user/0/cacerts-added/ 移动到 /system/etc/security/cacerts/ 下重启手机就OK了
+把安装好的用户证书从 /data/misc/user/0/cacerts-added/ 移动到 /system/etc/security/cacerts/ 下重启手机就OK了  (adb root && adb shell mount -o remount,rw /system)
 
    
    chown root:root HASH.0

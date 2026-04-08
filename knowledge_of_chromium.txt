@@ -170,3 +170,123 @@ echo "target_os = [ 'android' ]" >> .gclient
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+=========================================== 构建 chromium 的 cronet 的 iOS framework ===========================================
+
+# https://chromium.googlesource.com/chromium/src/+/master/docs/ios/build_instructions.md
+# https://chromium.googlesource.com/experimental/chromium/src/+/refs/tags/76.0.3809.94/components/cronet/ios/docs/BUILD.md
+
+
+git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git __PATH_TO__/depot_tools/
+
+export PATH="$PATH:$__PATH_TO__/depot_tools"
+
+
+# Get source
+
+## 初始化 iOS 代码库（带 --no-history 减少体积）
+mkdir chromium && cd chromium && fetch --nohistory ios
+
+
+## 切换到目标 Tag（124.0.6367.88）
+cd src
+
+### 1. 先确保本地能获取到目标 Tag（同步远程 Tag 信息），但这里又拉好多历史了(所以放弃这种)，再 gclient 同步依赖，--revision 指定 src 目录的版本为目标 Tag
+git fetch origin refs/tags/124.0.6367.88:refs/tags/124.0.6367.88 ; git checkout 124.0.6367.88 ; cd .. ; gclient sync --revision src@124.0.6367.88 --no-history
+
+
+# Get source again
+
+mkdir chromium-ios && cd chromium-ios
+
+# 浅克隆 src 仓库，仅拉取指定 Tag 的 1 个提交（--depth 1）
+git clone --depth 1 --branch 124.0.6367.88 https://chromium.googlesource.com/chromium/src.git src
+
+
+vim .gclient  (注意把下面的 # 解释去掉) (url可换成国内的: https://mirrors.tuna.tsinghua.edu.cn/git/chromium/src.git)
+
+  solutions = [
+    {
+      "name": "src",
+      "url": "https://chromium.googlesource.com/chromium/src.git",
+      "deps_file": "DEPS",
+      "managed": False,
+      "custom_deps": {},
+      # 关键：只同步 iOS 相关依赖，跳过 Android/Windows 等无关平台
+      "custom_vars": {
+        "checkout_ios": True,
+        "checkout_android": False,
+        "checkout_windows": False,
+        "checkout_linux": False,
+        "checkout_mac": True, # iOS 编译依赖 macOS 基础库，需保留
+      },
+    },
+  ]
+  # 全局配置：所有依赖都浅克隆（--depth 1），无历史
+  target_os = ["ios"]
+  disable_syntax_validation = True
+
+
+# 同步依赖，强制浅克隆+指定 Tag 版本，跳过历史
+gclient sync --revision src@124.0.6367.88 --shallow --no-history --jobs 8
+
+gclient sync \
+  --revision src@124.0.6367.88 \
+  --shallow \          # 所有依赖都浅克隆（--depth 1）
+  --no-history \       # 跳过依赖的 commit log
+  --jobs 8 \           # 多线程同步（加速）
+
+
+
+# 官方说M108就维护ios的cronet https://chromium.googlesource.com/chromium/src.git/+/refs/tags/108.0.5359.195/components/cronet/ios，但同事发现 121.0.6120.1 Tag 之后才删掉ios目录
+# 下载 https://chromium.googlesource.com/chromium/src.git/+/refs/tags/121.0.6120.1/components/cronet/ios 的 tgz，解压入回到 components/cronet/ 下 
+
+cd src
+
+rm -rf out/ 
+
+components/cronet/tools/cr_cronet.py gn ;  components/cronet/tools/cr_cronet.py build -d out/Debug-iphonesimulator
+
+components/cronet/tools/cr_cronet.py gn -i ; components/cronet/tools/cr_cronet.py build -i # components/cronet/tools/cr_cronet.py build -d out/Debug-iphoneos  
+# 注意修改 build/config/ios/ios_sdk.gni 里 ios_code_signing_identity_description = "Apple Development: xxx" 成自己的
+# 签名错误 python3 ../../build/config/ios/codesign.py code-sign-bundle -t=iphoneos -i=557A4B597C37AE9648670415EBFEFE0329808A36 -b=obj/components/cronet/ios/test/cronet_test -e=../../build/config/ios/entitlements.plist cronet_test.app -P=../../build/apple/plist_util.py -p=gen/components/cronet/ios/test/cronet_test_generate_info_plist.plist -p=gen/components/cronet/ios/test/cronet_test_partial_info.plist
+# 因为系统及XCode升级，XCode 15.3的Provisioning Profiles还是用旧的路径，因此: ln -s /Users/xpeng/Library/Developer/Xcode/UserData/Provisioning\ Profiles /Users/xpeng/Library/MobileDevice/Provisioning\ Profiles
+# 且 build/config/ios/ios_sdk.gni 里的 shared_bundle_id_for_test_apps = "com.xxx.xxx" 换成你的 bundle id.
+
+
+mkdir -p out/Universal-Cronet.framework
+
+cp -R out/Debug-iphoneos/Cronet.framework/* out/Universal-Cronet.framework/
+
+lipo -create \
+  out/Debug-iphoneos/Cronet.framework/Cronet \
+  out/Debug-iphonesimulator/Cronet.framework/Cronet \
+  -output out/Universal-Cronet.framework/Cronet
+
+lipo -info out/Universal-Cronet.framework/Cronet
+
+# xcodebuild -create-xcframework \
+#    -library "out/Debug-iphoneos/Cronet.framework/Cronet" \
+#    -headers "out/Debug-iphoneos/Cronet.framework/Headers" \
+#    -library "out/Debug-iphonesimulator/Cronet.framework/Cronet" \
+#    -headers "out/Debug-iphonesimulator/Cronet.framework/Headers" \
+#    -output "out/Cronet.xcframework"
+
+
+
+
+
+
+
+

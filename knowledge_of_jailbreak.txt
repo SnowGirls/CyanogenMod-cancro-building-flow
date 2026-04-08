@@ -1,4 +1,8 @@
 
+# 0
+Download [checkra1n beta 0.12.4.dmg] (https://checkra.in/ | https://assets.checkra.in/downloads/macos/754bb6ec4747b2e700f01307315da8c9c32c8b5816d0fe1e91d1bdfc298fe07b/checkra1n%20beta%200.12.4.dmg)
+Open checkra1n.app. [On macos 26.2/26.3 got error: “checkra1n.app” is damaged and can’t be opened. You should eject the disk image. / You can’t open the application “checkra1n.app” because it may be damaged or incomplete.]
+
 
 # 1
 iPhone 6S. iOS 13.3

@@ -75,6 +75,27 @@ project.properties.each { prop ->
 }
 
 
+************ 打印项目里的 所有库及其对应的maven仓库地址 ************
+tasks.register("printRepos") {
+    doLast {
+        println("=== Repositories ===")
+        allprojects.forEach { p ->
+            p.repositories.forEach { r ->
+                try {
+                    val url = when (r) {
+                        is org.gradle.api.artifacts.repositories.MavenArtifactRepository -> r.url
+                        else -> null
+                    }
+                    println("${p.path} -> ${r.name} : ${url ?: "-"}")
+                } catch (e: Exception) {
+                    println("${p.path} -> ${r.name} : (error: ${e.message})")
+                }
+            }
+        }
+    }
+}
+
+
 
 plugins.withId("com.android.library") {
     val libExt = extensions.getByType<LibraryExtension>()

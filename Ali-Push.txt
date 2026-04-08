@@ -1,0 +1,31 @@
+
+
+https://help.aliyun.com/zh/document_detail/434677.html
+
+
+消息推送系统厂商接入的大概流程：
+1. 不同的系统厂商（华为、荣耀、小米、VIVO、OPPO、魅族）分别单独申请开通移动推送应用（建议开通测试环境、生产环境两个）
+2. 通过后，在他们的后台根据业务申请不同的消息通道
+3. App本地接入SDK，配置相应的key
+
+需要明确一下包名 & App的应用名 & 提供不同厂商的通道类型
+
+https://open.oppomobile.com/documentation/page/info?id=11227
+https://dev.vivo.com.cn/documentCenter/doc/359# 
+https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/message-classification-0000001149358835
+https://dev.mi.com/xiaomihyperos/documentation/detail?pId=1655
+https://developer.honor.com/cn/docs/11002/guides/notification-class
+厂商为了限制用户滥用消息通知，会将推送的消息根据业务场景分一些类型，比如营销这种类型会限制一台设备一天只能收到1条或2条；通过消息分类，用户也可以在手机上设置接收哪些消息。具体可以参考以上文档
+
+
+
+除了申请各大厂商推送应用，还需要在上面配置业务的通道类型。Android厂商推送消息分类类似这种：
+"个人日程：107433，
+即时消息：108234，
+工作信息：108323，
+内容资讯：108524（公信），
+个人资产：108265，
+个人账户：108266，
+订单及物流：108784"，这些通道类型都需要在本地初始化的注册的。
+
+

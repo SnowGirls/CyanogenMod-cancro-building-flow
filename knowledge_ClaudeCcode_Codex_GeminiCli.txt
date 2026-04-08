@@ -15,13 +15,25 @@ Then Create New Token
 
 # 1. Install Claude Code
 
+
+## 1.0 使用 homebrew 方式 (推荐)
+brew install claude-code
+
+
+## 1.1 使用 npm 方式
+npm install -g @anthropic-ai/claude-code
+
+
+## 1.2 使用其官网的方式
 export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
 
 curl -fsSL https://claude.ai/install.sh | bash
 
 export PATH="$PATH:$HOME/.local/bin"
 
-or install using npm : npm install -g @anthropic-ai/claude-code
+
+## 关于升级版本
+# 如果使用 claude update 自身升级功能需要科学上网，所能推荐用 brew 来安装，更新就直接 brew upgrade claude-code 
 
 
 
@@ -94,7 +106,7 @@ vim __To_Your_Project_Directory__/.claude/settings.json
 
 
 
------------------------------------ Codex -----------------------------------
+----------------------------------- Codex Cli-----------------------------------
 
 
 # 1. Install Codex
@@ -175,6 +187,24 @@ vim ~/.gemini/settings.json
 gemini
 
 
+
+
+
+
+
+----------------------------------- Copilot Cli -----------------------------------
+
+https://github.com/features/copilot/cli
+
+# 1. Install
+
+brew install copilot-cli
+
+# 2. Run
+
+copilot
+
+/login      # 然后选择跳 github 登录公司账号即可
 
 
 

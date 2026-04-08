@@ -139,7 +139,7 @@ git push origin HEAD:feature/login
 
 git for-each-ref --sort=-committerdate refs/remotes/origin --format='%(authordate:short) %(color:red)%(objectname:short) %(color:yellow)%(refname:short)%(color:reset) (%(color:green)%(committerdate:relative)%(color:reset)) [%(authorname)] %(contents:subject)' 
 
-i.e: git for-each-ref --sort=-committerdate --format='%(committerdate:relative)%09%(authorname)%09%(refname:short)%09%(contents:subject)' refs/remotes/origin
+i.e: git for-each-ref --sort=-committerdate --format='%(committerdate:relative)%09%(authorname)%09%(refname:short)%09%(contents:subject)' refs/remotes/origin | head -n 20
 
 
 
