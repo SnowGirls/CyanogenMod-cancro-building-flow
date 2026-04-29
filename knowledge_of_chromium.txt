@@ -184,6 +184,7 @@ echo "target_os = [ 'android' ]" >> .gclient
 
 =========================================== 构建 chromium 的 cronet 的 iOS framework ===========================================
 
+# https://github.com/chromium/chromium
 # https://chromium.googlesource.com/chromium/src/+/master/docs/ios/build_instructions.md
 # https://chromium.googlesource.com/experimental/chromium/src/+/refs/tags/76.0.3809.94/components/cronet/ios/docs/BUILD.md
 
@@ -248,20 +249,33 @@ gclient sync \
   --jobs 8 \           # 多线程同步（加速）
 
 
-
 # 官方说M108就维护ios的cronet https://chromium.googlesource.com/chromium/src.git/+/refs/tags/108.0.5359.195/components/cronet/ios，但同事发现 121.0.6120.1 Tag 之后才删掉ios目录
 # 下载 https://chromium.googlesource.com/chromium/src.git/+/refs/tags/121.0.6120.1/components/cronet/ios 的 tgz，解压入回到 components/cronet/ 下 
 
-cd src
 
+
+# 构建之前先换回一个较旧一点的Xcode版本:
+sudo xcode-select -s /Applications/Xcode_15.3.app
+xcodebuild -version
+
+
+
+cd src
 rm -rf out/ 
 
-components/cronet/tools/cr_cronet.py gn ;  components/cronet/tools/cr_cronet.py build -d out/Debug-iphonesimulator
+components/cronet/tools/cr_cronet.py gn                                     # This sets up the simulator build directory and build env
+components/cronet/tools/cr_cronet.py build -d out/Debug-iphonesimulator     # This build for simulator
+
+components/cronet/tools/cr_cronet.py gn -i                                  # This sets up the device/iphoneos build directory and build env
+components/cronet/tools/cr_cronet.py build -i                               # or: components/cronet/tools/cr_cronet.py  build -d out/Debug-iphoneos     # This build for iphoneos
+
+# 后面有改代码后就直接构建: components/cronet/tools/cr_cronet.py build -d out/Debug-iphoneos ; components/cronet/tools/cr_cronet.py build -d out/Debug-iphonesimulator
+
 
 components/cronet/tools/cr_cronet.py gn -i ; components/cronet/tools/cr_cronet.py build -i # components/cronet/tools/cr_cronet.py build -d out/Debug-iphoneos  
 # 注意修改 build/config/ios/ios_sdk.gni 里 ios_code_signing_identity_description = "Apple Development: xxx" 成自己的
 # 签名错误 python3 ../../build/config/ios/codesign.py code-sign-bundle -t=iphoneos -i=557A4B597C37AE9648670415EBFEFE0329808A36 -b=obj/components/cronet/ios/test/cronet_test -e=../../build/config/ios/entitlements.plist cronet_test.app -P=../../build/apple/plist_util.py -p=gen/components/cronet/ios/test/cronet_test_generate_info_plist.plist -p=gen/components/cronet/ios/test/cronet_test_partial_info.plist
-# 因为系统及XCode升级，XCode 15.3的Provisioning Profiles还是用旧的路径，因此: ln -s /Users/xpeng/Library/Developer/Xcode/UserData/Provisioning\ Profiles /Users/xpeng/Library/MobileDevice/Provisioning\ Profiles
+# 因为系统及XCode升级，XCode 15.3的Provisioning Profiles还是用旧的路径，因此: ln -s $HOME/Library/Developer/Xcode/UserData/Provisioning\ Profiles $HOME/Library/MobileDevice/Provisioning\ Profiles
 # 且 build/config/ios/ios_sdk.gni 里的 shared_bundle_id_for_test_apps = "com.xxx.xxx" 换成你的 bundle id.
 
 

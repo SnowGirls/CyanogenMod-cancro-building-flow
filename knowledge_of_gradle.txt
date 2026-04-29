@@ -46,8 +46,8 @@ afterEvaluate {
         publications {
             mavenJava(MavenPublication) {
                 from components.release
-                groupId = "com.xiaopeng.xiaolong.react-native"
-                artifactId = "rn-gallery-saver"
+                groupId = "com.company.domain.react-native"
+                artifactId = "react-native-gallery-saver"
                 version = "1.0.0-SNAPSHOT"
             }
         }

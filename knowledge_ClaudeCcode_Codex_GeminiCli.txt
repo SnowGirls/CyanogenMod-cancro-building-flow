@@ -6,9 +6,7 @@
 
 # 0. Register & Topup
 
-https://duckcoding.com/console/topup  | Link with Github SnowGirls
-
-# https://qoder.com/ | Link with Github SnowGirls
+https://duckcoding.com/console/topup  | Link with Github SnowGirls   # https://qoder.com/ | Also Link with Github SnowGirls
 
 Then Create New Token
 
@@ -17,7 +15,7 @@ Then Create New Token
 
 
 ## 1.0 使用 homebrew 方式 (推荐)
-brew install claude-code
+brew install claude-code  # OR: brew install --cask claude-code # 更新就直接: brew upgrade claude-code 
 
 
 ## 1.1 使用 npm 方式
@@ -106,7 +104,60 @@ vim __To_Your_Project_Directory__/.claude/settings.json
 
 
 
------------------------------------ Codex Cli-----------------------------------
+
+
+----------------------------------- 把 Github Copilot 模型代理到本地端口，方便 Claude Code 的模型配置 -----------------------------------
+
+# node 版本建议 24 以上，版本太低会安装失败
+
+nvm --help ; nvm ls-remote --lts
+
+which npm ; which node ; nvm list  # 查看当前版本
+
+nvm version-remote --lts ;  nvm install --lts # Install the latest LTS version # OR: nvm install v24.14.1
+
+which npm ; which node ; nvm list  # 查看当前版本，确保是 24 及以上版本
+
+npm install -g copilot-api
+
+which copilot-api
+
+copilot-api start
+
+# 打开        https://github.com/ 登录公司账号 shxxxx_xxxxx 跳转微软企业邮箱登录 & Authenticator 输入 code 后成功登录 公司账号的github
+# 然后再打开   https://github.com/login/device  输入上面命令'copilot-api start'终端提示的 code，成功后终端会列出可用的模型列表和 「➜ Listening on: http://localhost:4141/」
+
+
+vim ~/.claude/settings.json :
+{
+  "env": {
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "ANTHROPIC_BASE_URL": "http://Localhost:4141",
+    "ANTHROPIC_AUTH_TOKEN": "dummy",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_MODEL": "claude-sonnet-4.6"
+  }
+}
+
+# 把 上面 ANTHROPIC_MODEL 改成 claude-opus-4.6
+
+# 在 ~/.zshrc 中添加以下环境变量，token 内容可以随便填，目的是为了跳过 claude 账号检测  (这步没有做，最后是成功OK的)
+
+export ANTHROPIC_AUTH_TOKEN="dummy"
+
+
+
+
+# 因为 nvm 没后面就直接
+
+nvm list ; nvm use v24.14.1 ; which copilot-api ; copilot-api start  # 然后再在项目的终端用命令 claude 来打开 claude code
+
+
+
+
+
+----------------------------------- Codex Cli -----------------------------------
 
 
 # 1. Install Codex
